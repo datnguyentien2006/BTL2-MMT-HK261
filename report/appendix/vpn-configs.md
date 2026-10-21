@@ -321,7 +321,7 @@ Cấu hình mẫu ví dụ trên FortiGate (chỉ minh hoạ):
 config vpn ssl settings
   set tunnel-ip-pools "VPN-POOL-TLW"
   set dns-servers 10.10.10.10
-  set源-interface "port-WAN-ISP1" "port-WAN-ISP2"
+  set source-interface "port-WAN-ISP1" "port-WAN-ISP2"
   set port 443
 end
 config user group
@@ -351,7 +351,7 @@ route tới VLAN 20 / 30 / 40 (HIS/PACS), tách kho IPv4 pool riêng 10.10.99.0/
 | Kênh | Đã cấu hình tại | Ghi chú |
 |---|---|---|
 | Main ↔ DBP | A.1 (IPsec thuần) / A.2 (SVTI GRE) | Cả 2 variant sẵn |
-| Main ↔ BHTQ | A.1 / A.2 | Ng.started 学习 |
+| Main ↔ BHTQ | A.1 / A.2 | Như trên (tương tự cấu hình DBP) |
 | Serial backup | A.2 — Tunnel11/21 | OSPF cost cao |
 | Teleworker | A.4.1 (IOS IPsec/NAT-T) + A.4.2 (TLS AnyConnect trên NGFW, khuyến nghị) | Home LAN 192.168.250.0/24 |
 

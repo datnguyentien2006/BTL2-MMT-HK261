@@ -36,3 +36,46 @@ Log chi tiết từng bước làm — song song với commit messages của rep
 4. Wireless guests (laptop + smartphone) – kiểm tra association.
 5. Bảng kiểm chứng ping/traceroute theo Step 5 + screenshot + lưu `.pkt` vào `simulation/`.
 6. Viết báo cáo `report/REPORT_vi.md` (Step 1→7).
+
+## 2026-10-21 — Dịch vụ, NAT/ACL, DNS, wireless
+
+- **NAT trên R-EDGE-MS**: PAT acl 1 → Gi0/0 (ISP1), PAT acl 2 → Gi0/1 (ISP2),
+  static `10.10.200.10 ↔ 203.0.115.10` — kiểm chứng ping từ LT-TELE → 203.0.115.10 3/4 (TTL 125).
+- **ACL guest 150/151/152** áp vào Gi0/0.60/.63/.73 chiều `in` (permit DNS → 10.10.20.5 + TCP/80 →
+  DMZ web; deny 10.0.0.0/8; permit any).
+- **DNS**: 5 record trên SRV-DNS (www/his/pacs/mail .hospital.local + www.internet-test.com);
+  **Web**: index.html trên SRV-WEB-DMZ/INT/HIS; **syslog** bật trên SRV-LOG + `logging 10.10.20.8`
+  trên R-EDGE-MS & R-CORE-MS; **NetFlow** NF-HOSP → 10.10.20.8:2055.
+- **Wireless guest giờ chạy**: SQL thêm/lắp NIC chỉ trên bridge: `removeModule('0')` +
+  `addModule('0', PT-LAPTOP-NM-1W)` trên LT-GR-MS1; smartphone SMARTPHONE-PT có sẵn Wireless0.
+
+## 2026-10-21 — Chẩn đoán & sửa các lỗi kết nối (khoản "debug" đáng giữ)
+
+- **Lỗi #1 — ACL chặn DHCP guest**: DISCOVER đi với src `0.0.0.0` → không match permit nào của
+  ACL 150 (src-scoped) → implicit deny → client chỉ nhận APIPA. Chỉnh được nhờ *Sim mode* +
+  `pt_read_packet_trace`. Fix: `5 permit udp any any eq bootps` vào ACL 150/151/152.
+- **Lỗi #2 — Static IP không được gán cho host**: PT 9.0.1 không có `setIp`; dùng
+  `port.setIpSubnetMask(ip, mask)` + `port.setDefaultGateway` + `port.setDnsServerIp` để chuẩn hoá
+  lại 16 IP (SRV-DNS .20.5, SRV-HIS .20.6, SRV-PACS .20.7, SRV-NVR .50.10, CAM-01 .50.21,
+  SRV-WEB-DMZ .200.10, PC-A/B/DBP/BHTQ 1 .11). *Không dùng* cách cấu static qua console
+  (`ipconfig /ip` là Invalid Command trong build này).
+- **Lỗi #3 — Laptop associate nhầm AP-HOME** (teleworker) vì XY gần AP đó: `pt_move_device`
+  LT-GR-MS1 → (120, 400); sau đó LTS nhận `10.10.60.23/24` DHCP bình thường.
+- **Lỗi #4 — Thiếu gateway cho SRV-WEB-INT**: đặt `198.51.100.1` thì reply mới đi ra khác subnet.
+- **Teleworker stub**: thêm `ip route 192.168.250.0/24` trên R-EDGE-MS & ISP1 cho đường về.
+
+## 2026-10-21 — Hardening, port-security, kiểm chứng & đóng gói
+
+- `pt_apply_hardening` áp cho ISP1, R-EDGE-MS, R-CORE-MS, R-WAN-MS, R-DBP, R-BHTQ, SW-CORE:
+  hostname, banner motd, `enable secret`, `ip domain-name`, RSA 1024, SSH v2, vty `transport input ssh`,
+  user local `admin` (privilege 15). Lưu ý schema user của tool: `{username, secret, privilege}`.
+- `pt_apply_port_security` áp cho 24 access port (attain: PC/server = max 2, sticky, violation restrict;
+  uplink AP = max 4, sticky off, restrict): SW-BLD-A/B (Fa0/1,2,3,5,23), SW-SRV (Fa0/1..4),
+  SW-CCTV (Fa0/1,2), SW-DMZ (Fa0/1,2), SW-DBP/BHTQ (Fa0/1,2,23).
+- Bảng kiểm chứng (report Step 5, KC-1→KC-6) chạy thật: tất cả ĐẠT, trừ một hạn chế đã ghi chú
+  (LT-TELE → 198.51.100.10 chưa qua được trong mô hình; static NAT DMZ đã OK).
+- **Failover EPL → serial (KC-2)**: shutdown `Gi0/1` R-DBP → PC-DBP1 → SRV-HIS 4/4 vẫn OK (OSPF
+  chuyển qua serial backup `10.255.0.0/30`); `no shutdown` → 4/4 (EPL).
+- Xóa thiết bị test `PC-TEST60`; dán 10 annotation (subnet labels) trên canvas; chụp
+  `report/images/topology-final(*).png`.
+- **Lưu bài nộp**: `pt_save_project` → `simulation/CCC-Hospital.pkt` (≈252 KB, Packet Tracer 9.0.1).
