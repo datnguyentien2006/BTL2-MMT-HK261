@@ -1,0 +1,8 @@
+# OS / editor
+Thumbs.db
+Desktop.ini
+*.tmp
+~$*
+*.swp
+# Packet Tracer autosave/temp
+*.pka~

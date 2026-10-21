@@ -1,0 +1,34 @@
+# CHANGELOG
+
+Log chi tiết từng bước làm — song song với commit messages của repo.
+
+## 2026-10-21 — Khởi động dự án
+
+- Phân tích đề bài Assignment 2 (bệnh viện 3 site, VLAN, WAN, VPN, bảo mật).
+- Chọn dữ liệu bàn giao: báo cáo tiếng Việt, không cần trang bìa (điền sau).
+- Kết nối MCP Packet Tracer: OK (HTTP + file bridge, PT 9.0.1.0858), workspace trống.
+- Lập `plan` 46 thiết bị / 45 link → `pt_validate_plan` PASS (0 lỗi, 0 warning).
+
+## 2026-10-21 — Deploy khung topology vào Packet Tracer
+
+- `pt_live_deploy`: 46/46 thiết bị, 43/45 link khớp ngay lập tức.
+- 2 link thất bại do Switch-PT generic đặt tên port `FastEthernet1/1`, `FastEthernet2/1`
+  (khác nhánh phổ biến `FastEthernet0/x`) → sửa bằng `pt_add_link`: OK → 45/45 link.
+- Lắp module WAN serial: `NIM-2T` slot `"0/1"` & `"0/2"` cho R-WAN-MS (ISR4331),
+  `HWIC-2T` slot `"0/0"` cho R-DBP và R-BHTQ (2911). 3/4 lần đầu lỗi do slot `"0/0"`
+  không tồn tại trên ISR4331 (NIM chỉ có `0/1`,`0/2`) → fix, cài đủ.
+- Nối 2 link serial (leased line dự phòng):
+  - R-WAN-MS `Serial0/1/0` ↔ R-DBP `Serial0/0/0`
+  - R-WAN-MS `Serial0/2/0` ↔ R-BHTQ `Serial0/0/0`
+- Cấu hình IP serial + clock rate 2 000 000 + thêm mạng vào OSPF area 0 qua `configureIosDevice`.
+  Phát hiện + sửa lỗi gán IP trái chiều trên R-WAN-MS (S0/1/0 phải là 10.255.0.1, S0/2/0 là 10.255.0.5).
+- OSPF: R-WAN-MS đã up đầy đủ adjacency với R-CORE-MS (10.10.0.1), R-DBP (10.11.10.1), R-BHTQ (10.12.10.1).
+
+## Tiếp theo (roadmap)
+
+1. default-information originate trên R-EDGE-MS; NAT/PAT + static NAT DMZ.
+2. ACL guest-WiFi trên 3 sub-interface (.60/.63/.73).
+3. Server: web page, DNS records, syslog; NetFlow trên R-EDGE-MS.
+4. Wireless guests (laptop + smartphone) – kiểm tra association.
+5. Bảng kiểm chứng ping/traceroute theo Step 5 + screenshot + lưu `.pkt` vào `simulation/`.
+6. Viết báo cáo `report/REPORT_vi.md` (Step 1→7).
