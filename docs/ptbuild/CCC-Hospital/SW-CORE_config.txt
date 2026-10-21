@@ -1,0 +1,74 @@
+enable
+configure terminal
+hostname SW-CORE
+vlan 10
+ name MGMT
+ exit
+vlan 20
+ name SERVER-FARM
+ exit
+vlan 30
+ name DEPT-A
+ exit
+vlan 40
+ name DEPT-B
+ exit
+vlan 50
+ name CCTV
+ exit
+vlan 60
+ name WIFI-GUEST
+ exit
+vlan 200
+ name DMZ
+ exit
+vlan 61
+ name DBP-STAFF
+ exit
+vlan 62
+ name DBP-SRV
+ exit
+vlan 63
+ name DBP-GUEST
+ exit
+vlan 71
+ name BHTQ-STAFF
+ exit
+vlan 72
+ name BHTQ-SRV
+ exit
+vlan 73
+ name BHTQ-GUEST
+ exit
+interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30,40,50,60,200
+ exit
+interface FastEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 30,60
+ exit
+interface FastEthernet0/4
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 40,60
+ exit
+interface FastEthernet0/6
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 20
+ exit
+interface FastEthernet0/8
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 50
+ exit
+interface FastEthernet0/10
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 200
+ exit
+end
+write memory

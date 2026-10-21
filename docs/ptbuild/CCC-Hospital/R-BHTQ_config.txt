@@ -1,0 +1,50 @@
+enable
+configure terminal
+hostname R-BHTQ
+no ip domain-lookup
+
+interface GigabitEthernet0/1
+ ip address 10.254.0.6 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0
+ no shutdown
+ exit
+interface GigabitEthernet0/0.71
+ encapsulation dot1Q 71
+ ip address 10.12.10.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.72
+ encapsulation dot1Q 72
+ ip address 10.12.20.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.73
+ encapsulation dot1Q 73
+ ip address 10.12.60.1 255.255.255.0
+ exit
+
+ip dhcp excluded-address 10.12.10.1 10.12.10.30
+ip dhcp excluded-address 10.12.60.1 10.12.60.20
+ip dhcp pool BHTQ-STAFF
+ network 10.12.10.0 255.255.255.0
+ default-router 10.12.10.1
+ dns-server 10.10.20.5
+ exit
+
+ip dhcp pool BHTQ-GUEST
+ network 10.12.60.0 255.255.255.0
+ default-router 10.12.60.1
+ dns-server 10.10.20.5
+ exit
+
+router ospf 1
+ router-id 10.12.10.1
+ network 10.12.10.0 0.0.0.255 area 0
+ network 10.12.20.0 0.0.0.255 area 0
+ network 10.12.60.0 0.0.0.255 area 0
+ network 10.254.0.4 0.0.0.3 area 0
+ exit
+
+end
+write memory

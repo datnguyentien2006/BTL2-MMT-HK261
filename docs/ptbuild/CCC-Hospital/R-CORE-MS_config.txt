@@ -1,0 +1,83 @@
+enable
+configure terminal
+hostname R-CORE-MS
+no ip domain-lookup
+
+interface GigabitEthernet0/1
+ ip address 10.10.0.1 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/2
+ ip address 10.10.0.5 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0
+ no shutdown
+ exit
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 10.10.10.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.20
+ encapsulation dot1Q 20
+ ip address 10.10.20.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.30
+ encapsulation dot1Q 30
+ ip address 10.10.30.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.40
+ encapsulation dot1Q 40
+ ip address 10.10.40.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.50
+ encapsulation dot1Q 50
+ ip address 10.10.50.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.60
+ encapsulation dot1Q 60
+ ip address 10.10.60.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.200
+ encapsulation dot1Q 200
+ ip address 10.10.200.1 255.255.255.0
+ exit
+
+ip dhcp excluded-address 10.10.30.1 10.10.30.30
+ip dhcp excluded-address 10.10.40.1 10.10.40.30
+ip dhcp excluded-address 10.10.60.1 10.10.60.20
+ip dhcp pool VLAN30-MS
+ network 10.10.30.0 255.255.255.0
+ default-router 10.10.30.1
+ dns-server 10.10.20.5
+ exit
+
+ip dhcp pool VLAN40-MS
+ network 10.10.40.0 255.255.255.0
+ default-router 10.10.40.1
+ dns-server 10.10.20.5
+ exit
+
+ip dhcp pool VLAN60-MS
+ network 10.10.60.0 255.255.255.0
+ default-router 10.10.60.1
+ dns-server 10.10.20.5
+ exit
+
+router ospf 1
+ router-id 10.10.0.1
+ network 10.10.0.0 0.0.0.3 area 0
+ network 10.10.0.4 0.0.0.3 area 0
+ network 10.10.10.0 0.0.0.255 area 0
+ network 10.10.20.0 0.0.0.255 area 0
+ network 10.10.30.0 0.0.0.255 area 0
+ network 10.10.40.0 0.0.0.255 area 0
+ network 10.10.50.0 0.0.0.255 area 0
+ network 10.10.60.0 0.0.0.255 area 0
+ network 10.10.200.0 0.0.0.255 area 0
+ exit
+
+end
+write memory

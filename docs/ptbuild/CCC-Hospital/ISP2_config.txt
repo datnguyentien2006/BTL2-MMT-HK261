@@ -1,0 +1,27 @@
+enable
+configure terminal
+hostname ISP2
+no ip domain-lookup
+
+interface GigabitEthernet0/0
+ ip address 203.0.114.1 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/1
+ ip address 192.168.250.1 255.255.255.0
+ no shutdown
+ exit
+
+ip dhcp excluded-address 192.168.250.1 192.168.250.1
+ip dhcp pool TELE-HOME
+ network 192.168.250.0 255.255.255.0
+ default-router 192.168.250.1
+ dns-server 198.51.100.10
+ exit
+
+ip route 203.0.115.0 255.255.255.0 203.0.114.2
+ip route 0.0.0.0 0.0.0.0 203.0.114.2
+
+end
+write memory

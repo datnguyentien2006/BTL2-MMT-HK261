@@ -1,0 +1,64 @@
+enable
+configure terminal
+hostname SW-SRV
+vlan 10
+ name MGMT
+ exit
+vlan 20
+ name SERVER-FARM
+ exit
+vlan 30
+ name DEPT-A
+ exit
+vlan 40
+ name DEPT-B
+ exit
+vlan 50
+ name CCTV
+ exit
+vlan 60
+ name WIFI-GUEST
+ exit
+vlan 200
+ name DMZ
+ exit
+vlan 61
+ name DBP-STAFF
+ exit
+vlan 62
+ name DBP-SRV
+ exit
+vlan 63
+ name DBP-GUEST
+ exit
+vlan 71
+ name BHTQ-STAFF
+ exit
+vlan 72
+ name BHTQ-SRV
+ exit
+vlan 73
+ name BHTQ-GUEST
+ exit
+interface FastEthernet0/1
+ switchport mode access
+ switchport access vlan 20
+ exit
+interface FastEthernet0/2
+ switchport mode access
+ switchport access vlan 20
+ exit
+interface FastEthernet0/3
+ switchport mode access
+ switchport access vlan 20
+ exit
+interface FastEthernet0/4
+ switchport mode access
+ switchport access vlan 20
+ exit
+interface GigabitEthernet0/1
+ switchport mode trunk
+ switchport trunk allowed vlan 20
+ exit
+end
+write memory

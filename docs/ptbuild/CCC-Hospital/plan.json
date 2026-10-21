@@ -1,0 +1,1748 @@
+{
+  "name": "CCC-Hospital",
+  "devices": [
+    {
+      "name": "ISP1",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 60,
+      "y": 70,
+      "interfaces": {
+        "GigabitEthernet0/0": "203.0.113.1/30",
+        "GigabitEthernet0/1": "198.51.100.1/24"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "R-EDGE-MS",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 300,
+      "y": 70,
+      "interfaces": {
+        "GigabitEthernet0/0": "203.0.113.2/30",
+        "GigabitEthernet0/1": "203.0.114.2/30",
+        "GigabitEthernet0/2": "10.10.0.2/30"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "ISP2",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 560,
+      "y": 70,
+      "interfaces": {
+        "GigabitEthernet0/0": "203.0.114.1/30",
+        "GigabitEthernet0/1": "192.168.250.1/24"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "R-CORE-MS",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 300,
+      "y": 170,
+      "interfaces": {
+        "GigabitEthernet0/0.10": "10.10.10.1/24",
+        "GigabitEthernet0/0.20": "10.10.20.1/24",
+        "GigabitEthernet0/0.30": "10.10.30.1/24",
+        "GigabitEthernet0/0.40": "10.10.40.1/24",
+        "GigabitEthernet0/0.50": "10.10.50.1/24",
+        "GigabitEthernet0/0.60": "10.10.60.1/24",
+        "GigabitEthernet0/0.200": "10.10.200.1/24",
+        "GigabitEthernet0/1": "10.10.0.1/30",
+        "GigabitEthernet0/2": "10.10.0.5/30"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "R-WAN-MS",
+      "model": "ISR4331",
+      "category": "router",
+      "role": "core_router",
+      "x": 560,
+      "y": 170,
+      "interfaces": {
+        "GigabitEthernet0/0/0": "10.10.0.6/30",
+        "GigabitEthernet0/0/1": "10.254.0.1/30",
+        "GigabitEthernet0/0/2": "10.254.0.5/30"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "R-DBP",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 680,
+      "y": 90,
+      "interfaces": {
+        "GigabitEthernet0/0.61": "10.11.10.1/24",
+        "GigabitEthernet0/0.62": "10.11.20.1/24",
+        "GigabitEthernet0/0.63": "10.11.60.1/24",
+        "GigabitEthernet0/1": "10.254.0.2/30"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "R-BHTQ",
+      "model": "2911",
+      "category": "router",
+      "role": "core_router",
+      "x": 860,
+      "y": 90,
+      "interfaces": {
+        "GigabitEthernet0/0.71": "10.12.10.1/24",
+        "GigabitEthernet0/0.72": "10.12.20.1/24",
+        "GigabitEthernet0/0.73": "10.12.60.1/24",
+        "GigabitEthernet0/1": "10.254.0.6/30"
+      },
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-CORE",
+      "model": "3560-24PS",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 300,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-BLD-A",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 110,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-BLD-B",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 220,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-SRV",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 420,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-CCTV",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 540,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-DMZ",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 650,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-DBP",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 680,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-BHTQ",
+      "model": "2960-24TT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 860,
+      "y": 260,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "SW-HOME",
+      "model": "Switch-PT",
+      "category": "switch",
+      "role": "access_switch",
+      "x": 480,
+      "y": 170,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "PC-A1",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 40,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.30.11/24"
+      },
+      "gateway": "10.10.30.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 30,
+      "wireless": false
+    },
+    {
+      "name": "PC-A2",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 80,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.30.12/24"
+      },
+      "gateway": "10.10.30.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 30,
+      "wireless": false
+    },
+    {
+      "name": "PC-A3",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 120,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.30.13/24"
+      },
+      "gateway": "10.10.30.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 30,
+      "wireless": false
+    },
+    {
+      "name": "PRN-A",
+      "model": "Printer-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 160,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.30.50/24"
+      },
+      "gateway": "10.10.30.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 30,
+      "wireless": false
+    },
+    {
+      "name": "PC-B1",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 210,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.40.11/24"
+      },
+      "gateway": "10.10.40.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 40,
+      "wireless": false
+    },
+    {
+      "name": "PC-B2",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 250,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.40.12/24"
+      },
+      "gateway": "10.10.40.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 40,
+      "wireless": false
+    },
+    {
+      "name": "PC-B3",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 290,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.40.13/24"
+      },
+      "gateway": "10.10.40.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 40,
+      "wireless": false
+    },
+    {
+      "name": "PRN-B",
+      "model": "Printer-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 330,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.40.50/24"
+      },
+      "gateway": "10.10.40.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 40,
+      "wireless": false
+    },
+    {
+      "name": "SRV-DNS",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 380,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.20.5/24"
+      },
+      "gateway": "10.10.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 20,
+      "wireless": false
+    },
+    {
+      "name": "SRV-HIS",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 420,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.20.6/24"
+      },
+      "gateway": "10.10.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 20,
+      "wireless": false
+    },
+    {
+      "name": "SRV-PACS",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 460,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.20.7/24"
+      },
+      "gateway": "10.10.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 20,
+      "wireless": false
+    },
+    {
+      "name": "SRV-LOG",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 500,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.20.8/24"
+      },
+      "gateway": "10.10.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 20,
+      "wireless": false
+    },
+    {
+      "name": "SRV-NVR",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 550,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.50.10/24"
+      },
+      "gateway": "10.10.50.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 50,
+      "wireless": false
+    },
+    {
+      "name": "CAM-01",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 590,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.50.21/24"
+      },
+      "gateway": "10.10.50.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 50,
+      "wireless": false
+    },
+    {
+      "name": "CAM-02",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 630,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.50.22/24"
+      },
+      "gateway": "10.10.50.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 50,
+      "wireless": false
+    },
+    {
+      "name": "SRV-WEB-DMZ",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 680,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.200.10/24"
+      },
+      "gateway": "10.10.200.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 200,
+      "wireless": false
+    },
+    {
+      "name": "SRV-MAIL-DMZ",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 720,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.10.200.11/24"
+      },
+      "gateway": "10.10.200.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 200,
+      "wireless": false
+    },
+    {
+      "name": "PC-DBP1",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 700,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.11.10.11/24"
+      },
+      "gateway": "10.11.10.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 61,
+      "wireless": false
+    },
+    {
+      "name": "PC-DBP2",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 740,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.11.10.12/24"
+      },
+      "gateway": "10.11.10.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 61,
+      "wireless": false
+    },
+    {
+      "name": "SRV-DBP",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 780,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.11.20.10/24"
+      },
+      "gateway": "10.11.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 62,
+      "wireless": false
+    },
+    {
+      "name": "PC-BHTQ1",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 880,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.12.10.11/24"
+      },
+      "gateway": "10.12.10.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 71,
+      "wireless": false
+    },
+    {
+      "name": "PC-BHTQ2",
+      "model": "PC-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 920,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.12.10.12/24"
+      },
+      "gateway": "10.12.10.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 71,
+      "wireless": false
+    },
+    {
+      "name": "SRV-BHTQ",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 960,
+      "y": 420,
+      "interfaces": {
+        "FastEthernet0": "10.12.20.10/24"
+      },
+      "gateway": "10.12.20.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 72,
+      "wireless": false
+    },
+    {
+      "name": "SRV-WEB-INT",
+      "model": "Server-PT",
+      "category": "server",
+      "role": "server_host",
+      "x": 40,
+      "y": 160,
+      "interfaces": {
+        "FastEthernet0": "198.51.100.10/24"
+      },
+      "gateway": "198.51.100.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "LT-TELE",
+      "model": "Laptop-PT",
+      "category": "pc",
+      "role": "end_host",
+      "x": 540,
+      "y": 170,
+      "interfaces": {
+        "FastEthernet0": "192.168.250.10/24"
+      },
+      "gateway": "192.168.250.1",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "AP-BLD-A",
+      "model": "AccessPoint-PT",
+      "category": "accesspoint",
+      "role": "end_host",
+      "x": 180,
+      "y": 340,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "AP-BLD-B",
+      "model": "AccessPoint-PT",
+      "category": "accesspoint",
+      "role": "end_host",
+      "x": 360,
+      "y": 340,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "AP-DBP",
+      "model": "AccessPoint-PT",
+      "category": "accesspoint",
+      "role": "end_host",
+      "x": 730,
+      "y": 340,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "AP-BHTQ",
+      "model": "AccessPoint-PT",
+      "category": "accesspoint",
+      "role": "end_host",
+      "x": 910,
+      "y": 340,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    },
+    {
+      "name": "AP-HOME",
+      "model": "AccessPoint-PT",
+      "category": "accesspoint",
+      "role": "end_host",
+      "x": 500,
+      "y": 170,
+      "interfaces": {},
+      "gateway": "",
+      "interfaces_v6": {},
+      "gateway_v6": "",
+      "vlan": 0,
+      "wireless": false
+    }
+  ],
+  "modules": [],
+  "links": [
+    {
+      "device_a": "ISP1",
+      "port_a": "GigabitEthernet0/0",
+      "device_b": "R-EDGE-MS",
+      "port_b": "GigabitEthernet0/0",
+      "cable": "cross"
+    },
+    {
+      "device_a": "ISP2",
+      "port_a": "GigabitEthernet0/0",
+      "device_b": "R-EDGE-MS",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "R-EDGE-MS",
+      "port_a": "GigabitEthernet0/2",
+      "device_b": "R-CORE-MS",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "R-CORE-MS",
+      "port_a": "GigabitEthernet0/2",
+      "device_b": "R-WAN-MS",
+      "port_b": "GigabitEthernet0/0/0",
+      "cable": "cross"
+    },
+    {
+      "device_a": "R-CORE-MS",
+      "port_a": "GigabitEthernet0/0",
+      "device_b": "SW-CORE",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-CORE",
+      "port_a": "FastEthernet0/2",
+      "device_b": "SW-BLD-A",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "SW-CORE",
+      "port_a": "FastEthernet0/4",
+      "device_b": "SW-BLD-B",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "SW-CORE",
+      "port_a": "FastEthernet0/6",
+      "device_b": "SW-SRV",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "SW-CORE",
+      "port_a": "FastEthernet0/8",
+      "device_b": "SW-CCTV",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "SW-CORE",
+      "port_a": "FastEthernet0/10",
+      "device_b": "SW-DMZ",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "SW-BLD-A",
+      "port_a": "FastEthernet0/1",
+      "device_b": "PC-A1",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-A",
+      "port_a": "FastEthernet0/2",
+      "device_b": "PC-A2",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-A",
+      "port_a": "FastEthernet0/3",
+      "device_b": "PC-A3",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-A",
+      "port_a": "FastEthernet0/5",
+      "device_b": "PRN-A",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-A",
+      "port_a": "FastEthernet0/23",
+      "device_b": "AP-BLD-A",
+      "port_b": "Port 0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-B",
+      "port_a": "FastEthernet0/1",
+      "device_b": "PC-B1",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-B",
+      "port_a": "FastEthernet0/2",
+      "device_b": "PC-B2",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-B",
+      "port_a": "FastEthernet0/3",
+      "device_b": "PC-B3",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-B",
+      "port_a": "FastEthernet0/5",
+      "device_b": "PRN-B",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BLD-B",
+      "port_a": "FastEthernet0/23",
+      "device_b": "AP-BLD-B",
+      "port_b": "Port 0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-SRV",
+      "port_a": "FastEthernet0/1",
+      "device_b": "SRV-DNS",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-SRV",
+      "port_a": "FastEthernet0/2",
+      "device_b": "SRV-HIS",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-SRV",
+      "port_a": "FastEthernet0/3",
+      "device_b": "SRV-PACS",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-SRV",
+      "port_a": "FastEthernet0/4",
+      "device_b": "SRV-LOG",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-CCTV",
+      "port_a": "FastEthernet0/1",
+      "device_b": "SRV-NVR",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-CCTV",
+      "port_a": "FastEthernet0/2",
+      "device_b": "CAM-01",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-CCTV",
+      "port_a": "FastEthernet0/3",
+      "device_b": "CAM-02",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DMZ",
+      "port_a": "FastEthernet0/1",
+      "device_b": "SRV-WEB-DMZ",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DMZ",
+      "port_a": "FastEthernet0/2",
+      "device_b": "SRV-MAIL-DMZ",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "R-DBP",
+      "port_a": "GigabitEthernet0/0",
+      "device_b": "SW-DBP",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DBP",
+      "port_a": "FastEthernet0/1",
+      "device_b": "PC-DBP1",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DBP",
+      "port_a": "FastEthernet0/2",
+      "device_b": "PC-DBP2",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DBP",
+      "port_a": "FastEthernet0/3",
+      "device_b": "SRV-DBP",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-DBP",
+      "port_a": "FastEthernet0/23",
+      "device_b": "AP-DBP",
+      "port_b": "Port 0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "R-BHTQ",
+      "port_a": "GigabitEthernet0/0",
+      "device_b": "SW-BHTQ",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BHTQ",
+      "port_a": "FastEthernet0/1",
+      "device_b": "PC-BHTQ1",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BHTQ",
+      "port_a": "FastEthernet0/2",
+      "device_b": "PC-BHTQ2",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BHTQ",
+      "port_a": "FastEthernet0/3",
+      "device_b": "SRV-BHTQ",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-BHTQ",
+      "port_a": "FastEthernet0/23",
+      "device_b": "AP-BHTQ",
+      "port_b": "Port 0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "ISP1",
+      "port_a": "GigabitEthernet0/1",
+      "device_b": "SRV-WEB-INT",
+      "port_b": "FastEthernet0",
+      "cable": "cross"
+    },
+    {
+      "device_a": "ISP2",
+      "port_a": "GigabitEthernet0/1",
+      "device_b": "SW-HOME",
+      "port_b": "FastEthernet0/1",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-HOME",
+      "port_a": "FastEthernet0/1",
+      "device_b": "AP-HOME",
+      "port_b": "Port 0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "SW-HOME",
+      "port_a": "FastEthernet2/1",
+      "device_b": "LT-TELE",
+      "port_b": "FastEthernet0",
+      "cable": "straight"
+    },
+    {
+      "device_a": "R-WAN-MS",
+      "port_a": "GigabitEthernet0/0/1",
+      "device_b": "R-DBP",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    },
+    {
+      "device_a": "R-WAN-MS",
+      "port_a": "GigabitEthernet0/0/2",
+      "device_b": "R-BHTQ",
+      "port_b": "GigabitEthernet0/1",
+      "cable": "cross"
+    }
+  ],
+  "dhcp_pools": [
+    {
+      "router": "R-CORE-MS",
+      "pool_name": "VLAN30-MS",
+      "network": "10.10.30.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.10.30.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.10.30.1",
+      "excluded_end": "10.10.30.30"
+    },
+    {
+      "router": "R-CORE-MS",
+      "pool_name": "VLAN40-MS",
+      "network": "10.10.40.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.10.40.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.10.40.1",
+      "excluded_end": "10.10.40.30"
+    },
+    {
+      "router": "R-CORE-MS",
+      "pool_name": "VLAN60-MS",
+      "network": "10.10.60.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.10.60.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.10.60.1",
+      "excluded_end": "10.10.60.20"
+    },
+    {
+      "router": "R-DBP",
+      "pool_name": "DBP-STAFF",
+      "network": "10.11.10.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.11.10.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.11.10.1",
+      "excluded_end": "10.11.10.30"
+    },
+    {
+      "router": "R-DBP",
+      "pool_name": "DBP-GUEST",
+      "network": "10.11.60.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.11.60.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.11.60.1",
+      "excluded_end": "10.11.60.20"
+    },
+    {
+      "router": "R-BHTQ",
+      "pool_name": "BHTQ-STAFF",
+      "network": "10.12.10.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.12.10.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.12.10.1",
+      "excluded_end": "10.12.10.30"
+    },
+    {
+      "router": "R-BHTQ",
+      "pool_name": "BHTQ-GUEST",
+      "network": "10.12.60.0",
+      "mask": "255.255.255.0",
+      "gateway": "10.12.60.1",
+      "dns": "10.10.20.5",
+      "excluded_start": "10.12.60.1",
+      "excluded_end": "10.12.60.20"
+    },
+    {
+      "router": "ISP2",
+      "pool_name": "TELE-HOME",
+      "network": "192.168.250.0",
+      "mask": "255.255.255.0",
+      "gateway": "192.168.250.1",
+      "dns": "198.51.100.10",
+      "excluded_start": "192.168.250.1",
+      "excluded_end": "192.168.250.1"
+    }
+  ],
+  "static_routes": [
+    {
+      "router": "R-EDGE-MS",
+      "destination": "0.0.0.0",
+      "mask": "0.0.0.0",
+      "next_hop": "203.0.113.1",
+      "admin_distance": 1
+    },
+    {
+      "router": "R-EDGE-MS",
+      "destination": "0.0.0.0",
+      "mask": "0.0.0.0",
+      "next_hop": "203.0.114.1",
+      "admin_distance": 50
+    },
+    {
+      "router": "ISP1",
+      "destination": "203.0.115.0",
+      "mask": "255.255.255.0",
+      "next_hop": "203.0.113.2",
+      "admin_distance": 1
+    },
+    {
+      "router": "ISP2",
+      "destination": "203.0.115.0",
+      "mask": "255.255.255.0",
+      "next_hop": "203.0.114.2",
+      "admin_distance": 1
+    },
+    {
+      "router": "ISP2",
+      "destination": "0.0.0.0",
+      "mask": "0.0.0.0",
+      "next_hop": "203.0.114.2",
+      "admin_distance": 1
+    }
+  ],
+  "ospf_configs": [
+    {
+      "router": "R-EDGE-MS",
+      "process_id": 1,
+      "router_id": "203.0.113.2",
+      "networks": [
+        {
+          "network": "10.10.0.0",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        }
+      ]
+    },
+    {
+      "router": "R-CORE-MS",
+      "process_id": 1,
+      "router_id": "10.10.0.1",
+      "networks": [
+        {
+          "network": "10.10.0.0",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        },
+        {
+          "network": "10.10.0.4",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        },
+        {
+          "network": "10.10.10.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.20.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.30.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.40.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.50.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.60.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.10.200.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        }
+      ]
+    },
+    {
+      "router": "R-WAN-MS",
+      "process_id": 1,
+      "router_id": "10.10.0.6",
+      "networks": [
+        {
+          "network": "10.10.0.4",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        },
+        {
+          "network": "10.254.0.0",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        },
+        {
+          "network": "10.254.0.4",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        }
+      ]
+    },
+    {
+      "router": "R-DBP",
+      "process_id": 1,
+      "router_id": "10.11.10.1",
+      "networks": [
+        {
+          "network": "10.11.10.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.11.20.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.11.60.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.254.0.0",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        }
+      ]
+    },
+    {
+      "router": "R-BHTQ",
+      "process_id": 1,
+      "router_id": "10.12.10.1",
+      "networks": [
+        {
+          "network": "10.12.10.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.12.20.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.12.60.0",
+          "wildcard": "0.0.0.255",
+          "area": 0
+        },
+        {
+          "network": "10.254.0.4",
+          "wildcard": "0.0.0.3",
+          "area": 0
+        }
+      ]
+    }
+  ],
+  "rip_configs": [],
+  "eigrp_configs": [],
+  "vlans": [
+    {
+      "vlan_id": 10,
+      "name": "MGMT",
+      "subnet": "10.10.10.0/24"
+    },
+    {
+      "vlan_id": 20,
+      "name": "SERVER-FARM",
+      "subnet": "10.10.20.0/24"
+    },
+    {
+      "vlan_id": 30,
+      "name": "DEPT-A",
+      "subnet": "10.10.30.0/24"
+    },
+    {
+      "vlan_id": 40,
+      "name": "DEPT-B",
+      "subnet": "10.10.40.0/24"
+    },
+    {
+      "vlan_id": 50,
+      "name": "CCTV",
+      "subnet": "10.10.50.0/24"
+    },
+    {
+      "vlan_id": 60,
+      "name": "WIFI-GUEST",
+      "subnet": "10.10.60.0/24"
+    },
+    {
+      "vlan_id": 200,
+      "name": "DMZ",
+      "subnet": "10.10.200.0/24"
+    },
+    {
+      "vlan_id": 61,
+      "name": "DBP-STAFF",
+      "subnet": "10.11.10.0/24"
+    },
+    {
+      "vlan_id": 62,
+      "name": "DBP-SRV",
+      "subnet": "10.11.20.0/24"
+    },
+    {
+      "vlan_id": 63,
+      "name": "DBP-GUEST",
+      "subnet": "10.11.60.0/24"
+    },
+    {
+      "vlan_id": 71,
+      "name": "BHTQ-STAFF",
+      "subnet": "10.12.10.0/24"
+    },
+    {
+      "vlan_id": 72,
+      "name": "BHTQ-SRV",
+      "subnet": "10.12.20.0/24"
+    },
+    {
+      "vlan_id": 73,
+      "name": "BHTQ-GUEST",
+      "subnet": "10.12.60.0/24"
+    }
+  ],
+  "access_ports": [
+    {
+      "switch": "SW-BLD-A",
+      "port": "FastEthernet0/1",
+      "vlan_id": 30
+    },
+    {
+      "switch": "SW-BLD-A",
+      "port": "FastEthernet0/2",
+      "vlan_id": 30
+    },
+    {
+      "switch": "SW-BLD-A",
+      "port": "FastEthernet0/3",
+      "vlan_id": 30
+    },
+    {
+      "switch": "SW-BLD-A",
+      "port": "FastEthernet0/5",
+      "vlan_id": 30
+    },
+    {
+      "switch": "SW-BLD-A",
+      "port": "FastEthernet0/23",
+      "vlan_id": 60
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "FastEthernet0/1",
+      "vlan_id": 40
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "FastEthernet0/2",
+      "vlan_id": 40
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "FastEthernet0/3",
+      "vlan_id": 40
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "FastEthernet0/5",
+      "vlan_id": 40
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "FastEthernet0/23",
+      "vlan_id": 60
+    },
+    {
+      "switch": "SW-SRV",
+      "port": "FastEthernet0/1",
+      "vlan_id": 20
+    },
+    {
+      "switch": "SW-SRV",
+      "port": "FastEthernet0/2",
+      "vlan_id": 20
+    },
+    {
+      "switch": "SW-SRV",
+      "port": "FastEthernet0/3",
+      "vlan_id": 20
+    },
+    {
+      "switch": "SW-SRV",
+      "port": "FastEthernet0/4",
+      "vlan_id": 20
+    },
+    {
+      "switch": "SW-CCTV",
+      "port": "FastEthernet0/1",
+      "vlan_id": 50
+    },
+    {
+      "switch": "SW-CCTV",
+      "port": "FastEthernet0/2",
+      "vlan_id": 50
+    },
+    {
+      "switch": "SW-CCTV",
+      "port": "FastEthernet0/3",
+      "vlan_id": 50
+    },
+    {
+      "switch": "SW-DMZ",
+      "port": "FastEthernet0/1",
+      "vlan_id": 200
+    },
+    {
+      "switch": "SW-DMZ",
+      "port": "FastEthernet0/2",
+      "vlan_id": 200
+    },
+    {
+      "switch": "SW-DBP",
+      "port": "FastEthernet0/1",
+      "vlan_id": 61
+    },
+    {
+      "switch": "SW-DBP",
+      "port": "FastEthernet0/2",
+      "vlan_id": 61
+    },
+    {
+      "switch": "SW-DBP",
+      "port": "FastEthernet0/3",
+      "vlan_id": 62
+    },
+    {
+      "switch": "SW-DBP",
+      "port": "FastEthernet0/23",
+      "vlan_id": 63
+    },
+    {
+      "switch": "SW-BHTQ",
+      "port": "FastEthernet0/1",
+      "vlan_id": 71
+    },
+    {
+      "switch": "SW-BHTQ",
+      "port": "FastEthernet0/2",
+      "vlan_id": 71
+    },
+    {
+      "switch": "SW-BHTQ",
+      "port": "FastEthernet0/3",
+      "vlan_id": 72
+    },
+    {
+      "switch": "SW-BHTQ",
+      "port": "FastEthernet0/23",
+      "vlan_id": 73
+    }
+  ],
+  "trunks": [
+    {
+      "switch": "SW-CORE",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        200
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CORE",
+      "port": "FastEthernet0/2",
+      "allowed_vlans": [
+        30,
+        60
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CORE",
+      "port": "FastEthernet0/4",
+      "allowed_vlans": [
+        40,
+        60
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CORE",
+      "port": "FastEthernet0/6",
+      "allowed_vlans": [
+        20
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CORE",
+      "port": "FastEthernet0/8",
+      "allowed_vlans": [
+        50
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CORE",
+      "port": "FastEthernet0/10",
+      "allowed_vlans": [
+        200
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-BLD-A",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        30,
+        60
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-BLD-B",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        40,
+        60
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-SRV",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        20
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-CCTV",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        50
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-DMZ",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        200
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-DBP",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        61,
+        62,
+        63
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    },
+    {
+      "switch": "SW-BHTQ",
+      "port": "GigabitEthernet0/1",
+      "allowed_vlans": [
+        71,
+        72,
+        73
+      ],
+      "native_vlan": 1,
+      "encapsulation": "dot1q"
+    }
+  ],
+  "subinterfaces": [
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 10,
+      "ip_cidr": "10.10.10.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 20,
+      "ip_cidr": "10.10.20.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 30,
+      "ip_cidr": "10.10.30.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 40,
+      "ip_cidr": "10.10.40.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 50,
+      "ip_cidr": "10.10.50.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 60,
+      "ip_cidr": "10.10.60.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-CORE-MS",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 200,
+      "ip_cidr": "10.10.200.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-DBP",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 61,
+      "ip_cidr": "10.11.10.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-DBP",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 62,
+      "ip_cidr": "10.11.20.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-DBP",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 63,
+      "ip_cidr": "10.11.60.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-BHTQ",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 71,
+      "ip_cidr": "10.12.10.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-BHTQ",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 72,
+      "ip_cidr": "10.12.20.1/24",
+      "encapsulation": "dot1Q"
+    },
+    {
+      "router": "R-BHTQ",
+      "parent_port": "GigabitEthernet0/0",
+      "vlan_id": 73,
+      "ip_cidr": "10.12.60.1/24",
+      "encapsulation": "dot1Q"
+    }
+  ],
+  "validations": [],
+  "dual_stack": false,
+  "errors": [],
+  "warnings": []
+}

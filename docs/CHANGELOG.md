@@ -22,7 +22,11 @@ Log chi tiết từng bước làm — song song với commit messages của rep
   - R-WAN-MS `Serial0/2/0` ↔ R-BHTQ `Serial0/0/0`
 - Cấu hình IP serial + clock rate 2 000 000 + thêm mạng vào OSPF area 0 qua `configureIosDevice`.
   Phát hiện + sửa lỗi gán IP trái chiều trên R-WAN-MS (S0/1/0 phải là 10.255.0.1, S0/2/0 là 10.255.0.5).
+  Root cause: gán `10.255.0.5` cho S0/2/0 khi S0/1/0 vẫn giữ `10.255.0.5/30` → IOS chặn
+  `% 10.255.0.4 overlaps with Serial0/1/0` âm thầm trong batch push. Sửa theo thứ tự:
+  S0/1/0 → 10.255.0.1 trước, rồi S0/2/0 → 10.255.0.5.
 - OSPF: R-WAN-MS đã up đầy đủ adjacency với R-CORE-MS (10.10.0.1), R-DBP (10.11.10.1), R-BHTQ (10.12.10.1).
+- `pt_verify_connectivity` serial backup: R-WAN-MS → 10.255.0.2 (R-DBP) 5/5; → 10.255.0.6 (R-BHTQ) 5/5.
 
 ## Tiếp theo (roadmap)
 

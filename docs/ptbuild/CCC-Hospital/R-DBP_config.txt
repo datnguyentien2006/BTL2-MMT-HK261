@@ -1,0 +1,50 @@
+enable
+configure terminal
+hostname R-DBP
+no ip domain-lookup
+
+interface GigabitEthernet0/1
+ ip address 10.254.0.2 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0
+ no shutdown
+ exit
+interface GigabitEthernet0/0.61
+ encapsulation dot1Q 61
+ ip address 10.11.10.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.62
+ encapsulation dot1Q 62
+ ip address 10.11.20.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0.63
+ encapsulation dot1Q 63
+ ip address 10.11.60.1 255.255.255.0
+ exit
+
+ip dhcp excluded-address 10.11.10.1 10.11.10.30
+ip dhcp excluded-address 10.11.60.1 10.11.60.20
+ip dhcp pool DBP-STAFF
+ network 10.11.10.0 255.255.255.0
+ default-router 10.11.10.1
+ dns-server 10.10.20.5
+ exit
+
+ip dhcp pool DBP-GUEST
+ network 10.11.60.0 255.255.255.0
+ default-router 10.11.60.1
+ dns-server 10.10.20.5
+ exit
+
+router ospf 1
+ router-id 10.11.10.1
+ network 10.11.10.0 0.0.0.255 area 0
+ network 10.11.20.0 0.0.0.255 area 0
+ network 10.11.60.0 0.0.0.255 area 0
+ network 10.254.0.0 0.0.0.3 area 0
+ exit
+
+end
+write memory

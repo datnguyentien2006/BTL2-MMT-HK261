@@ -1,0 +1,29 @@
+enable
+configure terminal
+hostname R-WAN-MS
+no ip domain-lookup
+
+interface GigabitEthernet0/0/0
+ ip address 10.10.0.6 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0/1
+ ip address 10.254.0.1 255.255.255.252
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0/2
+ ip address 10.254.0.5 255.255.255.252
+ no shutdown
+ exit
+
+router ospf 1
+ router-id 10.10.0.6
+ network 10.10.0.4 0.0.0.3 area 0
+ network 10.254.0.0 0.0.0.3 area 0
+ network 10.254.0.4 0.0.0.3 area 0
+ exit
+
+end
+write memory
