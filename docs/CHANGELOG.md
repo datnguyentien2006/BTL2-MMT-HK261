@@ -79,3 +79,27 @@ Log chi tiết từng bước làm — song song với commit messages của rep
 - Xóa thiết bị test `PC-TEST60`; dán 10 annotation (subnet labels) trên canvas; chụp
   `report/images/topology-final(*).png`.
 - **Lưu bài nộp**: `pt_save_project` → `simulation/CCC-Hospital.pkt` (≈252 KB, Packet Tracer 9.0.1).
+
+## 2026-11-07 — Bản chốt v2 (49 thiết bị) theo 3 trụ đề bài
+
+- **Tái kiến trúc `simulation/CCC-Hospital-v2.pkt`** (49 thiết bị / 49 link): Main Site một lối ra
+  (VLAN → SW-CORE L3 → R-CORE-MS → **FW-MAIN** → GW-MAIN → WAN); trạm phụ GW-DBP/GW-BHTQ **không
+  firewall**; VPN mobile chấm ngay trên firewall FW-MAIN ↔ R-HOME.
+- **Đánh lại dải địa chỉ:** VLAN 10/20/30/40/50/60 = 192.168.10/20/30/40/50/60.0/24; WAN transit
+  172.16.0.x; Frame Relay 172.17.10/20.0/30; serial backup 172.18.10/20.0/30; trạm phụ
+  192.168.110/120.0/24; mobile worker 192.168.90.0/24; overlay 10.254.0.0/30.
+- **WAN Frame Relay**: 2 PVC ánh xạ DLCI tay trong GUI (GW-MAIN S0/1/0 dlci **110** ↔ GW-DBP
+  S0/1/0 dlci **101**; GW-MAIN S0/1/1 dlci **120** ↔ GW-BHTQ S0/1/0 dlci **102**) + 2 serial
+  backup (floating static **AD 200**) trên GW-MAIN S0/2/0, S0/2/1.
+- **KC-2 failover v2 (đo thật):** cắt PVC DBP cả hai đầu → `ping 172.17.10.1` 0/5, `traceroute`
+  GW-DBP→HIS **hop 1 = 172.18.10.1** (rẽ serial backup), PC-DBP1 → HIS vẫn 4/4; khôi phục → 4/4.
+- **KC-7 VPN mobile:** GRE tunnel FW-MAIN↔R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS 0 % loss.
+  IKE/IPsec main-mode của PT 9.0.1 kẹt `MM_SA_SETUP` trên path đa-hop có NAT → dùng GRE làm đường dữ
+  liệu, giữ nguyên crypto-map làm chứng cứ thiết kế.
+- **Wi-Fi:** hai AP đặt SSID khác nhau bằng GUI; sau khi nạp lại project, LT-GR-MS1 → 192.168.60.21
+  (AP-GUEST), LT-MOBILE1 → 192.168.90.10 (AP-HOME).
+- **Khắc phục mất dấu enable secret GW-MAIN:** đặt lại đồng nhất `Hosp@2026!Sec` cho router qua
+  `configureIosDevice`; bổ sung static route trả về nhánh (110/120) trên GW-MAIN + floating default
+  (AD 200) trên GW-DBP/GW-BHTQ.
+- **Kiểm tra sức khoẻ cuối:** `pt_health_check` → 0 link down, 0 IP trùng; chốt `.pkt` + ảnh canvas
+  `report/images/topology-v2.png`; cập nhật `REPORT_vi.md` mục 5.4 và 6.1.
