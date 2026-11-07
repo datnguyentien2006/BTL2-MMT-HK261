@@ -80,26 +80,28 @@ Log chi tiết từng bước làm — song song với commit messages của rep
   `report/images/topology-final(*).png`.
 - **Lưu bài nộp**: `pt_save_project` → `simulation/CCC-Hospital.pkt` (≈252 KB, Packet Tracer 9.0.1).
 
-## 2026-11-07 — Bản chốt v2 (49 thiết bị) theo 3 trụ đề bài
+## 2026-11-07 — Bản chốt v2 (3 trụ yêu cầu + WAN Frame Relay + VPN mobile)
 
-- **Tái kiến trúc `simulation/CCC-Hospital-v2.pkt`** (49 thiết bị / 49 link): Main Site một lối ra
-  (VLAN → SW-CORE L3 → R-CORE-MS → **FW-MAIN** → GW-MAIN → WAN); trạm phụ GW-DBP/GW-BHTQ **không
-  firewall**; VPN mobile chấm ngay trên firewall FW-MAIN ↔ R-HOME.
-- **Đánh lại dải địa chỉ:** VLAN 10/20/30/40/50/60 = 192.168.10/20/30/40/50/60.0/24; WAN transit
-  172.16.0.x; Frame Relay 172.17.10/20.0/30; serial backup 172.18.10/20.0/30; trạm phụ
-  192.168.110/120.0/24; mobile worker 192.168.90.0/24; overlay 10.254.0.0/30.
-- **WAN Frame Relay**: 2 PVC ánh xạ DLCI tay trong GUI (GW-MAIN S0/1/0 dlci **110** ↔ GW-DBP
-  S0/1/0 dlci **101**; GW-MAIN S0/1/1 dlci **120** ↔ GW-BHTQ S0/1/0 dlci **102**) + 2 serial
-  backup (floating static **AD 200**) trên GW-MAIN S0/2/0, S0/2/1.
-- **KC-2 failover v2 (đo thật):** cắt PVC DBP cả hai đầu → `ping 172.17.10.1` 0/5, `traceroute`
-  GW-DBP→HIS **hop 1 = 172.18.10.1** (rẽ serial backup), PC-DBP1 → HIS vẫn 4/4; khôi phục → 4/4.
-- **KC-7 VPN mobile:** GRE tunnel FW-MAIN↔R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS 0 % loss.
-  IKE/IPsec main-mode của PT 9.0.1 kẹt `MM_SA_SETUP` trên path đa-hop có NAT → dùng GRE làm đường dữ
-  liệu, giữ nguyên crypto-map làm chứng cứ thiết kế.
-- **Wi-Fi:** hai AP đặt SSID khác nhau bằng GUI; sau khi nạp lại project, LT-GR-MS1 → 192.168.60.21
-  (AP-GUEST), LT-MOBILE1 → 192.168.90.10 (AP-HOME).
-- **Khắc phục mất dấu enable secret GW-MAIN:** đặt lại đồng nhất `Hosp@2026!Sec` cho router qua
-  `configureIosDevice`; bổ sung static route trả về nhánh (110/120) trên GW-MAIN + floating default
-  (AD 200) trên GW-DBP/GW-BHTQ.
-- **Kiểm tra sức khoẻ cuối:** `pt_health_check` → 0 link down, 0 IP trùng; chốt `.pkt` + ảnh canvas
-  `report/images/topology-v2.png`; cập nhật `REPORT_vi.md` mục 5.4 và 6.1.
+- **Tái kiến trúc thành `simulation/CCC-Hospital-v2.pkt`** (49 thiết bị / 49 link): Main Site một lối ra
+  (VLAN → SW-CORE L3 → R-CORE-MS → **FW-MAIN** → GW-MAIN → WAN); trạm phụ DBP/BHTQ **không firewall**;
+  VPN mobile **chấm trên FW-MAIN** (G0/2 199.115.1.1).
+- **Đánh lại dải địa chỉ**: VLAN 10/20/30/40/50/60 = 192.168.10/20/30/40/50/60.0/24; thêm VLAN 40 DMZ;
+  Internet giả lập 198.51.100.0/24 + 203.0.113.0/30; mobile LAN 192.168.90.0/24; trạm 192.168.110/120.0/24.
+- **WAN Frame Relay (DLCI cấu hình tay trong GUI — API PT không phơi DLCI)**:
+  GW-MAIN S0/1/0 ↔ GW-DBP S0/1/0 (**DLCI 110 ↔ 101**, 172.17.10.0/30);
+  GW-MAIN S0/1/1 ↔ GW-BHTQ S0/1/0 (**DLCI 120 ↔ 102**, 172.17.20.0/30).
+- **Serial backup + floating static**: GW-MAIN S0/2/0 ↔ GW-DBP S0/1/1 (172.18.10.0/30) và
+  GW-MAIN S0/2/1 ↔ GW-BHTQ S0/1/1 (172.18.20.0/30); default route AD 100 (FR) + **AD 200** (serial) ở hai
+  gateway nhánh; route về 192.168.110/120.0/24 trên GW-MAIN (AD 100/200).
+- **Wireless**: SSID khác nhau bằng GUI (AP-GUEST / AP-HOME) — sau khi nạp lại project, PT mới lọc đúng;
+  LT-GR-MS1 = **192.168.60.21** (guest), LT-MOBILE1 = **192.168.90.10** (mobile).
+- **VPN mobile**: IKE/IPsec main-mode không hội tụ trên path đa-hop có NAT (giới hạn PT 9.0.1) → dựng
+  **GRE tunnel FW-MAIN ↔ R-HOME (10.254.0.0/30)** làm đường chạy được; crypto-map/ISAKMP **giữ nguyên**
+  làm chứng cứ thiết kế.
+- **Sửa mất dấu enable secret trên GW-MAIN**: đặt lại đồng nhất `Hosp@2026!Sec` qua `configureIosDevice`.
+- **KC-2 v2 (failover FR → serial) đo thật**: PC-DBP1/PC-BHTQ1 → SRV-HIS 4/4; cắt PVC DBP cả hai đầu
+  (`ping 172.17.10.1` 0/5) → `traceroute` từ GW-DBP hop 1 = **172.18.10.1** (serial backup), PC vẫn 4/4;
+  khôi phục → 4/4. `pt_health_check`: 0 link down, 0 IP trùng.
+- **Báo cáo**: thêm mục **5.4** (kiến trúc + bảng địa chỉ + bảng DLCI v2) và **6.1** (ma trận KC-1→KC-8 v2)
+  trong `report/REPORT_vi.md`; thêm ảnh `report/images/topology-v2.png`.
+- **Lưu bài nộp v2**: `simulation/CCC-Hospital-v2.pkt` (≈260 KB, Packet Tracer 9.0.1).

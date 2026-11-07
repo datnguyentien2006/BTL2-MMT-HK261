@@ -443,8 +443,8 @@ Từ bản khung v1 ở trên, mô hình được tái kiến trúc thành **`si
 
 | Kênh | Đầu A | DLCI (A) | Đầu B | DLCI (B) | Vai trò |
 |---|---|---|---|---|---|
-| PVC Main–DBP | GW-MAIN S0/1/0 (172.17.10.1) | 110 | GW-DBP S0/1/0 (172.17.10.2) | 101 | Đường chính (static, AD 1 ở GW-MAIN / AD 100 ở nhánh) |
-| PVC Main–BHTQ | GW-MAIN S0/1/1 (172.17.20.1) | 120 | GW-BHTQ S0/1/0 (172.17.20.2) | 102 | Đường chính (static, AD 1 ở GW-MAIN / AD 100 ở nhánh) |
+| PVC Main–DBP | GW-MAIN S0/1/0 (172.17.10.1) | 110 | GW-DBP S0/1/0 (172.17.10.2) | 101 | Đường chính, static AD 100 |
+| PVC Main–BHTQ | GW-MAIN S0/1/1 (172.17.20.1) | 120 | GW-BHTQ S0/1/0 (172.17.20.2) | 102 | Đường chính, static AD 100 |
 | Serial backup DBP | GW-MAIN S0/2/0 (172.18.10.1) | — | GW-DBP S0/1/1 (172.18.10.2) | — | Floating static **AD 200** |
 | Serial backup BHTQ | GW-MAIN S0/2/1 (172.18.20.1) | — | GW-BHTQ S0/1/1 (172.18.20.2) | — | Floating static **AD 200** |
 
@@ -545,12 +545,9 @@ Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi 
 
 | File | Mô tả |
 |---|---|
-| `MTTT_[MSSV]_Ass2_CCC-Hospital.pkt` | File Packet Tracer **bản chốt v2** — 49 thiết bị / 49 link (`simulation/CCC-Hospital-v2.pkt`) |
+| `MTTT_[MSSV]_Ass2_CCC-Hospital.pkt` | File Packet Tracer (**bản chốt v2** — `simulation/CCC-Hospital-v2.pkt`, 49 thiết bị / 49 link đã build & test; bản v1 46 thiết bị lưu tại `simulation/CCC-Hospital.pkt`) |
 | `MTTT_[MSSV]_Ass2_Report.pdf` | Xuất báo cáo này (REPORT_vi.md → PDF) |
 | `MTTT_[MSSV]_Ass2.zip` | Zip gồm: .pkt + PDF + thư mục `images/` + phụ lục (vpn-configs, security-best-practices) |
-
-> **Lưu ý phiên bản:** `simulation/CCC-Hospital.pkt` là bản khung v1 (46 thiết bị) giữ lại để đối
-> chiếu; **bản nộp cuối là `simulation/CCC-Hospital-v2.pkt`** (mục 5.4).
 
 ### 8.2 Quy trình nộp
 
