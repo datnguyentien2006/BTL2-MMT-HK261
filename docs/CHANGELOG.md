@@ -2,6 +2,24 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-08 — Round fix trước khi nộp (khớp chuẩn checklist đề bài)
+
+- **Sửa cơ số tính Step 3**: khung giờ "9–11h & 15–16h" = **3 giờ hiệu dụng** (bản đọc nhầm 4h).
+  Method A: 6.512.000 Mbit ÷ 10.800 s ≈ 603 Mbps → +20% ≈ **724 Mbps**; Method B: peak ≈
+  **965 Mbps** → ×1,2 ≈ **1.158 Mbps**. WAN/trạm: tính lại (kèm lưu lượng server tải xuống qua
+  WAN) ≈ 139/222 Mbps → ×1,2 ≈ 166/**266 Mbps** → **chọn EPL 300 Mbps/trạm** (trước 200).
+- **Thêm §3.6** — bảng so sánh 5 phương án WAN (MPLS L3VPN, EPL, serial FR, IPsec/DMVPN,
+  SD-WAN) với chi phí thuê + ưu/nhược + lý do chọn EPL (yêu cầu rành của đề).
+- **Thêm §3.7** — đề xuất hệ thống CCTV (62 camera, NVR RAID-6/6-8, VLAN 50, sizing ~28 TB main,
+  băng thông ~250 Mbps, PoE+) theo đề bài "propose a surveillance camera system".
+- Bổ sung LIS/CRM (§2.1) và "phishing" ở roadmap §7.3.
+- Sửa KC-4 + Phụ lục A.4/B.1-7: đích DNS đúng **10.10.20.5** (không phải 10.10.10.10).
+- Phụ lục A thêm ghi chú rõ: bảng IP của phụ lục mô tả **thiết kế thật (Step 1–3)**; bảng IP v2
+  của .pkt ở §5.4 chỉ áp dụng cho mô phỏng.
+- §5.3 + §6.1: mô tả đúng vị trí cấu hình v1 (`docs/ptbuild/CCC-Hospital/`) và vị trí export
+  config v2 (`docs/ptbuild/CCC-Hospital-v2/`); đánh dấu 3 mục ảnh Step 5 chờ chụp từ .pkt v2
+  (thay tham chiếu ảnh chưa tồn tại = broken render).
+
 ## 2026-10-21 — Khởi động dự án
 
 - Phân tích đề bài Assignment 2 (bệnh viện 3 site, VLAN, WAN, VPN, bảo mật).

@@ -85,7 +85,7 @@ ip source binding 001A.A1B2.C3D4 vlan 30 Gi0/5
 
 ### 7) ACL least-privilege — đặc biệt Wi-Fi khách
 
-- VLAN 60/63/73 (guest) chỉ được: **DNS nội bộ (UDP/TCP 53 → 10.10.10.10)**, **HTTP/HTTPS đến web DMZ (10.10.200.10)** và **default out Internet (NAT PAT)**.
+- VLAN 60/63/73 (guest) chỉ được: **DNS nội bộ (UDP/TCP 53 → 10.10.20.5 = SRV-DNS)**, **HTTP/HTTPS đến web DMZ (10.10.200.10)** và **default out Internet (NAT PAT)**.
 - **Deny all** về dải nội bộ `10.10.0.0/16`, `10.11.0.0/16`, `10.12.0.0/16`, VLAN 20, VLAN 50 (CCTV), VLAN 10 (MGMT); cuối ACL `deny ip ... log` để audit.
 - ACL đặt closest-to-source trên R-CORE-MS subinterface VLAN 60/63/73 (hoặc trên NGFW policy).
 

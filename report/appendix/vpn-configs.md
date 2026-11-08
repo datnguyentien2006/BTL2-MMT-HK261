@@ -6,6 +6,13 @@
 > crypto isakmp/IPsec/GRE. Trong mô phỏng, đường liên trạm dùng Ethernet EPL + serial
 > backup với OSPF; VPN/IPsec chỉ được **thiết kế ở đây để triển khai thực tế**.
 >
+> **Bảng IP áp dụng:** Phụ lục này viết theo **bảng IP của thiết kế thật (Step 1–3)**: Main
+> `10.10.0.0/16`, DBP `10.11.0.0/16`, BHTQ `10.12.0.0/16`, WAN EPL `10.254.x.x/30`, serial backup
+> `10.255.x.x/30`. Mô hình Packet Tracer **bản chốt v2** dùng bảng IP khác (trình bày tại §5.4
+> báo cáo chính: `192.168.x.0/24` + WAN Frame Relay `172.17.x.x/172.18.x.x` + GRE overlay
+> `10.254.0.0/30` kết thúc tại FW-MAIN). Khi triển khai trên thiết bị thật → dùng bảng của phần
+> này; bảng của §5.4 chỉ áp dụng cho file `.pkt` mô phỏng.
+>
 > Tham số dùng theo bảng IP đã chốt:
 > - Key chung: `HOSP2026` (ISAKMP pre-shared key — khi vận hành thật nên thay bằng key mạnh, duy nhất cho từng peer và xoay vòng định kỳ)
 > - Peers Ethernet EPL: R-WAN-MS `10.254.0.1` ↔ R-DBP `10.254.0.2`; R-WAN-MS `10.254.0.5` ↔ R-BHTQ `10.254.0.6`
@@ -256,7 +263,7 @@ exit
 crypto isakmp key 0 HOSP2026 address 0.0.0.0 0.0.0.0          ! legacy EzVPN: key chung
 crypto isakmp client configuration group TELEWORKER
   key HOSP2026
-  dns 10.10.10.10                                             ! SRV-DNS
+  dns 10.10.20.5                                              ! SRV-DNS (VLAN 20)
   domain hospital.local
   pool VPN-POOL
   netmask 255.255.255.0
@@ -320,7 +327,7 @@ Cấu hình mẫu ví dụ trên FortiGate (chỉ minh hoạ):
 ```
 config vpn ssl settings
   set tunnel-ip-pools "VPN-POOL-TLW"
-  set dns-servers 10.10.10.10
+  set dns-servers 10.10.20.5
   set source-interface "port-WAN-ISP1" "port-WAN-ISP2"
   set port 443
 end

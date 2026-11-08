@@ -3,7 +3,7 @@
 Repo này chứa toàn bộ sản phẩm cho Assignment 2 (Mạng máy tính – HCMUT):
 
 - **Báo cáo dự án** (`report/`) — tiếng Việt, theo cấu trúc Step 1→7 của đề bài.
-- **Mô phỏng Packet Tracer** (`simulation/`) — file `.pkt` được dựng bằng MCP Packet Tracer (PTBuilder).
+- **Mô phỏng Packet Tracer** (`simulation/`) — **bản nộp cuối: `CCC-Hospital-v2.pkt`** (49 thiết bị / 49 link — Main Site một lối ra qua FW-MAIN, trạm phụ không firewall, VPN mobile chấm trên FW-MAIN, WAN Frame Relay + serial backup); bản v1 `CCC-Hospital.pkt` (46/45) chỉ giữ làm tham chiếu.
 - **Plan / script / cấu hình IOS** tự động sinh (`docs/ptbuild/`).
 - **Nhật ký xây dựng + kiểm chứng** (`docs/`).
 

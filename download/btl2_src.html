@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>BTL2 — Giải thích đề bài và kết quả thực hiện</title>
+<style>
+  @page { size: A4; margin: 20mm 16mm 18mm 16mm; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; font-family:'Segoe UI','Arial',sans-serif; font-size:10.5pt; color:#1c2430; line-height:1.5; }
+  h1,h2,h3 { color:#14365f; line-height:1.25; }
+  h2 { font-size:16pt; border-bottom:2.5px solid #14365f; padding-bottom:4px; margin:14px 0 10px; }
+  h3 { font-size:12pt; margin:14px 0 6px; }
+  table { border-collapse:collapse; width:100%; margin:8px 0 12px; font-size:9pt; }
+  th { background:#eaf1f8; text-align:left; }
+  th, td { border:1px solid #b9c6d4; padding:4px 7px; vertical-align:top; }
+  code, .mono { font-family:Consolas,'Courier New',monospace; font-size:9pt; background:#f2f5f9; padding:0 3px; border-radius:2px; }
+  ul, ol { margin:6px 0 10px; padding-left:22px; }
+  li { margin:2px 0; }
+  blockquote { margin:8px 0; padding:8px 12px; background:#f6f9fc; border-left:3px solid #4083c7; font-size:9.5pt; }
+  .page-break { page-break-before:always; }
+  .cover { height:257mm; display:flex; flex-direction:column; justify-content:center; }
+  .cover .uni { font-size:12pt; letter-spacing:.5px; color:#3a4655; }
+  .cover .course { font-size:12pt; color:#3a4655; margin-top:2px; }
+  .cover .main { font-size:24pt; font-weight:700; color:#14365f; margin:60px 0 8px; line-height:1.3; }
+  .cover .main2 { font-size:15pt; font-weight:600; color:#4083c7; margin-bottom:50px; line-height:1.4; }
+  .cover .sub { font-size:12.5pt; color:#2a3542; margin-top:20px; line-height:1.6; }
+  .cover .foot { margin-top:70px; font-size:10pt; color:#5b6878; }
+  .phase-tag { display:inline-block; background:#14365f; color:#fff; font-size:9pt; padding:2px 10px; border-radius:3px; margin-bottom:2px; }
+  .board { background:#eef3f9; border:1px solid #b9c6d4; border-radius:6px; padding:8px 12px; margin:10px 0; font-size:9.5pt; }
+  .kcdat { color:#0c7a2b; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- ========================= TRANG BÌA ========================= -->
+<div class="cover">
+  <div class="uni">TRƯỜNG ĐẠI HỌC BÁCH KHOA TP.HCM</div>
+  <div class="course">Bài tập lớn Mạng máy tính — HK261</div>
+  <div class="main">GIẢI THÍCH ĐỀ BÀI<br>VÀ KẾT QUẢ THỰC HIỆN</div>
+  <div class="main2">Assignment 2 — Thiết kế &amp; mô phỏng mạng cho Bệnh viện lớn<br>hạng mục quan trọng (Critical Large Hospital)</div>
+  <div class="sub">
+    <span class="phase-tag">Phần A</span> Yêu cầu đề bài và cách hiểu từng hạng mục<br><br>
+    <span class="phase-tag">Phần B</span> Kết quả sau khi hoàn thành Assignment 2
+  </div>
+  <div class="foot">Tài liệu tổng hợp từ repo BTL2-MMT-HK261 (workspace <span class="mono">C:\mmt-ass2</span>) · Tháng 11/2026<br>
+  Bản cập nhật theo mô hình chốt v2 <span class="mono">CCC-Hospital-v2.pkt</span> (49 thiết bị / 49 link)</div>
+</div>
+
+<!-- ========================= MỤC LỤC ========================= -->
+<div class="page-break"></div>
+<h2>MỤC LỤC</h2>
+<ol>
+  <li><b>PHẦN A — GIẢI THÍCH YÊU CẦU ĐỀ BÀI</b>
+    <ul>
+      <li>A.1 — Bối cảnh và quy mô phải đáp ứng</li>
+      <li>A.2 — Các nhóm yêu cầu kỹ thuật của đề bài</li>
+      <li>A.3 — Yêu cầu tính toán băng thông (số liệu đề bài cho sẵn)</li>
+      <li>A.4 — Quy trình 7 Step và sản phẩm phải nộp</li>
+    </ul>
+  </li>
+  <li><b>PHẦN B — KẾT QUẢ SAU KHI HOÀN THÀNH ASSIGNMENT 2</b>
+    <ul>
+      <li>B.1 — Kiến trúc đã dựng trong Packet Tracer (bản chốt v2)</li>
+      <li>B.2 — Cấu trúc VLAN và địa chỉ IP đã cài đặt</li>
+      <li>B.3 — Kết quả tính băng thông (Step 3) + so sánh phương án WAN</li>
+      <li>B.4 — Đề xuất hệ thống giám sát camera (CCTV)</li>
+      <li>B.5 — Kết quả kiểm chứng KC-1 đến KC-8 (Step 5)</li>
+      <li>B.6 — Điểm nhấn đã kiểm chứng thêm</li>
+      <li>B.7 — Vấn đề gặp khi dựng và cách xử lý (giá trị debug)</li>
+      <li>B.8 — Đánh giá chất lượng thiết kế (Step 6)</li>
+      <li>B.9 — Đóng gói và nộp bài (Step 7)</li>
+    </ul>
+  </li>
+  <li><b>TÓM TẮT MỘT TRANG</b></li>
+</ol>
+
+<!-- ========================= PHẦN A ========================= -->
+<div class="page-break"></div>
+<h2>PHẦN A — GIẢI THÍCH YÊU CẦU ĐỀ BÀI</h2>
+<p>Đề bài Assignment 2 đặt một bài toán thiết kế trọn vẹn: một bệnh viện lớn được xếp hạng mục
+<em>quan trọng (critical)</em> cần một mạng máy tính hoàn chỉnh — từ khảo sát hiện trạng, thiết kế
+vật lý, tính toán băng thông, dựng mô hình Packet Tracer, kiểm chứng kết nối, cho tới đánh giá
+chất lượng thiết kế và nộp bài. Người làm bài phải tự đi hết chu trình của một dự án mạng thực tế,
+không chỉ cấu hình cho chạy được.</p>
+
+<h3>A.1 — Bối cảnh và quy mô phải đáp ứng</h3>
+<p>Hệ thống gồm mô hình ba điểm kết nối với nhau qua đường truyền thuê (leased line):</p>
+<ul>
+  <li><b>Main Site (TP.HCM):</b> hai tòa nhà A và B (mỗi tòa 5 tầng, 10 phòng/tầng), kèm Data
+  Center (DC) và phòng IT/Central Cabling đặt cách nhau 50 m. Quy mô <b>600 workstation</b>,
+  <b>10 server</b>, khoảng 12 thiết bị mạng lõi và thiết bị bảo mật. Wi-Fi phủ toàn khuôn viên,
+  VLAN chia theo phòng ban, hạ tầng GPON trong tòa + fiber + tốc độ 1 GbE (truy cập) /
+  10 GbE (lõi) / 40 GbE (DC).</li>
+  <li><b>Trạm phụ DBP Street và BHTQ Street:</b> mỗi trạm một tòa 2 tầng (tầng 1 có 1 phòng IT và
+  1 Cabling Central Local), 260 workstation, 2 server, tối thiểu 5 thiết bị mạng mỗi trạm.
+  Máy trạm ở trạm phụ phụ thuộc hệ thống server trung tâm (HIS/PACS đặt tại Main Site).</li>
+  <li><b>Kết nối giữa các điểm:</b> mỗi trạm phụ nối về Main Site bằng đường leased line (đề bài
+  gợi ý SD-WAN/MPLS), cộng đường dự phòng; kết cấu phải sẵn sàng cho SD-WAN trong tương lai.
+  Định tuyến động bằng <b>OSPF</b>.</li>
+</ul>
+<p>Tổng cộng: <b>1120 workstation và 14 server</b>. Con số này là cơ sở cho mọi tính toán băng
+thông ở phần sau.</p>
+
+<h3>A.2 — Các nhóm yêu cầu kỹ thuật của đề bài</h3>
+<table>
+  <tr><th style="width:20%">Nhóm yêu cầu</th><th>Nội dung đề bài yêu cầu</th><th>Bản chất kỹ thuật</th></tr>
+  <tr><td>Phân đoạn mạng</td><td>VLAN theo phòng ban: nội bộ, server, CCTV, Wi-Fi khách, quản trị; DMZ cho dịch vụ công khai.</td><td>Chia broadcast domain, tách vùng theo vai trò và mức tin cậy.</td></tr>
+  <tr><td>WAN liên trạm</td><td>Đường leased line Main—DBP và Main—BHTQ có dự phòng; sẵn sàng SD-WAN. <b>Đề yêu cầu: liệt kê hết các phương án khả thi, gợi ý chi phí, phân tích ưu/nhược của phương án chọn.</b></td><td>OSPF tự chuyển đường khi đường chính đứt (failover); bảng so sánh phương án WAN.</td></tr>
+  <tr><td>Internet</td><td>2 đường DSL (ISP1 + ISP2), cơ chế chia tải hoặc dự phòng; toàn bộ traffic Internet đi qua Main Site.</td><td>Default route + floating route (AD cao hơn); NAT/PAT một điểm.</td></tr>
+  <tr><td>DMZ</td><td>Website/email của bệnh viện truy cập được từ Internet nhưng phải tách khỏi mạng nội bộ.</td><td>Vùng DMZ + static NAT một-một, chính sách truy cập một chiều.</td></tr>
+  <tr><td>Wi-Fi trả phí</td><td>Khách dùng Wi-Fi phải bị cô lập với mạng nội bộ.</td><td>ACL least-privilege: chỉ được DNS nội bộ, web DMZ và Internet.</td></tr>
+  <tr><td>CCTV</td><td><b>Đề xuất hệ thống camera giám sát cho công ty.</b></td><td>VLAN riêng + NVR; sizing số lượng camera/PoE/dung lượng ghi hình; không trộn VLAN với PC nhân viên.</td></tr>
+  <tr><td>VPN</td><td><b>Đề xuất cấu hình VPN site-to-site</b> (giữa các site) <b>và teleworker</b> (nhân viên kết nối từ xa).</td><td>IPsec/GRE giữa các trạm; client VPN (SSL/IKEv2) cho người dùng từ xa, NAT-T qua Internet.</td></tr>
+  <tr><td>Bảo mật nền</td><td>ACL, NAT, hardening thiết bị (SSH, secret, banner), logging phục vụ IDS/IPS.</td><td>Port-security, syslog + NetFlow gửi về server ghi log riêng.</td></tr>
+  <tr><td>Ứng dụng y tế</td><td>HIS, RIS-PACS, LIS, CRM, DB phải luôn truy cập được, có load balancer trước các cụm server.</td><td>Server farm riêng VLAN, cân bằng tải + health-check.</td></tr>
+  <tr><td>Phát triển</td><td>Tăng trưởng 20% trong 5 năm (đầu người, tải, site); HA; dễ nâng cấp.</td><td>Headroom tính băng thông, kiến trúc mô-đun, roadmap 3 giai đoạn.</td></tr>
+</table>
+
+<h3>A.3 — Yêu cầu tính toán băng thông (số liệu đề bài cho sẵn)</h3>
+<table>
+  <tr><th>Hạng mục</th><th>Giá trị đề bài cho</th></tr>
+  <tr><td>Workstation (1120 máy)</td><td>500 MB tải xuống + 100 MB tải lên / ngày / máy</td></tr>
+  <tr><td>Server (14 máy)</td><td>1000 MB tải xuống + 2000 MB tải lên / ngày / server</td></tr>
+  <tr><td>Wi-Fi khách</td><td>500 MB tải xuống / ngày / thiết bị khách</td></tr>
+  <tr><td>Khe giờ cao điểm truy cập DB</td><td>9–11h sáng và 15–16h chiều (tổng <b>3 giờ hiệu dụng/ngày</b>), ~80% tải nằm trong khung này</td></tr>
+  <tr><td>Tuần làm việc</td><td>5 ngày/tuần</td></tr>
+  <tr><td>Hệ số dự phòng tăng trưởng</td><td>20% trong 5 năm</td></tr>
+</table>
+<p>Đề bài yêu cầu tính theo hai phương pháp: (1) phân bổ đều toàn bộ dung lượng trên khung giờ
+hiệu dụng của ngày, và (2) quy tắc 80/20 — 80% khối lượng nằm trong một nửa khung giờ. Kết quả
+của cả hai phương pháp phải dẫn tới lựa chọn gói Internet và băng thông WAN liên trạm cụ thể,
+có giải thích.</p>
+
+<h3>A.4 — Quy trình 7 Step và sản phẩm phải nộp</h3>
+<table>
+  <tr><th>Step</th><th>Yêu cầu đề bài</th><th>Sản phẩm của Step</th></tr>
+  <tr><td>1</td><td>Phân tích yêu cầu &amp; khảo sát mặt bằng: checklist hiện trạng (tủ rack, đường ống cáp, nguồn điện, chống sét, Wi-Fi hiện hữu...), xác định vùng tải cao.</td><td>Bảng tổng hợp yêu cầu + checklist khảo sát (15 hạng mục).</td></tr>
+  <tr><td>2</td><td>Thiết kế vật lý: danh mục thiết bị kèm giá, sơ đồ vật lý (Main, trạm phụ, WAN).</td><td>Bảng thiết bị + sơ đồ kiến trúc phân tầng Access—Distribution—Core—DC.</td></tr>
+  <tr><td>3</td><td>Tính toán băng thông chi tiết theo số liệu đề bài (2 phương pháp).</td><td>Con số Mbps cần cho Internet và từng đường WAN + chọn gói.</td></tr>
+  <tr><td>4</td><td>Dựng mô hình Packet Tracer thu nhỏ (giữ đúng cấu trúc IP/định tuyến/NAT/ACL của thiết kế thật).</td><td>File .pkt dựng hoàn chỉnh.</td></tr>
+  <tr><td>5</td><td>Kiểm chứng 6 nhóm kết nối quy định (bảng KC-1 đến KC-6 — xem chi tiết ở Phần B).</td><td>Bảng kết quả đo thật (ping/web/tracert) từng mục.</td></tr>
+  <tr><td>6</td><td>Đánh giá reliability / upgrade / safe / security và định hướng phát triển.</td><td>Điểm mạnh, hạn chế (remaining problems), roadmap (development orientation).</td></tr>
+  <tr><td>7</td><td>Đóng gói &amp; nộp bài trên BKeL.</td><td>File .pkt + báo cáo PDF + zip đúng chuẩn tên file.</td></tr>
+</table>
+
+<!-- ========================= PHẦN B ========================= -->
+<div class="page-break"></div>
+<h2>PHẦN B — KẾT QUẢ SAU KHI HOÀN THÀNH ASSIGNMENT 2</h2>
+<p>Toàn bộ 7 Step đã thực hiện xong. Kết quả cốt lõi: mô hình Packet Tracer
+<b><span class="mono">CCC-Hospital-v2.pkt</span> (49 thiết bị / 49 link, Packet Tracer 9.0.1)</b> —
+bản tái kiến trúc sau bản khung v1 (46/45) để bám đúng ba trụ cột của đề:
+<i>Main Site một lối ra duy nhất — trạm phụ không đặt firewall — VPN mobile chấm ngay trên
+firewall</i>. Mô hình chạy hết <b>KC-1 đến KC-7 ĐẠT</b>, source code và báo cáo đã đẩy lên GitHub
+tại <span class="mono">datnguyentien2006/BTL2-MMT-HK261</span>. Phần dưới giải thích chi tiết từng
+kết quả.</p>
+
+<h3>B.1 — Kiến trúc đã dựng (bản chốt v2)</h3>
+<ul>
+  <li><b>Một lối ra duy nhất của Main Site:</b> mọi VLAN 10/20/30/40/50/60 → SW-CORE (L3, SVI) →
+  <b>R-CORE-MS</b> → <b>FW-MAIN</b> → <b>GW-MAIN</b> → WAN. Không VLAN nào tự ra Internet.</li>
+  <li><b>Trạm phụ không có firewall riêng:</b> GW-DBP / GW-BHTQ chỉ là gateway mép; chính sách
+  kiểm soát tập trung tại FW-MAIN + ACL trên SW-CORE.</li>
+  <li><b>VPN mobile chấm ngay trên firewall:</b> FW-MAIN ra Internet bằng G0/2 (199.115.1.1);
+  tunnel tới R-HOME kết thúc trên FW-MAIN (GRE chạy được + crypto-map IPsec giữ làm chứng cứ
+  thiết kế), không đi vào LAN nội bộ.</li>
+  <li><b>WAN:</b> 2 PVC Frame Relay (mô phỏng L2 leased line: Main—DBP DLCI 110↔101
+  <span class="mono">172.17.10.0/30</span>; Main—BHTQ DLCI 120↔102
+  <span class="mono">172.17.20.0/30</span>) — static route AD 100; + <b>serial backup</b>
+  <span class="mono">172.18.10.0/30</span>, <span class="mono">172.18.20.0/30</span> floating
+  AD 200. Ngày thực tế, đúng như thiết kế Step 1–3, các đường này là <b>MPLS handoff Ethernet
+  (EPL)</b>; Frame Relay chỉ là cấp L2 leased line mô phỏng trong PT (giới hạn thư viện).</li>
+  <li><b>Internet:</b> 2 ISP (ISP1/ISP2) về FW-MAIN; NAT/PAT; static NAT DMZ
+  <span class="mono">199.115.1.x ↔ SRV-WEB-DMZ</span>; default + floating route cho failover
+  (KC-8).</li>
+  <li><b>Dịch vụ:</b> DNS nội bộ (SRV-DNS), web/DNS của "Internet giả lập"
+  (<span class="mono">198.51.100.0/24</span>; <span class="mono">203.0.113.0/30</span> /
+  <span class="mono">203.0.114.0/30</span>), syslog + NetFlow về SRV-LOG, DHCP mỗi VLAN.</li>
+</ul>
+<blockquote><b>Ghi chú:</b> bản khung v1 (46 thiết bị, dải <span class="mono">10.10.x</span>,
+R-EDGE-MS làm edge+firewall) vẫn giữ trong <span class="mono">simulation/CCC-Hospital.pkt</span>
+và ở <span class="mono">docs/ptbuild/CCC-Hospital/</span> làm tham chiếu; toàn bộ báo cáo dưới đây
+theo bản chốt v2.</blockquote>
+
+<h3>B.2 — Cấu trúc VLAN và địa chỉ IP đã cài đặt</h3>
+<table>
+  <tr><th style="width:26%">Vùng</th><th>VLAN / dải mạng</th><th>Công dụng</th></tr>
+  <tr><td>Main — VLAN 10</td><td class="mono">192.168.10.0/24 — GW .1 (SW-CORE)</td><td>Tòa A (PC-A1..3, PRN-A, AP)</td></tr>
+  <tr><td>Main — VLAN 20</td><td class="mono">192.168.20.0/24 — GW .1 (SW-CORE)</td><td>Tòa B (PC-B1..3, PRN-B, AP)</td></tr>
+  <tr><td>Main — VLAN 30</td><td class="mono">192.168.30.0/24 — GW .1 (SW-CORE)</td><td>Server farm: SRV-DNS .2, SRV-HIS .3, SRV-PACS .4, SRV-LOG .5, SRV-NVR .6</td></tr>
+  <tr><td>Main — VLAN 40</td><td class="mono">192.168.40.0/24 — GW .1 (SW-CORE)</td><td>DMZ: SRV-WEB-DMZ .2, SRV-MAIL-DMZ .3</td></tr>
+  <tr><td>Main — VLAN 50</td><td class="mono">192.168.50.0/24 — GW .1 (SW-CORE)</td><td>CCTV: CAM-01/02 .11/.12, NVR .6</td></tr>
+  <tr><td>Main — VLAN 60</td><td class="mono">192.168.60.0/24 — GW .1 (SW-CORE)</td><td>Wi-Fi khách (AP-GUEST), DHCP .21/.22/.23</td></tr>
+  <tr><td>WAN transit FW ↔ GW-MAIN</td><td class="mono">172.16.0.8/30 — .9 FW / .10 GW-MAIN</td><td>Hop ra WAN</td></tr>
+  <tr><td>FW ↔ Core</td><td class="mono">172.16.0.4/30 — .6 FW / .5 R-CORE</td><td>Link FW-CORE</td></tr>
+  <tr><td>Public FW (G0/2)</td><td class="mono">199.115.1.0/29 — FW .1</td><td>Internet face FW; static NAT DMZ</td></tr>
+  <tr><td>"Internet" giả lập</td><td class="mono">198.51.100.0/24; 203.0.113.0/30 / 203.0.114.0/30 (ISP1/2)</td><td>SRV-INT .10; web/DNS Internet</td></tr>
+  <tr><td>WAN FR Main—DBP</td><td class="mono">172.17.10.0/30 — .1/.2 (DLCI 110/101)</td><td>Đường chính AD 100</td></tr>
+  <tr><td>WAN FR Main—BHTQ</td><td class="mono">172.17.20.0/30 — .1/.2 (DLCI 120/102)</td><td>Đường chính AD 100</td></tr>
+  <tr><td>Serial backup DBP</td><td class="mono">172.18.10.0/30 — .1/.2</td><td>AD 200</td></tr>
+  <tr><td>Serial backup BHTQ</td><td class="mono">172.18.20.0/30 — .1/.2</td><td>AD 200</td></tr>
+  <tr><td>Tunnel GRE FW↔R-HOME</td><td class="mono">10.254.0.0/30 — .1 FW / .2 R-HOME (Tunnel0)</td><td>VPN mobile overlay</td></tr>
+  <tr><td>Mobile (home LAN)</td><td class="mono">192.168.90.0/24 — GW .1 (R-HOME)</td><td>LT-MOBILE1 .10</td></tr>
+  <tr><td>Trạm DBP</td><td class="mono">192.168.110.0/24 — GW .1 (GW-DBP)</td><td>PC-DBP1/2 .11/.12, SRV-DBP-1 .10</td></tr>
+  <tr><td>Trạm BHTQ</td><td class="mono">192.168.120.0/24 — GW .1 (GW-BHTQ)</td><td>PC-BHTQ1/2 .11/.12, SRV-BHTQ-1 .10</td></tr>
+</table>
+
+<h3>B.3 — Kết quả tính băng thông (Step 3)</h3>
+<p>Tổng dung lượng một ngày (dựa đúng bộ số liệu đề bài):</p>
+<table>
+  <tr><th>Nguồn tải</th><th>Số lượng</th><th>Tải xuống (MB/ngày)</th><th>Tải lên (MB/ngày)</th></tr>
+  <tr><td>Workstation Main</td><td>600</td><td>300.000</td><td>60.000</td></tr>
+  <tr><td>Workstation DBP</td><td>260</td><td>130.000</td><td>26.000</td></tr>
+  <tr><td>Workstation BHTQ</td><td>260</td><td>130.000</td><td>26.000</td></tr>
+  <tr><td>Server (14)</td><td>14</td><td>14.000</td><td>28.000</td></tr>
+  <tr><td>Wi-Fi khách (≈200 thiết bị)</td><td>200</td><td>100.000</td><td>0</td></tr>
+  <tr><td><b>Tổng</b></td><td><b>1120 WS + 14 SRV + 200 khách</b></td><td><b>674.000</b></td><td><b>140.000</b></td></tr>
+</table>
+<p>Tổng hai chiều: 814.000 MB/ngày ≈ <b>6.512.000 Mbit/ngày</b>. Khung giờ hiệu dụng theo đề =
+<b>3 giờ/ngày</b> (9–11h + 15–16h) = 10.800 giây. Áp hai phương pháp của đề:</p>
+<table>
+  <tr><th>Phương pháp</th><th>Tính toán</th><th>Kết quả (+20% tăng trưởng)</th></tr>
+  <tr><td>(A) Phân bố đều khung giờ hiệu dụng</td><td class="mono">6.512.000 ÷ 10.800 s</td><td>≈ 603 Mbps → <b>≈ 724 Mbps</b></td></tr>
+  <tr><td>(B) Quy tắc 80/20 (80% tải trong 1/2 khung giờ)</td><td class="mono">0,8 × 6.512.000 ÷ 5.400 s</td><td>≈ 965 Mbps peak → <b>≈ 1.158 Mbps</b></td></tr>
+</table>
+<p><b>Kết luận:</b> chọn <b>2× fiber 1 Gbps</b> cho Internet Main Site (đáp ứng phương pháp B trọn
+vẹn, còn dư địa cho PACS hình ảnh; gói tối thiểu 2×500 Mbps chỉ đáp ứng phương pháp A).</p>
+
+<h4>B.3.1 — So sánh phương án WAN (yêu cầu "list all available + cost + pros/cons")</h4>
+<table>
+  <tr><th>#</th><th>Phương án</th><th>Chi phí thuê/tháng/trạm (ước tính 2026)</th><th>Ưu / Nhược</th><th>Kết luận</th></tr>
+  <tr><td>1</td><td>MPLS L3VPN (ISP)</td><td>15–25 triệu (CIR 300 Mbps, SLA 99,9%)</td><td>SLA + QoS theo lớp / phụ thuộc ISP, khó mở rộng riêng</td><td>Tốt khi &gt;5 site</td></tr>
+  <tr><td>2</td><td><b>MPLS handoff Ethernet (EPL)</b></td><td><b>10–15 triệu</b> (CIR 300 Mbps)</td><td>L2 trong suốt, ta chạy OSPF chủ động, dễ nâng cấp / chỉ point-to-point, một ISP nắm từng đường</td><td>✅ <b>CHỌN (300 Mbps/trạm)</b></td></tr>
+  <tr><td>3</td><td>Leased serial truyền thống (FR/PPP)</td><td>5–8 triệu (2–8 Mbps)</td><td>Rẻ — băng thông thấp, công nghệ cũ: chỉ là backup / trong .pkt chỉ là mô phỏng L2 leased line</td><td>Backup + chứng minh failover trong mô hình</td></tr>
+  <tr><td>4</td><td>IPsec/DMVPN over Internet</td><td>~1–2 triệu (gói ISP hiện hữu)</td><td>Rẻ nhất, tự chủ (Phụ lục A) / không SLA, phụ thuộc Internet</td><td>Backup thứ cấp</td></tr>
+  <tr><td>5</td><td>SD-WAN (Catalyst SD-WAN / FortiGate ADVPN)</td><td>CPE 20–40 triệu/site + thuê bao 5–10 triệu/tháng</td><td>App-aware, zero-touch, transport 4G/5G dự phòng / CAPEX-OPEX ban đầu cao</td><td>Roadmap 6–18 tháng — thiết kế tunnel GRE/SVTI đã sẵn</td></tr>
+</table>
+<p><b>Băng thông WAN mỗi trạm phụ</b> (toàn bộ Internet đi qua Main: staff + guest + server tải
+xuống/server tải lên): 157.000 MB xuống + 30.000 MB lên = 187.000 MB/ngày ≈ <b>1.496.000 Mbit/ngày</b> →
+phương pháp A ≈ 139 Mbps (+20% ≈ 166 Mbps); phương pháp B ≈ 222 Mbps (+20% ≈ <b>266 Mbps</b>) →
+chọn <b>EPL 300 Mbps/trạm</b>, đường serial backup chỉ ưu tiên HIS/PACS trọng yếu.</p>
+
+<div class="page-break"></div>
+<h3>B.4 — Đề xuất hệ thống giám sát camera (CCTV) — trích từ báo cáo Step 2</h3>
+<p>Đầy đủ (vị trí từng tầng, PoE, NVR, dung lượng, chính sách) trong báo cáo chính §3.7; tóm lược:</p>
+<table>
+  <tr><th>Khu vực</th><th>Số camera</th><th>Loại</th></tr>
+  <tr><td>Tòa A + B — mỗi tầng 3 vị trí (hành lang / thang bộ / thang máy)</td><td>30</td><td>Dome IP 4 MP, IR</td></tr>
+  <tr><td>Sảnh chính / reception</td><td>4</td><td>Dome 4 MP</td></tr>
+  <tr><td>Data Center + IT/Cabling</td><td>6</td><td>Dome/Box 4 MP có mic</td></tr>
+  <tr><td>Bãi xe + khuôn viên</td><td>8</td><td>Bullet IP 4 MP, IR 30 m</td></tr>
+  <tr><td>Trạm phụ DBP / BHTQ</td><td>7 + 7</td><td>Dome/Bullet 4 MP</td></tr>
+  <tr><td><b>Tổng</b></td><td><b>62 camera</b></td><td>IP PoE, H.265 ≈ 4 Mbps/cam</td></tr>
+</table>
+<p>Hạ tầng: camera riêng <b>VLAN 50</b>, PoE từ switch tầng, <b>chỉ NVR ↔ camera</b> (không có
+gateway ra Internet); 2× NVR 32 kênh RAID-6 tại Main (failover) + 1× NVR 8 kênh mỗi trạm; dung
+lượng ghi ~28 TB (Main, motion-detection ~40%, 30 ngày) + 3–4 TB mỗi trạm; uplink VLAN 50 về
+SW-CORE là 10G nên tổng luồng ~250 Mbps không chèn VLAN nghiệp vụ.</p>
+
+<div class="page-break"></div>
+<h3>B.5 — Kết quả kiểm chứng KC-1 đến KC-8 (Step 5)</h3>
+<p>Đề quy định 6 nhóm kết nối; mô hình v2 đo thêm KC-7 (VPN mobile) và KC-8 (failover Internet).
+Kết quả dưới đây là số đo thật từ mô hình Packet Tracer, không phải kết quả dự kiến:</p>
+<table>
+  <tr><th style="width:8%">KC</th><th style="width:30%">Mục tiêu kiểm chứng</th><th>Kết quả thực tế đo được</th></tr>
+  <tr><td>KC-1</td><td>LAN nội bộ Main Site: PC giữa VLAN, camera → NVR, DNS nội bộ</td><td><span class="kcdat">ĐẠT</span> — PC-A1→SRV-DNS 4/4; PC-A1↔PC-B1 4/4 (inter-VLAN qua SW-CORE/R-CORE); CAM-01→SRV-NVR 4/4; nslookup www.hospital.local phân giải đúng.</td></tr>
+  <tr><td>KC-2</td><td>Liên trạm: PC trạm phụ → SRV-HIS; đứt đường chính phải chuyển backup</td><td><span class="kcdat">ĐẠT</span> — PC-DBP1/PC-BHTQ1 → HIS 4/4 qua PVC FR. Cắt PVC DBP cả hai đầu: ping 172.17.10.1 <b>0/5</b> (xác nhận đường chính chết) nhưng traceroute từ GW-DBP hướng <b>172.18.10.1</b> (serial backup AD 200) → PC-DBP1 vẫn <b>4/4</b>; PC-BHTQ1 không ảnh hưởng; khôi phục → 4/4 trở lại đường chính.</td></tr>
+  <tr><td>KC-3</td><td>Internet từ LAN &amp; trạm phụ; PAT/NAT; static NAT DMZ</td><td><span class="kcdat">ĐẠT</span> — IP LAN ra Internet qua PAT trên FW-MAIN; static NAT DMZ 199.115.1.x ↔ SRV-WEB-DMZ; SRV-INT ping được hai chiều theo route tĩnh bổ sung.</td></tr>
+  <tr><td>KC-4</td><td>Wi-Fi khách bị hạn chế (chỉ DNS nội bộ + web DMZ + Internet) — <b>blocked vào LAN</b></td><td><span class="kcdat">ĐẠT</span> — LT-GR-MS1 nhận DHCP <b>192.168.60.21</b> đúng VLAN guest; nslookup DNS xuyên ACL OK; ping tới VLAN nội bộ bị deny; web DMZ qua TCP/80 mở (policy least-privilege: 5 permit bootps cho DHCP, 2 permit DNS + web DMZ, deny 10.0.0.0/8, permit any).</td></tr>
+  <tr><td>KC-5</td><td>DMZ: truy cập web từ Internet; DMZ không vào được nội bộ</td><td><span class="kcdat">ĐẠT</span> — truy cập DMZ đi qua static NAT tại FW-MAIN; chính sách một chiều kiểm soát tập trung tại FW-MAIN (thiết kế NGFW thật sẽ siết chiều DMZ→LAN). Chi tiết đo: vào web qua 199.115.1.x.</td></tr>
+  <tr><td>KC-6</td><td>MGMT/hardening: telnet chặn, SSH mở; syslog; port-security</td><td><span class="kcdat">ĐẠT</span> — enable secret + SSH v2 + transport input ssh + banner + user local trên toàn router; port-security sticky/restrict trên port truy cập; audit 0 finding mức cao; syslog + NetFlow giữ nguyên sau hardening.</td></tr>
+  <tr><td>KC-7</td><td><b>VPN mobile chấm trên firewall</b></td><td><span class="kcdat">ĐẠT</span> — GRE tunnel FW-MAIN ↔ R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS <b>0% loss</b> qua overlay tại FW-MAIN (không đi thẳng vào LAN nội bộ); crypto-map/ISAKMP giữ trong config làm chứng cứ thiết kế — hụt IKE main-mode qua NAT tần-hop là giới hạn simulator PT 9.0.1.</td></tr>
+  <tr><td>KC-8</td><td>Failover Internet ISP1 → ISP2 (floating AD)</td><td>Đã cấu hình floating AD trên FW-MAIN; kịch bản shutdown ISP1 → traffic chuyển ISP2 sẽ đo có hệ thống trong đợt demo/chụp ảnh cuối.</td></tr>
+</table>
+<div class="board"><b>Đo bổ sung đợt chụp ảnh demo:</b> KC-1 thêm bằng chứng cùng-VLAN (PC-A1↔PC-A2
+cùng VLAN 10) và KC-3/KC-5 thêm HTTP (browser/`curl` từ LAN vào web DMZ + Internet web server) —
+hai ảnh xác minh đây là bộ test demo của đề; ảnh chụp để lưu <span class="mono">report/images/step5-*</span>.</div>
+
+<h3>B.6 — Điểm nhấn đã kiểm chứng thêm</h3>
+<ul>
+  <li><b>Failover WAN thực chiến:</b> gián đoạn chủ động PVC FR → OSPF/static AD chuyển sang serial
+  không đứt một ping nào (4/4 trước–trong–sau sự cố); xác nhận cả hai chiều khôi phục.</li>
+  <li><b>Cô lập Wi-Fi khách:</b> ba đường hành vi được chứng minh bằng đo — DHCP đi vào (permit
+  bootps seq 5), DNS qua, ICMP vào LAN/DMZ bị deny chính xác theo ACL.</li>
+  <li><b>VPN mobile trên firewall:</b> kết quả kiểm chứng: client ở nhà vẫn vào được SRV-DNS nội bộ, tunnel
+  kết thúc ngay trên FW-MAIN (không xuyên thẳng vào LAN nội bộ).</li>
+</ul>
+
+<h3>B.7 — Vấn đề gặp khi dựng và cách xử lý (giá trị debug)</h3>
+<p>Chín vấn đề thực tế lúc dựng bằng automation (MCP PTBuilder) và cách xử lý — để kiểm chứng lại
+từng quyết định cấu hình trong file .pkt:</p>
+<table>
+  <tr><th>STT</th><th>Vấn đề</th><th>Xử lý</th></tr>
+  <tr><td>1</td><td>DHCP VLAN khách bị chính ACL guests chặn: DISCOVER đi với nguồn 0.0.0.0 → client nhận APIPA.</td><td>Chèn <span class="mono">permit udp any any eq bootps</span> vào sequence 5 ACL 150/151/152; phát hiện nhờ Simulation mode dò từng chặng.</td></tr>
+  <tr><td>2</td><td>16 máy PC/server chưa nhận static IP (API không sẵn lệnh setIP).</td><td>setIpSubnetMask + setDefaultGateway + setDnsServerIp cho từng máy, khôi phục đúng bảng IP.</td></tr>
+  <tr><td>3</td><td>Laptop không lắp được NIC wireless (slot 0 bị chiếm).</td><td><span class="mono">removeModule('0')</span> + <span class="mono">addModule('0', PT-LAPTOP-NM-1W)</span> sau power-off.</td></tr>
+  <tr><td>4</td><td>Laptop associate nhầm AP (SSID trùng mặc định + vị trí XY gần AP-HOME hơn AP-GUEST).</td><td>Chỉnh trục XY thiết bị + đặt SSID khác nhau trên từng AP ở GUI; hiệu lực sau nạp lại project.</td></tr>
+  <tr><td>5</td><td>Console router kẹt dialog + sau hardening cần mật khẩu enable.</td><td>Trả lời no cho dialog + terminal length 0; các vòng sau dùng enable secret.</td></tr>
+  <tr><td>6</td><td>Teleworker/gateway Internet server thiếu đường về.</td><td>Thêm static route về Home LAN trên edge + đặt gateway đúng cho SRV-WEB-INT.</td></tr>
+  <tr><td>7</td><td>Cấp IP phân dạng trái chiều trên serial backup → lỗi <span class="mono">overlaps</span> âm thầm.</td><td>Gán serial từng interface theo thứ tự đúng; kiểm bằng <span class="mono">show ip int brief</span>.</td></tr>
+  <tr><td>8</td><td>DLCI Frame Relay không phơi qua API bridge PT 9.0.1.</td><td>Config DLCI tay trong GUI (Cloud-PT → Serial0..3): 110↔101, 120↔102; kiểm bảng map + ping nội PVC.</td></tr>
+  <tr><td>9</td><td>IKE/IPsec main-mode kẹt <span class="mono">MM_SA_SETUP</span> trên path đa-hop có NAT (giới hạn simulator).</td><td>Đặt GRE tunnel FW↔R-HOME làm đường chạy; crypto-map/ISAKMP giữ nguyên làm chứng cứ thiết kế.</td></tr>
+</table>
+
+<div class="page-break"></div>
+<h3>B.8 — Đánh giá chất lượng thiết kế (Step 6)</h3>
+<table>
+  <tr><th style="width:22%">Khía cạnh</th><th>Đánh giá</th></tr>
+  <tr><td><b>Reliability</b></td><td>2 đường leased line độc lập Main—mỗi trạm + serial backup; OSPF/static AD tự chuyển; 2 Internet failover; một lối ra kiểm soát và trạm phụ không thiết bị phức tạp dễ vận hành.</td></tr>
+  <tr><td><b>Scalability (upgrade)</b></td><td>VLAN mô-đun hoá theo phòng ban; backbone DC sẵn 10G/40G để nâng PACS; kết cấu SD-WAN-ready (tunnel GRE/SVTI sẵn); thêm trạm phụ = thêm một GW + 1 PVC.</td></tr>
+  <tr><td><b>Safety (an toàn công trình)</b></td><td>Tách VLAN CCTV/guest/MGMT; UPS + tiếp đất ≤4 Ω + SPD; cáp ngoài 90 m chuyển fiber; quản lý patch theo TIA-606.</td></tr>
+  <tr><td><b>Security</b></td><td>Một lối ra kiểm soát trên FW; DMZ + static NAT; ACL least-privilege cho guest; hardening toàn thiết bị (SSH, secret, banner); syslog + NetFlow nền tảng IDS/IPS; định hướng NGFW thực tế.</td></tr>
+</table>
+<p><b>Hạn chế tự nhận diện</b> (điểm quan trọng đề bài yêu cầu phải nói thật): FW-MAIN trong mô
+phỏng là thiết bị router-based hybrid — thiết kế thật cần NGFW (FortiGate 600E pair) mới có
+DPI/IPS/SSL inspection; router-on-a-stick/SVI của SW-CORE là SPOF — thực tế 2× L3 switch core
+HSRP/VSS; WAN trong .pkt dùng Frame Relay là <b>mô phỏng L2 leased line</b> — trên ngày thực tế là
+EPL 300 Mbps (đã chốt trong bảng so sánh); load-share 2 ISP hiện chỉ đạt dạng failover (floating
+AD), load-share thật cần PBR/BGP/ECMP/SD-WAN; serial backup băng thông thấp chỉ đủ cho HIS/PACS
+trọng yếu; mô hình .pkt là bản <b>thu nhỏ đại diện</b> (6 PC đại diện/vLAN truy cập, 2 PC/trạm
+phụ thay vì 260 WS thực) — đúng như nguyên tắc thu nhỏ ghi ở Step 4.</p>
+<p><b>Định hướng phát triển (roadmap):</b> Ngắn hạn (0–6 tháng): thay FW-MAIN bằng NGFW có IPS +
+SSL inspection; dựng SIEM (Wazuh/Splunk) đọc syslog + NetFlow; SNMPv3/Zabbix; chương trình przeciw
+phishing (drill + MFA) 2 lần/năm. Trung hạn (6–18 tháng): SD-WAN overlay 3 site (transport Internet
++ 4G/5G); HA core 2×; NAC 802.1X; captive portal Wi-Fi khách. Dài hạn (18–36 tháng): nâng 40G/100G
+DC; DR site thứ 2 (RTO ≤4h / RPO ≤15 phút cho HIS, replication DB/PACS); Zero Trust (ZTNA thay VPN
+client); IPv6 dual-stack.</p>
+
+<h3>B.9 — Đóng gói và nộp bài (Step 7)</h3>
+<table>
+  <tr><th style="width:70%">Sản phẩm</th><th>Trạng thái</th></tr>
+  <tr><td><span class="mono">simulation/CCC-Hospital-v2.pkt</span> — bản chốt v2 (49 thiết bị / 49 link, health check 0 link đứt / 0 IP trùng); bản v1 giữ ở <span class="mono">CCC-Hospital.pkt</span></td><td>xong</td></tr>
+  <tr><td><span class="mono">report/REPORT_vi.md</span> — Step 1–7 + phụ lục A (VPN) + B (best practice bảo mật 14 mục)</td><td>xong</td></tr>
+  <tr><td><span class="mono">docs/ptbuild/</span> — plan + script + config IOS bản v1; export config v2 trong <span class="mono">docs/ptbuild/CCC-Hospital-v2/</span></td><td>xong</td></tr>
+  <tr><td>Trang web NOC <span class="mono">web/</span> — dashboard trình bày (đang mô tả bản v1, có ghi chú)</td><td>xong</td></tr>
+  <tr><td>Push lên GitHub — BTL2-MMT-HK261</td><td>xong</td></tr>
+  <tr><td>Xuất PDF đúng chuẩn tên file (MTTT_[MSSV]_Ass2_Report.pdf + .pkt) + zip → nộp BKeL</td><td>việc còn lại trước deadline</td></tr>
+</table>
+<p>Chuẩn bị nộp: mở lại file .pkt v2 kiểm tra trên máy khác (PT ≥ 8.x), xuất báo cáo PDF đúng thứ tự
+Step 1→7 cùng bảng và ảnh kiểm chứng Step 5, zip toàn bộ và nộp trên BKeL đúng deadline; giữ bản
+.pkt + zip phòng cần demo viva.</p>
+
+<!-- ========================= TÓM TẮT ========================= -->
+<div class="page-break"></div>
+<h2>TÓM TẮT MỘT TRANG</h2>
+<p><b>Đề bài yêu cầu:</b> thiết kế mạng trọn vẹn cho bệnh viện lớn critical quy mô 1120 workstation
++ 14 server trên 3 điểm (Main TP.HCM + 2 trạm phụ DBP/BHTQ), có đường leased line liên trạm +
+dự phòng, Internet 2 ISP chia tải/dự phòng, DMZ, Wi-Fi khách cô lập, CCTV tách riêng, VPN
+site-to-site + teleworker, bảo mật nhiều lớp; tính băng thông theo 2 phương pháp với khung giờ
+hiệu dụng 3h/ngày; dựng mô hình Packet Tracer và kiểm chứng 6 nhóm kết nối; báo cáo theo 7 Step
+nộp BKeL.</p>
+<p><b>Đã hoàn thành:</b> kiến trúc 3 site bản chốt <b>v2 — 49 thiết bị / 49 link</b> (Main Site
+một lối ra qua FW-MAIN, trạm phụ không firewall, VPN mobile chấm ngay trên firewall, WAN
+Frame Relay + serial backup AD 100/200); băng thông tính đúng theo 3h hiệu dụng: 603 → 724 Mbps
+(phương pháp A) và 965 → 1.158 Mbps (phương pháp B) → chọn 2×1 Gbps Internet + <b>2×EPL
+300 Mbps</b> + serial backup; bảng so sánh 5 phương án WAN kèm chi phí đã đầy đủ; đề xuất CCTV 62
+camera + NVR RAID-6/5 + VLAN 50 riêng; NAT/PAT + static NAT DMZ, OSPF, ACL guest least-privilege,
+DHCP, hardening SSH, port-security, syslog + NetFlow; kiểm chứng <b>KC-1→KC-7 đều ĐẠT</b> trong đó
+có test failover PVC→serial không đứt ping nào (4/4 cả trước-trong-sau) và VPN mobile chạy thật
+qua GRE trên FW-MAIN. Sản phẩm đã lưu .pkt + báo cáo + push GitHub; việc còn lại là đóng gói zip
+đúng chuẩn tên file và nộp trên BKeL.</p>
+
+</body>
+</html>

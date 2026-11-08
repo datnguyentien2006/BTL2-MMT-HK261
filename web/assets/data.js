@@ -352,7 +352,7 @@ window.CCC = (function () {
         { k: "Workstations", v: "260" },
         { k: "Servers", v: "2" },
         { k: "VLANs", v: "3" },
-        { k: "Uplink", v: "EPL 200 Mbps + serial" },
+        { k: "Uplink", v: "EPL 300 Mbps + serial backup" },
         { k: "Subnet", v: "10.11.0.0/16", mono: true }
       ],
       rows: [
@@ -366,7 +366,7 @@ window.CCC = (function () {
         { k: "Workstations", v: "260" },
         { k: "Servers", v: "2" },
         { k: "VLANs", v: "3" },
-        { k: "Uplink", v: "EPL 200 Mbps + serial" },
+        { k: "Uplink", v: "EPL 300 Mbps + serial backup" },
         { k: "Subnet", v: "10.12.0.0/16", mono: true }
       ],
       rows: [

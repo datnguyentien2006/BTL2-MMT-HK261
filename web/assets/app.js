@@ -2497,8 +2497,8 @@ ip route 0.0.0.0 0.0.0.0 203.0.114.1 50</div>
           ${panelHead("WAN utilisation", "Per circuit · live", `<a class="link-arrow" href="#/routing">Circuits ${icon("arrow")}</a>`, "globe")}
           <div class="panel-body stack-sm">
             ${[
-              { name: "MPLS EPL #1 · DBP", load: 42, cap: "200 Mbps", down: "r-wan|r-dbp|mpls" },
-              { name: "MPLS EPL #2 · BHTQ", load: 58, cap: "200 Mbps", down: "r-wan|r-bhtq|mpls" },
+              { name: "MPLS EPL #1 · DBP", load: 42, cap: "300 Mbps", down: "r-wan|r-dbp|mpls" },
+              { name: "MPLS EPL #2 · BHTQ", load: 58, cap: "300 Mbps", down: "r-wan|r-bhtq|mpls" },
               { name: "Serial S0/1/0 · DBP", load: 0, cap: "2 Mbps", down: "r-wan|r-dbp|serial" },
               { name: "ISP1 uplink", load: 31, cap: "1 Gbps", down: "isp1|r-edge|internet" },
               { name: "ISP2 uplink", load: 0, cap: "1 Gbps", down: "isp2|r-edge|internet" }

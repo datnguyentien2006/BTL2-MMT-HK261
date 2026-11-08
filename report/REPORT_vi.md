@@ -64,7 +64,7 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục *cr
 | Internet | 2× DSL load-share/failover, tổng thông qua Main | PBR/floating static trong mô phỏng |
 | DMZ | Web + Mail cho bên ngoài | Static NAT 1:1 |
 | Bảo mật | ACL, NAT, hardening, port-security, syslog/NetFlow | Cẩm nang ở Phụ lục B |
-| Ứng dụng y tế | HIS, RIS-PACS, DB, CCTV/NVR, DNS, syslog | Load balancer đặt trước HIS/RIS-PACS/DB (§2.4) |
+| Ứng dụng y tế | HIS, RIS-PACS, LIS, CRM, DB, CCTV/NVR, DNS, syslog | Load balancer đặt trước HIS/RIS-PACS/DB (§2.4); LIS/CRM chạy chung server farm VLAN 20 |
 
 ### 2.2 Cấu trúc VLAN / địa chỉ IP (đã chốt)
 
@@ -110,7 +110,7 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục *cr
 ### 2.4 Xác định vùng tải cao (hotspots)
 
 - **Server Farm / DMZ:** mọi truy vấn HIS/PACS từ 1120 workstation dồn về VLAN 20; DMZ chịu traffic Internet. ⮑ **10GbE/40GbE** từ DC lên core, uplink SC riêng.
-- **Khe giờ truy cập DB cao:** **9h–11h sáng và 15h–16h chiều**, ~80% dịch chuyển dữ liệu trong ~4 giờ hiệu dụng/ngày, 5 ngày/tuần (dùng làm cơ sở tính Step 3).
+- **Khe giờ truy cập DB cao:** **9h–11h sáng và 15h–16h chiều** (tổng **3 giờ hiệu dụng/ngày**), ~80% dịch chuyển dữ liệu tập trung trong khung này, 5 ngày/tuần (dùng làm cơ sở tính Step 3).
 - **Load balancer đặt ngay trước HIS / RIS-PACS / DB cluster:** phân tải L4/L7, health-check, failover giữa cụm server, tránh tình trạng "một server nghẽn, cả bệnh viện dừng".
 
 ### 2.5 Kết cấu kiến trúc — sơ đồ phân tầng
@@ -246,6 +246,55 @@ kết quả SD-WAN overlay chuẩn bị sẵn: GRE/IPsec + BFD trên đường I
 
 **Định tuyến Internet:** NAT/PAT trên R-EDGE-MS; static default `0.0.0.0/0 → ISP1` + floating AD 50 `→ ISP2` (failover); (muốn load-share thật dùng PBR/ECMP/BGP — ghi trong SD-WAN roadmap).
 
+### 3.6 So sánh phương án WAN — danh sách các lựa chọn khả thi, chi phí & ưu/nhược
+
+> Đề bài yêu cầu *liệt kê hết các phương án khả thi, gợi ý chi phí và phân tích ưu/nhược điểm của
+> phương án chọn*. Giá thuê dưới đây là **ước tính thị trường VNPT/Viettel/FPT 2026**, cần chốt lại
+> bằng báo giá thực tế từng nhà mạng trước khi ký.
+
+| # | Phương án | Công nghệ | Chi phí thuê (ước tính/tháng/trạm phụ) | Ưu điểm | Nhược điểm | Kết luận |
+|---|---|---|---|---|---|---|
+| 1 | MPLS L3VPN ISP | VRF + BGP với CE | 15–25 triệu (CIR 300 Mbps, SLA 99,9%) | SLA + QoS theo lớp, tách routing nội bộ khỏi ISP | Phụ thuộc nhà mạng, chi phí cao theo site, ISP quản lý routing | Tốt cho >5 site — không cần thiết với 2 trạm phụ |
+| 2 | **MPLS handoff Ethernet (EPL/EVPL)** | L2 leased point-to-point transparent | **10–15 triệu** (CIR 300 Mbps) | Kênh L2 trong suốt, OSPF do ta chủ động, băng thông đảm bảo CIR, nâng cấp dễ 1G/10G | Chỉ point-to-point (hub-spoke), mức SLA theo hợp đồng | ✅ **CHỌN** (cả 2 trạm phụ, + serial backup) |
+| 3 | Leased line serial truyền thống (FR/PPP) | Serial FR/PPP DCE-DTE | 5–8 triệu (2–8 Mbps) | Rẻ, ổn định, sẵn trong thư viện PT (mô hình dùng làm L2 leased-line backup) | Băng thông thấp, công nghệ lỗi thời — chỉ đủ cho lưu lượng trọng yếu tối thiểu | Chọn làm backup; trong .pkt chỉ là mô phỏng L2 |
+| 4 | IPsec/DMVPN over Internet | SVTI/GRE trên 2 ISP hiện hữu | ~1–2 triệu (phần băng thông ISP tăng lệch) | Rẻ nhất, cấu hình tự chủ, sẵn site-to-site IPsec (Phụ lục A) | Không SLA, độ trễ/rớt gói phụ thuộc Internet chất lượng | Phương án backup thứ cấp |
+| 5 | SD-WAN (Cisco SD-WAN / FortiGate ADVPN) | Overlay IPsec trên Internet + 4G/5G | CPE 20–40 triệu/site + subscription ~5–10 triệu/tháng | App-aware routing (ưu tiên HIS/PACS), zero-touch, quan sát tập trung; transport dự phòng 4G/5G | CAPEX/OPEX ban đầu cao, cần nhân sự vận hành | Roadmap 6–18 tháng (§7.3) — thiết kế tunnel GRE/SVTI đã sẵn sàng |
+
+**Phương án chốt:** **EPL 300 Mbps ×2 (đường chính) + serial backup (dự phòng)** — tổng chi thuê
+ước tính ~20–30 triệu/tháng cho lane liên trạm, cộng Internet 2×1 Gbps corporate (SLA, IP tĩnh)
+~15–25 triệu/tháng.
+
+### 3.7 Đề xuất hệ thống giám sát camera (CCTV)
+
+**Phạm vi:** toàn khuôn viên Main Site (2 tòa + DC + IT/Cabling + ngoài trời) và 2 trạm phụ.
+Camera IP đặt riêng VLAN 50, lấy PoE từ switch tầng, chỉ kết nối tới NVR (không có gateway ra
+Internet) — khớp ma trận policy ở Phụ lục B.2 (NVR ↔ camera, deny mọi chiều khác).
+
+| Khu vực | Vị trí lắp | Số camera | Loại đề xuất |
+|---|---|---|---|
+| Tòa A + B (mỗi tòa 5 tầng) | Mỗi tầng: 1 hành lang + 1 lối thang bộ + 1 thang máy | 3 × 5 tầng × 2 tòa = **30** | Dome IP 4 MP, IR cho hành lang |
+| Sảnh chính/reception | Lối vào, quầy lễ tân, làn vào, sau phòng đợi | **4** | Dome 4 MP, chống ngược sáng |
+| Data Center + IT/Cabling | DC: 4 (khu rack + cửa); IT Cabling: 2 | **6** | Dome/Box IP 4 MP có mic |
+| Bãi xe + khuôn viên | Cổng vào/ra, 4 góc bãi, viền tường | **8** | Bullet IP 4 MP, IR 30 m |
+| Trạm phụ DBP | 2 tầng: 1 hành lang + 1 lối thang/tầng + sảnh + phòng server | **7** | Dome/Bullet 4 MP |
+| Trạm phụ BHTQ | Nhân bản DBP | **7** | Dome/Bullet 4 MP |
+| **Tổng** | | **62 camera** | IP PoE (IEEE 802.3af/at), H.265 |
+
+**Thông số & hạ tầng:**
+
+- Chất lượng: 4 MP @ H.265 ≈ **4 Mbps/camera**; tổng luồng khi chạy đồng loạt ≈
+  62 × 4 ≈ **250 Mbps** — uplink switch CCTV (VLAN 50) về SW-CORE dùng 10G nên không ảnh hưởng
+  VLAN nhân viên/ nghiệp vụ.
+- NVR: Main Site **2× NVR 32 kênh (RAID-6)**, chia nửa camera theo tòa (failover); trạm phụ mỗi
+  site **1× NVR 8 kênh (RAID-5)**, ghi 14 ngày local.
+- Dung lượng ghi hình: 4 Mbps ≈ 42 GB/ngày/camera nếu ghi liên tục; dùng chế độ motion-detection
+  (~40% thời gian có sự kiện) → Main ≈ (56 camera × 42 GB × 30 ngày × 40%) ≈ 28 TB; mỗi trạm phụ
+  ≈ 3–4 TB. Backup footage theo quy 3-2-1 (Phụ lục B.12), còn lại theo chính sách lưu dữ y tế.
+- Nguồn: switch CCTV tầng dùng PoE+ (30 W/port) + UPS chung rack tầng; camera ngoài trời có SPD
+  chống sét trên cả nguồn và cáp tín hiệu.
+- Riêng tư/pháp lý: biển báo khu vực có camera; quyền xem NVR phân quyền theo RBAC; VLAN 50
+  không có đường ra Internet — chỉ NVR ↔ camera.
+
 ---
 
 ## 4. STEP 3 — TÍNH TOÁN BĂNG THÔNG CHI TIẾT
@@ -258,7 +307,7 @@ kết quả SD-WAN overlay chuẩn bị sẵn: GRE/IPsec + BFD trên đường I
 | Lưu lượng/ workstation | **500 MB tải xuống + 100 MB tải lên / ngày** |
 | Server (14: 10 Main + 2 DBP + 2 BHTQ) | **1000 MB xuống + 2000 MB lên / ngày mỗi server** |
 | Wi-Fi guest | **500 MB tải xuống / ngày mỗi thiết bị khách** |
-| Khe giờ cao điểm DB | **9–11h & 15–16h** (≈ 4 giờ hiệu dụng/ngày), tải đỉnh ≈ **80%** |
+| Khe giờ cao điểm DB | **9–11h & 15–16h** (= **3 giờ hiệu dụng/ngày**), ~80% tải nằm trong khung này |
 | Tuần làm việc | 5 ngày/tuần |
 | Hệ số tăng trưởng dự phòng | **20% trong 5 năm** |
 
@@ -279,30 +328,30 @@ Giả định bổ sung (phải ghi rõ): số thiết bị Wi-Fi khách đồng
 
 ### 4.3 Phương pháp A — phân bổ đều trên thời gian hiệu dụng (bảo thủ)
 
-Thời gian hiệu dụng = 2 khe × 2 h = 4 h = **14 400 giây/ngày**.
+Thời gian hiệu dụng = 9–11h + 15–16h = **3 h = 10 800 giây/ngày**.
 
 ```
 B_A = Tổng Mbit ÷ thời gian hiệu dụng
-    = 6 512 000 Mbit ÷ 14 400 s
-    ≈ 452 Mbps      (trung bình khe giờ hiệu dụng)
-+ tăng trưởng 20%/5 năm → 452 × 1,2 ≈ 543 Mbps
+    = 6 512 000 Mbit ÷ 10 800 s
+    ≈ 603 Mbps      (trung bình khung giờ hiệu dụng)
++ tăng trưởng 20%/5 năm → 603 × 1,2 ≈ 724 Mbps
 ```
 
-→ Với phương pháp bảo thủ, cần tối thiểu **≈ 543 Mbps tổng** băng thông Internet.
+→ Với phương pháp phân bổ đều, cần tối thiểu **≈ 724 Mbps tổng** băng thông Internet.
 
 ### 4.4 Phương pháp B — quy tắc 80/20 (80% tải trong 1/2 thời gian)
 
-80% dung lượng nằm trong 7 200 s (1/2 thời gian hiệu dụng):
+80% dung lượng nằm trong 5 400 s (1/2 thời gian hiệu dụng):
 
 ```
-B_peak = 0,8 × 6 512 000 ÷ 7 200 ≈ 724 Mbps   (tập trung khe 9–11h & 15–16h)
-20% còn lại phân bổ trên 7 200 s:        ≈ 181 Mbps
+B_peak = 0,8 × 6 512 000 ÷ 5 400 ≈ 965 Mbps   (tập trung khe 9–11h & 15–16h)
+20% còn lại phân bổ trên 5 400 s:        ≈ 241 Mbps
 ```
 
-→ Công suất phải đáp ứng **giờ peak ≈ 724 Mbps**, cộng tăng trưởng 20%/5 năm:
+→ Công suất phải đáp ứng **giờ peak ≈ 965 Mbps**, cộng tăng trưởng 20%/5 năm:
 
 ```
-724 × 1,2 ≈ 869 Mbps
+965 × 1,2 ≈ 1 158 Mbps
 ```
 
 ### 4.5 Kết luận & lựa chọn gói
@@ -311,24 +360,25 @@ Tổng băng thông Internet khuyến nghị: **2× [500 Mbps – 1 Gbps]**.
 
 | Phương án | Gói | Đánh giá |
 |---|---|---|
-| Tối thiểu | 2× DSL/fiber 500 Mbps (ISP1 chính, ISP2 floating) | Đủ phương pháp A (543 Mbps), thiếu dư địa cho peak 869 Mbps |
-| **Khuyến nghị** | **2× fiber 1 Gbps (SD-WAN ready)** | Đủ phương pháp B trọn vòng, có dư cho PACS hình ảnh, failover không mất chất lượng |
-| Bổ trợ | 2× MPLS EPL 200 Mbps (liên trạm) + serial backup | Xem bên dưới |
+| Tối thiểu | 2× DSL/fiber 500 Mbps (ISP1 chính, ISP2 floating) | Đủ phương pháp A (724 Mbps < 1 Gbps tổng), thiếu dư địa cho peak 1 158 Mbps |
+| **Khuyến nghị** | **2× fiber 1 Gbps (SD-WAN ready)** | Đủ phương pháp B trọn vòng (peak 1 158 Mbps), có dư cho PACS hình ảnh, failover không mất chất lượng |
+| Bổ trợ | 2× MPLS EPL 300 Mbps (liên trạm) + serial backup | Xem bên dưới |
 
 ### 4.6 Cỡ băng thông đường WAN theo trạm phụ
 
 Tổng load qua WAN **mỗi trạm phụ** (thiết kế: toàn bộ Internet đi qua Main ⇒ mạng trạm phụ + khách Internet trạm đều đi qua):
 
 ```
-Down qua WAN = staff (260×500 = 130 000) + guest (50×500 = 25 000) = 155 000 MB
-Up qua WAN   = staff (26 000) + server (2×2000 = 4 000)          =  30 000 MB
-Tổng          = 185 000 MB/ngày = 1 480 000 Mbit/ngày
+Down qua WAN = staff (260×500 = 130 000) + guest (50×500 = 25 000)
+             + branch server tải xuống từ Internet (2×1000 = 2 000) = 157 000 MB
+Up qua WAN   = staff (26 000) + server (2×2000 = 4 000)                =  30 000 MB
+Tổng          = 187 000 MB/ngày = 1 496 000 Mbit/ngày
 
-Phương pháp A: 1 480 000 ÷ 14 400 ≈ 103 Mbps  → ×1,2 ≈ 123 Mbps
-Phương pháp B: 0,8 × 1 480 000 ÷ 7 200 ≈ 164 Mbps → ×1,2 ≈ 197 Mbps
+Phương pháp A: 1 496 000 ÷ 10 800 ≈ 139 Mbps  → ×1,2 ≈ 166 Mbps
+Phương pháp B: 0,8 × 1 496 000 ÷ 5 400 ≈ 222 Mbps → ×1,2 ≈ 266 Mbps
 ```
 
-→ **Chọn MPLS EPL 200 Mbps/hướng mỗi trạm phụ**, đường serial backup (N×E1 hoặc IPsec broadband) chạy OSPF cost cao; khi leased-line đứt, serial đủ cho HIS/PACS/dịch vụ trọng yếu.
+→ **Chọn MPLS EPL 300 Mbps/hướng mỗi trạm phụ**, đường serial backup (N×E1 hoặc IPsec broadband) chạy OSPF cost cao; khi leased-line đứt, serial đủ cho HIS/PACS/dịch vụ trọng yếu.
 
 ### 4.7 Bảng gợi ý gói ISP (đã chốt)
 
@@ -336,8 +386,8 @@ Phương pháp B: 0,8 × 1 480 000 ÷ 7 200 ≈ 164 Mbps → ×1,2 ≈ 197 Mbps
 |---|---|---|---|
 | ISP1 Main | Fiber corporate | 1 Gbps (min 500) | Internet chính, DMZ static NAT |
 | ISP2 Main | Fiber corporate | 1 Gbps (min 500) | Failover (floating AD 50) + load-share |
-| MPLS EPL #1 | Leased Ethernet | 200 Mbps | Main ↔ DBP |
-| MPLS EPL #2 | Leased Ethernet | 200 Mbps | Main ↔ BHTQ |
+| MPLS EPL #1 | Leased Ethernet | 300 Mbps | Main ↔ DBP |
+| MPLS EPL #2 | Leased Ethernet | 300 Mbps | Main ↔ BHTQ |
 | Serial backup ×2 | N×E1 / IPsec broadband | 2–8 Mbps | OSPF cost cao, ưu tiên HIS/PACS |
 
 ---
@@ -398,7 +448,7 @@ người đọc có thể kiểm chứng từng quyết định cấu hình tron
    Sau hardening, console yêu cầu mật khẩu `enable` — các vòng log sau dùng `enable secret`.
 6. **Stub route teleworker + gateway SRV-WEB-INT**: thêm `ip route 192.168.250.0 255.255.255.0`
    (trên R-EDGE-MS và ISP1) để cân bằng đường về cho home LAN qua 2 chặn ISP; đặt default gateway
-   `198.51.100.1` cho SRV-WEB-INT (ban đầu сервер không có gateway nên không trả lời bất kỳ đích nào).
+   `198.51.100.1` cho SRV-WEB-INT (ban đầu server không có gateway nên không trả lời bất kỳ đích nào).
 
 
 ### 5.3 Ảnh minh hoạ (đã chụp từ mô hình thật)
@@ -406,8 +456,10 @@ người đọc có thể kiểm chứng từng quyết định cấu hình tron
 ![Tổng thể topology CCC-Hospital (src: Packet Tracer 9.0.1)](images/topology-final.png)
 
 Các ảnh bổ sung (OSPF neighbor, NAT table, Wi-Fi guest ACL) có thể chụp thêm từ file
-`simulation/CCC-Hospital.pkt` — toàn bộ giá trị cấu hình đã ghi đầy đủ trong
-`docs/ptbuild/CCC-Hospital/` (plan.json + các file config từng thiết bị).
+mô hình — toàn bộ giá trị cấu hình của **bản khung v1** đã ghi đầy đủ trong
+`docs/ptbuild/CCC-Hospital/` (plan.json + các file config từng thiết bị); cấu hình cuối của
+**bản chốt v2** được export tại `docs/ptbuild/CCC-Hospital-v2/` (config từng thiết bị FW-MAIN,
+GW-MAIN, GW-DBP, GW-BHTQ, R-HOME + table DLCI Frame Relay).
 
 ### 5.4 Bản chốt v2 — bám sát 3 trụ yêu cầu (2026-11-07)
 
@@ -475,16 +527,14 @@ Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi 
 | KC-1 | Truy cập LAN nội bộ: PC VLAN30/40 → DNS + HIS; camera → NVR | `ping`, Web/FTP từ PC | 100% success, DNS resolve | **ĐẠT** — PC-A1→SRV-DNS 4/4; PC-A1→PC-B1 4/4; CAM-01→SRV-NVR 4/4; `nslookup www.hospital.local` → **10.10.200.10** từ PC nội bộ |
 | KC-2 | Liên trạm: PC-DBP1, PC-BHTQ1 → SRV-HIS (10.10.20.x) | `ping` + `tracert` | Đi đường Ethernet EPL; đứt EPL → chuyển serial, ping tiếp tục thành công | **ĐẠT** — PC-DBP1→SRV-HIS 4/4 (EPL); **shutdown `Gi0/1` của R-DBP** → OSPF hội tụ, ping **vẫn 4/4 đi đường serial backup** (`10.255.0.0/30`); khôi phục EPL → 4/4 |
 | KC-3 | Internet: PC trong LAN & branch → 198.51.100.10 | `ping` + Web | Nat PAT hoạt động; shutdown ISP1 → mọi traffic chuyển ISP2 (floating AD50) | **ĐẠT (ping từ LAN)** — LT-GR-MS1→198.51.100.10 **4/4** qua PAT R-EDGE-MS; static NAT DMZ: LT-TELE→`203.0.115.10` 3/4 (TTL 125). Shutdown ISP1/Floating chưa test có hệ thống trong đợt này |
-| KC-4 | Wi-Fi khách bị hạn chế: LT-GUEST chỉ được DNS nội bộ (10.10.10.10 = SRV-DNS), **web DMZ**, Internet; **blocked** tới các VLAN nội bộ & branch | `ping` từng đích | Ping LAN bị `Destination host unreachable / denied` theo ACL; vào web DMZ được | **ĐẠT** — Client Wi-Fi nhận DHCP guest: LT-GR-MS1 = 10.10.60.23, SM-GR-MS1 = 10.10.60.21; `nslookup` xuyên ACL **OK** (10.10.20.5); **ping 10.10.30.11 = 0/4** (ACL 150 deny); **ping 10.10.200.10 ICMP = 0/4** (chỉ permit TCP/80) — đúng policy least-privilege |
+| KC-4 | Wi-Fi khách bị hạn chế: LT-GUEST chỉ được DNS nội bộ (10.10.20.5 = SRV-DNS), **web DMZ**, Internet; **blocked** tới các VLAN nội bộ & branch | `ping` từng đích | Ping LAN bị `Destination host unreachable / denied` theo ACL; vào web DMZ được | **ĐẠT** — Client Wi-Fi nhận DHCP guest: LT-GR-MS1 = 10.10.60.23, SM-GR-MS1 = 10.10.60.21; `nslookup` xuyên ACL **OK** (10.10.20.5); **ping 10.10.30.11 = 0/4** (ACL 150 deny); **ping 10.10.200.10 ICMP = 0/4** (chỉ permit TCP/80) — đúng policy least-privilege |
 | KC-5 | DMZ: PC-INTERNET → `203.0.115.10` (static NAT) hiển thị trang SRV-WEB-DMZ; SRV-WEB-DMZ **không** truy cập được vào VLAN nội bộ | Web browse + `ping` ngược | Web hoạt động; ping từ DMZ vào VLAN20/30 bị deny | **ĐẠT (ping static NAT)** — LT-TELE→203.0.115.10 3/4 (bị drop echo đầu do ARP, 3 reply TTL=125). Phía DMZ: chưa dựng ACL chiều ngược trong mô hình PT (đi thẳng qua router-on-a-stick) — ghi nhận là restrict của NGFW thật |
 | KC-6 | MGMT/hardening: `telnet` bị từ chối, SSH từ MGMT vào thiết bị được; syslog đi về SRV-LOG; port-security drop khi đổi thiết bị | `ssh -l admin`, `telnet`, xóa MAC | Telnet fail, SSH success, syslog thấy tại SRV-LOG, violation restrict khóa port | **ĐẠT (cấu hình + audit)** — `pt_apply_hardening` đã áp cho 6 router + SW-CORE (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local `admin`); `pt_audit_security` R-CORE-MS: **0 finding mức cao** (chỉ ghi chú type 5 — giới hạn IOS của PT); port-security sticky/restrict áp cho **24 access port** (SW-BLD-A/B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ); syslog = 10.10.20.8 + NetFlow collector còn nguyên sau hardening |
 
-![Kiểm chứng liên trạm với shutdown EPL → serial backup](images/step5-failover.png)
-![Wi-Fi guest theo ACL - block LAN, permit DNS+DMZ+Internet](images/step5-guest-acl.png)
-![Static NAT từ Internet vào SRV-WEB-DMZ](images/step5-dmz.png)
-
-*(Ba ảnh trên là vị trí khuyến nghị chụp thêm từ `simulation/CCC-Hospital.pkt`; một ảnh canvas thật
-đã có tại `images/topology-final.png`. Bảng kết quả ở trên đã ghi đủ dữ liệu tương đương năm.)*
+> **Ảnh bằng chứng Step 5:** bốn ảnh chụp CLI/web test (`step5-failover`, `step5-guest-acl`,
+> `step5-dmz`, `step5-samevlan`) được chụp lại trực tiếp từ `simulation/CCC-Hospital-v2.pkt`
+> trong đợt demo cuối; toàn bộ số đo tương ứng đã ghi rành trong bảng KC-1→KC-8 (§6.1).
+> Cho đến bản chốt, kết quả Step 5 dựa trên số đo thật đã liệt kê trong bảng — không dùng số dự kiến.
 
 ### 6.1 Ma trận kiểm chứng v2 (bản nộp cuối — đo trên mô hình thật)
 
@@ -500,6 +550,11 @@ Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi 
 | KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | Đã cấu hình floating AD 50 ISP2; kịch bản đo có hệ thống dành cho demo viva |
 
 ![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology-v2.png)
+
+> **Đo bổ sung (đợt chụp ảnh demo cuối):** KC-1 sẽ thêm kết quả cùng-VLAN (PC-A1↔PC-A2, cùng
+> VLAN 10 = 4/4) và KC-3/KC-5 thêm bằng chứng HTTP (lệnh `curl`/browser từ LAN vào web DMZ &
+> Internet web server) — hai mục này thuộc bộ test demo của đề, số đo sẽ được điền ngay khi
+> chụp ảnh từ `CCC-Hospital-v2.pkt`. Tương tự KC-8 (failover ISP1→ISP2) đo trong cùng đợt.
 
 *KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là quy ước vẽ của PT cho link FR
 (không phải link lỗi) — trạng thái thật đã xác nhận up/up bằng `pt_inspect_ports` (Serial 4/4 up).*
@@ -532,7 +587,7 @@ Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi 
 
 ### 7.3 Định hướng phát triển (roadmap)
 
-- **Ngắn hạn (0–6 tháng):** thay R-EDGE bằng NGFW (FortiGate/Palo Alto/ASA) với IPS + SSL inspection; setup SIEM (Wazuh/Splunk) đọc syslog+NetFlow; Zabbix/SNMPv3 monitor.
+- **Ngắn hạn (0–6 tháng):** thay R-EDGE bằng NGFW (FortiGate/Palo Alto/ASA) với IPS + SSL inspection; setup SIEM (Wazuh/Splunk) đọc syslog+NetFlow; Zabbix/SNMPv3 monitor; **chương trình chống phishing (drill + MFA) 2 lần/năm theo Phụ lục B.11**.
 - **Trung hạn (6–18 tháng):** **SD-WAN overlay** giữa Main↔DBP↔BHTQ (Cisco Catalyst SD-WAN / FortiGate ADVPN): transport Internet + 4G/5G; HA core 2×; NAC 802.1X cho toàn design; captive portal Wi-Fi trả phí.
 - **Dài hạn (18–36 tháng):** nâng 40G/100G DC & spine; DR site thứ 2 (chuyển dịch VM + DB replication cho HIS/PACS); Zero Trust (micro-segmentation, ZTNA thay VPN client); IPv6 dual-stack.
 - **DR cho y tế:** RTO ≤4 h / RPO ≤15 phút cho HIS; backup 3-2-1 (xem Phụ lục B).
