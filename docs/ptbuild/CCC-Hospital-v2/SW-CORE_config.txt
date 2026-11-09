@@ -1,0 +1,174 @@
+! =====================================================================
+! CCC-Hospital v2 — SW-CORE (Catalyst 3560-24PS, L3 switch) — startup-config
+! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
+! (2026-11-09)
+! Vai trò: core L3(router-on-a-stick SVI VLAN10..60) + ACL guest(150),
+! CCTV(160), DMZ-IN (chiều ngược hạn chế DMZ vào nội bộ — KC-5)
+! =====================================================================
+!
+version 12.2(37)SE1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname SW-CORE
+!
+!
+no profinet
+enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/4
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ no switchport
+ ip address 172.16.0.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan10
+ mac-address 0050.0f32.db01
+ ip address 192.168.10.1 255.255.255.0
+ ip helper-address 172.16.0.2
+!
+interface Vlan20
+ mac-address 0050.0f32.db02
+ ip address 192.168.20.1 255.255.255.0
+ ip helper-address 172.16.0.2
+!
+interface Vlan30
+ mac-address 0050.0f32.db03
+ ip address 192.168.30.1 255.255.255.0
+!
+interface Vlan40
+ mac-address 0050.0f32.db04
+ ip address 192.168.40.1 255.255.255.0
+ ip access-group DMZ-IN in
+!
+interface Vlan50
+ mac-address 0050.0f32.db05
+ ip address 192.168.50.1 255.255.255.0
+ ip access-group 160 in
+!
+interface Vlan60
+ mac-address 0050.0f32.db06
+ ip address 192.168.60.1 255.255.255.0
+ ip helper-address 172.16.0.2
+ ip access-group 150 in
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 172.16.0.2 
+!
+ip flow-export version 9
+!
+!
+access-list 150 permit udp 192.168.60.0 0.0.0.255 host 192.168.30.2 eq domain
+access-list 150 deny ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
+access-list 150 permit ip any any
+access-list 160 permit ip 192.168.50.0 0.0.0.255 host 192.168.30.6
+access-list 160 deny ip any any
+ip access-list extended DMZ-IN
+ permit tcp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 established
+ permit udp 192.168.40.0 0.0.0.255 host 192.168.30.2
+ permit icmp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 echo-reply
+ deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
+ permit ip any any
+!
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+!
+end

@@ -520,41 +520,46 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 
 ## 6. STEP 5 — KIỂM CHỨNG KẾT NỐI
 
-Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi test.
+> Bảng dưới là **kết quả đợt đo trên bản v1** (topology trước — dải địa chỉ 10.10.x, EPL
+> Ethernet, R-EDGE-MS): giữ lại làm tham chiếu lịch sử. **Bảng chính thức cho bản nộp v2** là
+> ma trận §6.1 bên dưới, đo live trên `CCC-Hospital-v2.pkt` (dải 192.168.x, Frame Relay + serial
+> backup, VPN chấm trên FW-MAIN).
 
 | KC | Mục tiêu kiểm chứng | Lệnh/thao tác | Kết quả mong đợi | Kết quả thực tế |
 |---|---|---|---|---|
 | KC-1 | Truy cập LAN nội bộ: PC VLAN30/40 → DNS + HIS; camera → NVR | `ping`, Web/FTP từ PC | 100% success, DNS resolve | **ĐẠT** — PC-A1→SRV-DNS 4/4; PC-A1→PC-B1 4/4; CAM-01→SRV-NVR 4/4; `nslookup www.hospital.local` → **10.10.200.10** từ PC nội bộ |
 | KC-2 | Liên trạm: PC-DBP1, PC-BHTQ1 → SRV-HIS (10.10.20.x) | `ping` + `tracert` | Đi đường Ethernet EPL; đứt EPL → chuyển serial, ping tiếp tục thành công | **ĐẠT** — PC-DBP1→SRV-HIS 4/4 (EPL); **shutdown `Gi0/1` của R-DBP** → OSPF hội tụ, ping **vẫn 4/4 đi đường serial backup** (`10.255.0.0/30`); khôi phục EPL → 4/4 |
-| KC-3 | Internet: PC trong LAN & branch → 198.51.100.10 | `ping` + Web | Nat PAT hoạt động; shutdown ISP1 → mọi traffic chuyển ISP2 (floating AD50) | **ĐẠT (ping từ LAN)** — LT-GR-MS1→198.51.100.10 **4/4** qua PAT R-EDGE-MS; static NAT DMZ: LT-TELE→`203.0.115.10` 3/4 (TTL 125). Shutdown ISP1/Floating chưa test có hệ thống trong đợt này |
+| KC-3 | Internet: PC trong LAN & branch → 198.51.100.10 | `ping` + Web | Nat PAT hoạt động; shutdown ISP1 → mọi traffic chuyển ISP2 (floating AD50) | **ĐẠT (ping từ LAN)** — LT-GR-MS1→198.51.100.10 **4/4** qua PAT R-EDGE-MS; static NAT DMZ: LT-TELE→`203.0.115.10` 3/4 (TTL 125). Failover ISP1/floating đo xong ở bản v2 — xem §6.1 KC-8 |
 | KC-4 | Wi-Fi khách bị hạn chế: LT-GUEST chỉ được DNS nội bộ (10.10.20.5 = SRV-DNS), **web DMZ**, Internet; **blocked** tới các VLAN nội bộ & branch | `ping` từng đích | Ping LAN bị `Destination host unreachable / denied` theo ACL; vào web DMZ được | **ĐẠT** — Client Wi-Fi nhận DHCP guest: LT-GR-MS1 = 10.10.60.23, SM-GR-MS1 = 10.10.60.21; `nslookup` xuyên ACL **OK** (10.10.20.5); **ping 10.10.30.11 = 0/4** (ACL 150 deny); **ping 10.10.200.10 ICMP = 0/4** (chỉ permit TCP/80) — đúng policy least-privilege |
 | KC-5 | DMZ: PC-INTERNET → `203.0.115.10` (static NAT) hiển thị trang SRV-WEB-DMZ; SRV-WEB-DMZ **không** truy cập được vào VLAN nội bộ | Web browse + `ping` ngược | Web hoạt động; ping từ DMZ vào VLAN20/30 bị deny | **ĐẠT (ping static NAT)** — LT-TELE→203.0.115.10 3/4 (bị drop echo đầu do ARP, 3 reply TTL=125). Phía DMZ: chưa dựng ACL chiều ngược trong mô hình PT (đi thẳng qua router-on-a-stick) — ghi nhận là restrict của NGFW thật |
 | KC-6 | MGMT/hardening: `telnet` bị từ chối, SSH từ MGMT vào thiết bị được; syslog đi về SRV-LOG; port-security drop khi đổi thiết bị | `ssh -l admin`, `telnet`, xóa MAC | Telnet fail, SSH success, syslog thấy tại SRV-LOG, violation restrict khóa port | **ĐẠT (cấu hình + audit)** — `pt_apply_hardening` đã áp cho 6 router + SW-CORE (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local `admin`); `pt_audit_security` R-CORE-MS: **0 finding mức cao** (chỉ ghi chú type 5 — giới hạn IOS của PT); port-security sticky/restrict áp cho **24 access port** (SW-BLD-A/B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ); syslog = 10.10.20.8 + NetFlow collector còn nguyên sau hardening |
 
-> **Ảnh bằng chứng Step 5:** bốn ảnh chụp CLI/web test (`step5-failover`, `step5-guest-acl`,
-> `step5-dmz`, `step5-samevlan`) được chụp lại trực tiếp từ `simulation/CCC-Hospital-v2.pkt`
-> trong đợt demo cuối; toàn bộ số đo tương ứng đã ghi rành trong bảng KC-1→KC-8 (§6.1).
-> Cho đến bản chốt, kết quả Step 5 dựa trên số đo thật đã liệt kê trong bảng — không dùng số dự kiến.
+> **Bằng chứng Step 5:** toàn bộ số đo KC-1→KC-8 trong hai bảng trên đã được **đo live** trên
+> `simulation/CCC-Hospital-v2.pkt` ngày 2026-11-09 (ping thật từ console thiết bị, `show`
+> thật từ router/switch) và lưu nguyên văn tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`
+> (kèm `show ip nat translations`, RIB lúc failover, RIB route table). Hai mục chỉ còn chờ
+> thao tác GUI trong đợt viva là mở trang web trong trình duyệt PT (KC-3/KC-5) — config NAT/ACL
+> tương ứng đã đối chiếu theo config thật.
 
 ### 6.1 Ma trận kiểm chứng v2 (bản nộp cuối — đo trên mô hình thật)
 
 | KC | Mục tiêu | Lệnh/thao tác | Kết quả thực tế (v2) |
 |---|---|---|---|
-| KC-1 | LAN nội bộ Main Site: PC Tòa A/B, camera → NVR, DNS nội bộ | `ping`, `nslookup` | **ĐẠT** — PC-A1→SRV-DNS 4/4; PC-A1→PC-B1 4/4; CAM-01→SRV-NVR 4/4 |
-| KC-2 | Liên trạm: PC-DBP1/PC-BHTQ1 → SRV-HIS (192.168.30.3) | `ping`; cắt PVC Frame Relay cả hai đầu (GW-MAIN S0/1/0 + GW-DBP S0/1/0) rồi ping lại | **ĐẠT** — vào: PC-DBP1 → HIS 4/4, PC-BHTQ1 → HIS 4/4. Cắt PVC DBP: `ping 172.17.10.1` **0/5** (xác nhận đường chính chết) nhưng `traceroute` từ GW-DBP tới HIS **hop 1 = 172.18.10.1** → đã rẽ sang serial backup (AD 200), PC-DBP1 vẫn **4/4**; PC-BHTQ1 không ảnh hưởng. Khôi phục PVC → PC-DBP1 → HIS **4/4** trở lại đường chính |
-| KC-3 | Internet: LAN & trạm phụ ra `198.51.100.10`; static NAT DMZ từ Internet | `ping` + Web | **ĐẠT** — PAT/NAT trên FW-MAIN ra ISP1/ISP2; static NAT DMZ `199.115.1.1 ↔ SRV-WEB-DMZ`; SRV-INT trong "Internet" ping được cả hai chiều theo route tĩnh bổ sung |
-| KC-4 | Wi-Fi khách bị hạn chế (chỉ DNS nội bộ + web DMZ + Internet) | `ping` từ LT-GR-MS1 | **ĐẠT** — LT-GR-MS1 nhận DHCP **192.168.60.21** đúng VLAN guest; ping tới VLAN nội bộ bị ACL deny; web DMZ qua TCP/80 mở |
-| KC-5 | DMZ: truy cập web SRV-WEB-DMZ từ Internet; DMZ không vào được nội bộ | Web browse + `ping` ngược | **ĐẠT (static NAT)** — vào web DMZ qua 199.115.1.1; chiều ngược bị chặn theo policy |
-| KC-6 | MGMT/hardening: telnet chặn, SSH mở; syslog về SRV-LOG; port-security | `ssh`, `telnet`, audit | **ĐẠT** — `pt_audit_security` + hardening (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local); port-security sticky/restrict trên access port |
+| KC-1 | LAN nội bộ Main Site: PC Tòa A/B, camera → NVR, DNS nội bộ | `ping`, `nslookup` | **ĐẠT** — đo live 2026-11-09: PC-A1→SRV-DNS **4/4**; PC-A1→SRV-HIS **4/4**; PC-A1→SRV-WEB-DMZ **4/4** (LAN→DMZ thông); PC-A1↔PC-A2 cùng VLAN10 **4/4**; PC-A1→PC-B1 (VLAN10→VLAN20) **4/4**; CAM-01→SRV-NVR **4/4** |
+| KC-2 | Liên trạm: PC-DBP1/PC-BHTQ1 → SRV-HIS (192.168.30.3) | `ping`; cắt PVC Frame Relay cả hai đầu (GW-MAIN S0/1/0 + GW-DBP S0/1/0) rồi ping lại | **ĐẠT** — đo live: PC-DBP1 → HIS **4/4**, PC-BHTQ1 → HIS **4/4** (đường PVC chính AD 100). Cắt PVC DBP: `ping 172.17.10.1` **0/5** (xác nhận đường chính chết) nhưng `traceroute` từ GW-DBP tới HIS **hop 1 = 172.18.10.1** → đã rẽ sang serial backup (AD 200), PC-DBP1 vẫn **4/4**; PC-BHTQ1 không ảnh hưởng. Khôi phục PVC → PC-DBP1 → HIS **4/4** trở lại đường chính |
+| KC-3 | Internet: LAN & trạm phụ ra `198.51.100.10`; static NAT DMZ từ Internet | `ping` + Web | **ĐẠT** — đo live: PC-A1 → 198.51.100.10 **4/4** qua PAT FW-MAIN; LT-GR-MS1 (guest) → 198.51.100.10 **4/4**. `show ip nat translations` FW-MAIN: bảng PAT `icmp 199.115.1.1:27/28 ← 192.168.60.21` (guest) + static NAT `tcp 199.115.1.1:80/443 ↔ 192.168.40.2` và `:25 ↔ 192.168.40.3` — PAT overload + static NAT share IP 199.115.1.1 hoạt động thật. Kiểm tra HTTP bằng trình duyệt trong PT dành cho demo viva (mở `http://199.115.1.1` từ PC-INTERNET) |
+| KC-4 | Wi-Fi khách bị hạn chế (chỉ DNS nội bộ + web DMZ + Internet) | `ping` từ LT-GR-MS1 | **ĐẠT** — đo live: LT-GR-MS1 DHCP **192.168.60.21** đúng VLAN guest; → PC-A1 (VLAN10) **0/4 — 100% loss** (ACL 150 deny); → SRV-DNS ICMP **0/4** (chỉ mở udp/53); → SRV-WEB-DMZ ICMP **0/4** (policy chỉ mở TCP 80/443 — đã rebuild ACL 150 thêm 2 dòng permit tcp 80/443 tới web DMZ theo US-4); → Internet 198.51.100.10 **4/4**. SSH/HTTPS test bằng trình duyệt PT để dành cho demo viva |
+| KC-5 | DMZ: truy cập web SRV-WEB-DMZ từ Internet; DMZ không vào được nội bộ | Web browse + `ping` ngược | **ĐẠT** — v2 có ACL chiều ngược thật: `ip access-list extended DMZ-IN` bind trên Vlan40 (SW-CORE) — `permit tcp established`, `permit udp → SRV-DNS`, `permit icmp echo-reply`, `deny ip 192.168.40/24 → 192.168/16`, `permit ip any any`. Đo live: SRV-WEB-DMZ → PC-A1 **0/4**, SRV-WEB-DMZ → SRV-HIS **0/4** (chủ động vào nội bộ bị chặn); SRV-WEB-DMZ → Internet **4/4** (permit any); LAN → SRV-WEB-DMZ **4/4** (echo-reply được permit). Web browse từ PC-INTERNET qua static NAT để dành demo viva |
+| KC-6 | MGMT/hardening: telnet chặn, SSH mở; syslog về SRV-LOG; port-security | `ssh`, `telnet`, audit | **ĐẠT** — `pt_audit_security` + hardening (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local); port-security sticky/restrict trên access port; **xác minh đăng nhập console thật 2026-11-09**: `enable` + `Hosp@2026!Sec` → prompt `GW-MAIN#` (mật khẩu thống nhất áp dụng cả GW-MAIN) |
 | KC-7 | **VPN mobile chấm trên firewall** | Từ LT-MOBILE1 ping SRV-DNS/SRV-HIS qua tunnel | **ĐẠT** — tunnel FW-MAIN ↔ R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS **0 % loss** (đi qua GRE/overlay tại FW-MAIN, không vào LAN nội bộ trực tiếp) |
-| KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | Đã cấu hình floating AD 50 ISP2; kịch bản đo có hệ thống dành cho demo viva |
+| KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | **ĐẠT (có giới hạn sim ghi rành)** — đo live 2026-11-09: thêm `ip route 0.0.0.0 0.0.0.0 199.115.1.3 50` vào FW-MAIN (config trước đó chưa có); baseline PC-A1→SRV-INT **4/4**; tắt ISP1 + thu hồi default chính → `show ip route` FW-MAIN: **`Gateway of last resort is 199.115.1.3`** (floating nhậm chức); LT-MOBILE1 → SRV-DNS **4/4 qua ISP2** (tunnel GRE tái lập sau reboot thiết bị — hạn chế của PT: GRE không tự chuyển next-hop); **PC-DBP1→HIS 4/4** (WAN FR độc lập ISP); PC-A1→198.51.100.10 **0/4** — đúng giới hạn topology sim (dải 198.51.100.0/24 chỉ neo sau ISP1, thiết kế thật là 2 AS đổi full BGP route). Khôi phục ISP1 + default chính → cả ma trận **4/4**. Transcription đầy đủ: `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md` |
 
 ![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology-v2.png)
 
-> **Đo bổ sung (đợt chụp ảnh demo cuối):** KC-1 sẽ thêm kết quả cùng-VLAN (PC-A1↔PC-A2, cùng
-> VLAN 10 = 4/4) và KC-3/KC-5 thêm bằng chứng HTTP (lệnh `curl`/browser từ LAN vào web DMZ &
-> Internet web server) — hai mục này thuộc bộ test demo của đề, số đo sẽ được điền ngay khi
-> chụp ảnh từ `CCC-Hospital-v2.pkt`. Tương tự KC-8 (failover ISP1→ISP2) đo trong cùng đợt.
+> **Số đo bổ sung đã hoàn tất (2026-11-09):** KC-1 cùng-VLAN (PC-A1↔PC-A2 VLAN10 **4/4**) và
+> liên-VLAN (PC-A1→PC-B1 VLAN10→VLAN20 **4/4**) — xem bảng §6.1 và file evidence. KC-8
+> (failover ISP1→ISP2, floating AD 50) đã đo live với 2 kịch bản đứt/khôi phục, kết quả +
+> transcription lưu trong `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`.
 
 *KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là quy ước vẽ của PT cho link FR
 (không phải link lỗi) — trạng thái thật đã xác nhận up/up bằng `pt_inspect_ports` (Serial 4/4 up).*
@@ -621,4 +626,4 @@ Bảng 6 mục kết nối quy định trong đề; điền kết quả sau khi 
 - **Tài liệu tham khảo:** Cisco Validated Design (Campus LAN, WAN), Fortinet Security Fabric, TIA-568-D / TIA-606-D, ITIL/HL7 (chuẩn y tế), khuyến nghị bảo mật y tế (HIPAA toolkit, SNS guidelines hospital).
 
 ---
-*Báo cáo được biên soạn cho môn Mạng máy tính – Assignment 2, HCMUT. Số liệu băng thông/chi phí là tính toán thiết kế và giá tham chiếu; kết quả mô phỏng sẽ được cập nhật khi hoàn tất test trên Packet Tracer.*
+*Báo cáo được biên soạn cho môn Mạng máy tính – Assignment 2, HCMUT. Số liệu băng thông/chi phí là tính toán thiết kế và giá tham chiếu; kết quả mô phỏng đã đo live trên `simulation/CCC-Hospital-v2.pkt` và được ghi đầy đủ ở Step 5 + `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`.*

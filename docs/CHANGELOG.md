@@ -2,6 +2,31 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-09 — Đợt đo kiểm chứng live trên CCC-Hospital-v2.pkt + chỉ SK xuất archive v2
+
+- **Đo live KC-1→KC-8** trên `simulation/CCC-Hospital-v2.pkt` (49 thiết bị/49 link, PT 9.0.1)
+  qua MCP: ping thật từ console thiết bị, `show` thật từ router/switch. Toàn bộ transcription:
+  `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`.
+- **KC-8 failover ISP1→ISP2 đo đầy đủ 2 kịch bản:** baseline 4/4; tắt ISP1 + thu hồi default
+  chính → RIB FW-MAIN chuyển `Gateway of last resort is 199.115.1.3` (floating AD 50 nhậm
+  chức), LT-MOBILE1→SRV-DNS **4/4 qua ISP2**, PC-DBP1→HIS 4/4 (FR độc lập), PC-A1→SRV-INT 0/4
+  (dải "Internet" chỉ neo sau ISP1 — giới hạn sim đã ghi rành); khôi phục → 4/4.
+- **Sửa config thiếu trong .pkt** (đã save lại):
+  - FW-MAIN thiếu floating default AD 50 (report khai báo trước nhưng config thật chỉ có
+    default ISP1) → thêm `ip route 0.0.0.0 0.0.0.0 199.115.1.3 50`.
+  - SW-CORE ACL 150 thiếu permit guest → web DMZ TCP 80/443 (US-4) → rebuild ACL 150 đúng
+    thứ tự + giữ bind `ip access-group 150 in` trên Vlan60.
+  - Khôi phục crypto FW-MAIN (ISAKMP policy/key, transform TS-MOB, crypto map VPN-MOB dưới
+    G0/2) bị rơi trong vòng boot build — khớp phụ lục A.4.
+- **Archive v2 mới:** `docs/ptbuild/CCC-Hospital-v2/` — 9 config (`FW-MAIN`, `GW-MAIN`,
+  `GW-DBP`, `GW-BHTQ`, `R-CORE-MS`, `R-HOME`, `SW-CORE`, `ISP1`, `ISP2` — xuất startup-config
+  thật bằng pt_backup_config) + `metadata.json` + evidence.
+- Xác minh đăng nhập console GW-MAIN: `enable` + `Hosp@2026!Sec` OK (mật khẩu thống nhất
+  đúng cho toàn bộ router; hash Type 5 khác nhau giữa các thiết bị là hành vi bình thường
+  của mỗi lần đặt secret).
+- Report: điền số đo thật vào §6.1 (KC-1..KC-8), gắn nhãn bảng §6 là "đợt đo v1" để không
+  nhầm với v2, thay promise "ảnh CLI chờ chụp" bằng reference file evidence.
+
 ## 2026-11-08 — Round fix trước khi nộp (khớp chuẩn checklist đề bài)
 
 - **Sửa cơ số tính Step 3**: khung giờ "9–11h & 15–16h" = **3 giờ hiệu dụng** (bản đọc nhầm 4h).
