@@ -176,10 +176,9 @@ kết quả.</p>
   (<span class="mono">198.51.100.0/24</span>; <span class="mono">203.0.113.0/30</span> /
   <span class="mono">203.0.114.0/30</span>), syslog + NetFlow về SRV-LOG, DHCP mỗi VLAN.</li>
 </ul>
-<blockquote><b>Ghi chú:</b> bản khung v1 (46 thiết bị, dải <span class="mono">10.10.x</span>,
-R-EDGE-MS làm edge+firewall) vẫn giữ trong <span class="mono">simulation/CCC-Hospital.pkt</span>
-và ở <span class="mono">docs/ptbuild/CCC-Hospital/</span> làm tham chiếu; toàn bộ báo cáo dưới đây
-theo bản chốt v2.</blockquote>
+<blockquote><b>Ghi chú:</b> báo cáo dưới đây theo <b>bản chốt v2</b>
+(<span class="mono">simulation/CCC-Hospital-v2.pkt</span>, 49 thiết bị); cấu hình archive đối chiếu tại
+<span class="mono">docs/ptbuild/CCC-Hospital-v2/</span>.</blockquote>
 
 <h3>B.2 — Cấu trúc VLAN và địa chỉ IP đã cài đặt</h3>
 <table>
@@ -333,10 +332,9 @@ client); IPv6 dual-stack.</p>
 <h3>B.9 — Đóng gói và nộp bài (Step 7)</h3>
 <table>
   <tr><th style="width:70%">Sản phẩm</th><th>Trạng thái</th></tr>
-  <tr><td><span class="mono">simulation/CCC-Hospital-v2.pkt</span> — bản chốt v2 (49 thiết bị / 49 link, health check 0 link đứt / 0 IP trùng); bản v1 giữ ở <span class="mono">CCC-Hospital.pkt</span></td><td>xong</td></tr>
+  <tr><td><span class="mono">simulation/CCC-Hospital-v2.pkt</span> — bản nộp duy nhất (49 thiết bị / 49 link, health check 0 link đứt / 0 IP trùng)</td><td>xong</td></tr>
   <tr><td><span class="mono">report/REPORT_vi.md</span> — Step 1–7 + phụ lục A (VPN) + B (best practice bảo mật 14 mục)</td><td>xong</td></tr>
-  <tr><td><span class="mono">docs/ptbuild/</span> — plan + script + config IOS bản v1; export config v2 trong <span class="mono">docs/ptbuild/CCC-Hospital-v2/</span></td><td>xong</td></tr>
-  <tr><td>Trang web NOC <span class="mono">web/</span> — dashboard trình bày (đang mô tả bản v1, có ghi chú)</td><td>xong</td></tr>
+  <tr><td><span class="mono">docs/ptbuild/CCC-Hospital-v2/</span> — archive config IOS của bản nộp (9 config thật + metadata + evidence đo live KC-1→KC-8)</td><td>xong</td></tr>
   <tr><td>Push lên GitHub — BTL2-MMT-HK261</td><td>xong</td></tr>
   <tr><td>Xuất PDF đúng chuẩn tên file (MTTT_[MSSV]_Ass2_Report.pdf + .pkt) + zip → nộp BKeL</td><td>việc còn lại trước deadline</td></tr>
 </table>

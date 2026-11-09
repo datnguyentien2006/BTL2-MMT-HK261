@@ -2,6 +2,24 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-09 — Dọn repo: chỉ giữ bản final nộp bài
+
+- **Giao:** repo (GitHub `datnguyentien2006/BTL2-MMT-HK261`) chỉ giữ **bản final cuối cùng**;
+  các bản trung gian/v1 không push lên repo nữa.
+- **Xóa:**
+  - `simulation/CCC-Hospital.pkt` (bản khung v1 46/45) và 2 ảnh `CCC_Hospital_v2_final.png` /
+    `CCC_Hospital_v2_layout.png` (không được tham chiếu trong report) → `simulation/` giờ chứa
+    duy nhất `CCC-Hospital-v2.pkt`.
+  - `docs/ptbuild/CCC-Hospital/` (archive config v1, 20 file) — các thay đổi ACL guest/CCTV của
+    thành viên trên bản v1 đã dồn vào lịch sử git; bản archive duy nhất của repo là
+    `docs/ptbuild/CCC-Hospital-v2/`.
+  - `web/` (dashboard NOC mô tả bản khung v1) — để tránh nhầm lẫn hai phiên bản thiết kế trong
+    bộ nộp.
+- **Sửa tham chiếu theo đó:** README,
+  `report/REPORT_vi.md` (§5.2 bước chuẩn bị, §5.3 archive config, bảng đóng gói §8),
+  `download/btl2_src.html` (ghi chú phiên bản + B.9 đóng gói) → PDF nộp render lại.
+- Lịch sử git vẫn giữ nguyên toàn bộ file v1/web đã xóa (có thể truy vết bằng commit cũ).
+
 ## 2026-11-09 — Đợt đo kiểm chứng live trên CCC-Hospital-v2.pkt + chỉ SK xuất archive v2
 
 - **Đo live KC-1→KC-8** trên `simulation/CCC-Hospital-v2.pkt` (49 thiết bị/49 link, PT 9.0.1)

@@ -415,7 +415,7 @@ Phương pháp B: 0,8 × 1 496 000 ÷ 5 400 ≈ 222 Mbps → ×1,2 ≈ 266 Mbps
 
 ### 5.2 Các bước dựng
 
-1. **Chuẩn bị:** cài PT mới nhất; mở dự án `CCC-Hospital.pkt`; kế hoạch device/link từ `docs/ptbuild/CCC-Hospital/plan.json` (46 thiết bị / 45 link).
+1. **Chuẩn bị:** cài PT mới nhất; kế hoạch device/link theo thiết kế bảng mapping ở §5.1; toàn bộ cấu hình cuối đối chiếu bằng archive `docs/ptbuild/CCC-Hospital-v2/`.
 2. **Đặt thiết bị & link:** 7 router, 9 switch, 10 server, 5 AP, 15 endpoint/camera theo bảng mapping; link straight/cross/serial theo bảng topology.
 3. **Cấu hình VLAN & trunking:** SW truy cập gán VLAN 30/40/60(DBP:61/63, BHTQ:71/73); trunk 802.1Q về R-CORE-MS/SW-CORE.
 4. **Inter-VLAN (router-on-a-stick):** subinterface `G0/0.10..200` với gateway `.1` mỗi VLAN.
@@ -457,10 +457,9 @@ người đọc có thể kiểm chứng từng quyết định cấu hình tron
 ![Tổng thể topology CCC-Hospital (src: Packet Tracer 9.0.1)](images/topology-final.png)
 
 Các ảnh bổ sung (OSPF neighbor, NAT table, Wi-Fi guest ACL) có thể chụp thêm từ file
-mô hình — toàn bộ giá trị cấu hình của **bản khung v1** đã ghi đầy đủ trong
-`docs/ptbuild/CCC-Hospital/` (plan.json + các file config từng thiết bị); cấu hình cuối của
-**bản chốt v2** được export tại `docs/ptbuild/CCC-Hospital-v2/` (config từng thiết bị FW-MAIN,
-GW-MAIN, GW-DBP, GW-BHTQ, R-HOME + table DLCI Frame Relay).
+mô hình — toàn bộ cấu hình của **bản chốt v2** được export tại `docs/ptbuild/CCC-Hospital-v2/`
+(config từng thiết bị FW-MAIN, GW-MAIN, GW-DBP, GW-BHTQ, R-CORE-MS, R-HOME, SW-CORE, ISP1/ISP2 +
+metadata + `evidence-2026-11-09.md`).
 
 ### 5.4 Bản chốt v2 — bám sát 3 trụ yêu cầu (2026-11-07)
 
@@ -606,7 +605,7 @@ _KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là q
 
 | File                                | Mô tả                                                                                                                                                                    |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `MTTT_[MSSV]_Ass2_CCC-Hospital.pkt` | File Packet Tracer (**bản chốt v2** — `simulation/CCC-Hospital-v2.pkt`, 49 thiết bị / 49 link đã build & test; bản v1 46 thiết bị lưu tại `simulation/CCC-Hospital.pkt`) |
+| `MTTT_[MSSV]_Ass2_CCC-Hospital.pkt` | File Packet Tracer (**bản chốt v2** — `simulation/CCC-Hospital-v2.pkt`, 49 thiết bị / 49 link đã build & test) |
 | `MTTT_[MSSV]_Ass2_Report.pdf`       | Xuất báo cáo này (REPORT_vi.md → PDF)                                                                                                                                    |
 | `MTTT_[MSSV]_Ass2.zip`              | Zip gồm: .pkt + PDF + thư mục `images/` + phụ lục (vpn-configs, security-best-practices)                                                                                 |
 
