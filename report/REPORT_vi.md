@@ -117,8 +117,7 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục _cr
 
 Chọn cấu trúc kiểu phân tầng **Access – Distribution – Core – Data Center + WAN**: modul hoá theo tầng/tòa, dễ mở rộng, định tuyến ở lõi, ổn định domain failure nhỏ.
 
-```
-                    ┌─────────────────────────── INTERNET (2× DSL) ──────────────────────────┐
+``                    ┌─────────────────────────── INTERNET (2× DSL) ──────────────────────────┐
                     │                                        │                                │
                     │   ISP1 ───────────►┌──────────┐◄─────── ISP2                        │
                     │                   │ R-EDGE-MS │  (firewall + NAT + DMZ)              │
@@ -147,8 +146,7 @@ Chọn cấu trúc kiểu phân tầng **Access – Distribution – Core – Da
 
    ══════ Home / Teleworker ══════
         Laptop (+AP-HOME/SW-HOME) ──Internet──► R-EDGE-MS / NGFW (client VPN)
-```
-
+``
 ### 2.6 Thẩm mỹ (aesthetics) & tiêu chuẩn lắp đặt
 
 - Cáp đi trong **cống/kênh cáp kín (coro/thanh treo)** đạt chuẩn **TIA-568A/B (TIA-568-D)**: tách cáp điện/cáp tín hiệu ≥ 30 cm (song song) hoặc bắt buộc cách bằng vách kim loại đã tiếp đất.
@@ -188,12 +186,11 @@ Chọn cấu trúc kiểu phân tầng **Access – Distribution – Core – Da
 
 ### 3.2 Thiết bị mô phỏng Packet Tracer (bản thu nhỏ, khớp kiến trúc)
 
-R-EDGE-MS = Cisco **2911** (firewall/NAT), R-CORE-MS = Cisco **2911** (inter-VLAN, router-on-a-stick _thay cho 2× L3 switch_), R-WAN-MS = Cisco **ISR4331**, ISP1/ISP2 = Cisco **2911**, SW-CORE = **3560-24PS**, switch truy cập = **2960-24TT**; wireless = AccessPoint-PT + laptop/smartphone Wi-Fi khách. **Tổng 46 thiết bị, 45 link.**
+FW-MAIN = Cisco **2911** (firewall/NAT/DMZ + đầu cuối VPN), R-CORE-MS = Cisco **2911** (inter-VLAN, DHCP tập trung, router-on-a-stick _thay cho 2× L3 switch_), GW-MAIN = Cisco **ISR4331** (WAN hub), GW-DBP/GW-BHTQ = Cisco **2911**, R-HOME = Cisco **2911** (teleworker), ISP1/ISP2 = Cisco **2911**, SW-CORE = **3560-24PS**, switch truy cập = **2960-24TT**; wireless = AccessPoint-PT (AP-GUEST, AP-HOME). **Tổng 49 thiết bị, 49 link** — địa chỉ & WAN chi tiết ở §5.4.
 
 ### 3.3 Sơ đồ vật lý Main Site (mô tả)
 
-```
-                         ┌────────────────────────── Main Site TP.HCM ────────────────────────────┐
+``                         ┌────────────────────────── Main Site TP.HCM ────────────────────────────┐
                          │                                                                        │
    Toà A (5 tầng)        │      Toà B (5 tầng)               Data Center          IT/Central Cabling
  ┌───────────────────┐   │  ┌───────────────────┐        ┌────────────────┐      ┌──────────────────┐
@@ -205,14 +202,12 @@ R-EDGE-MS = Cisco **2911** (firewall/NAT), R-CORE-MS = Cisco **2911** (inter-VLA
            └─────────────┴────────────┴──────► SW-CORE (SW layer)◄──┴─────────────────────────┘
                                                   │
                           VLAN: 10 MGMT │ 20 SRV │ 30 Toà A │ 40 Toà B │ 50 CCTV │ 60 WiFi-Guest │ 200 DMZ
-```
-
+``
 Mỗi tòa 5 tầng × 10 phòng; mỗi tầng: patch panel + 1 access switch 48p (hoặc 2 nếu >24 socket/tầng), 2 AP Wi-Fi 6; backhaul fiber OM4 về SW-CORE/IT Central Cabling.
 
 ### 3.4 Sơ đồ trạm phụ (nhân bản 2 site)
 
-```
-┌──── Trạm phụ (DBP / BHTQ) — 2 tầng ────┐
+``┌──── Trạm phụ (DBP / BHTQ) — 2 tầng ────┐
 │  R-DBP (ISR4331)                        │
 │   ├─ G0/0  router-on-a-stick            │
 │   │    ├─ .61 ETH-MPLS: 10.254.0.2/30   │
@@ -224,12 +219,10 @@ Mỗi tòa 5 tầng × 10 phòng; mỗi tầng: patch panel + 1 access switch 48
 │               63 guest                  │
 │  260 PC + 2 SRV + AP                    │
 └─────────────────────────────────────────┘
-```
-
+``
 ### 3.5 Sơ đồ WAN & OSPF
 
-```
-                 ┌─ MPLS EPL 10.254.0.0/30 ── R-DBP (.2)
+``                 ┌─ MPLS EPL 10.254.0.0/30 ── R-DBP (.2)
 R-WAN-MS (.1/.5) ┤
 (Main)  ─ serial backup 10.255.0.0/30 ─→ R-DBP (.2)
                  │
@@ -240,8 +233,7 @@ OSPF:  area 0 backbone (Main),  area 1 (DBP),  area 2 (BHTQ)
        [mô phỏng PT: single area 0]
 Serial backup: OSPF cost cao (bandwidth thấp) → EPL đứt thì OSPF tự chuyển sang serial làm primary;
 kết quả SD-WAN overlay chuẩn bị sẵn: GRE/IPsec + BFD trên đường IPsec.
-```
-
+``
 **Định tuyến:** OSPF tại Main; static route floating AD 50 cho WAN nếu cần chắc chắn failover; nội bộ DMZ default về R-CORE-MS, Internet default về R-EDGE-MS.
 
 **Định tuyến Internet:** NAT/PAT trên R-EDGE-MS; static default `0.0.0.0/0 → ISP1` + floating AD 50 `→ ISP2` (failover); (muốn load-share thật dùng PBR/ECMP/BGP — ghi trong SD-WAN roadmap).
@@ -332,30 +324,24 @@ Giả định bổ sung (phải ghi rõ): số thiết bị Wi-Fi khách đồng
 
 Thời gian hiệu dụng = 9–11h + 15–16h = **3 h = 10 800 giây/ngày**.
 
-```
-B_A = Tổng Mbit ÷ thời gian hiệu dụng
+``B_A = Tổng Mbit ÷ thời gian hiệu dụng
     = 6 512 000 Mbit ÷ 10 800 s
     ≈ 603 Mbps      (trung bình khung giờ hiệu dụng)
 + tăng trưởng 20%/5 năm → 603 × 1,2 ≈ 724 Mbps
-```
-
+``
 → Với phương pháp phân bổ đều, cần tối thiểu **≈ 724 Mbps tổng** băng thông Internet.
 
 ### 4.4 Phương pháp B — quy tắc 80/20 (80% tải trong 1/2 thời gian)
 
 80% dung lượng nằm trong 5 400 s (1/2 thời gian hiệu dụng):
 
-```
-B_peak = 0,8 × 6 512 000 ÷ 5 400 ≈ 965 Mbps   (tập trung khe 9–11h & 15–16h)
+``B_peak = 0,8 × 6 512 000 ÷ 5 400 ≈ 965 Mbps   (tập trung khe 9–11h & 15–16h)
 20% còn lại phân bổ trên 5 400 s:        ≈ 241 Mbps
-```
-
+``
 → Công suất phải đáp ứng **giờ peak ≈ 965 Mbps**, cộng tăng trưởng 20%/5 năm:
 
-```
-965 × 1,2 ≈ 1 158 Mbps
-```
-
+``965 × 1,2 ≈ 1 158 Mbps
+``
 ### 4.5 Kết luận & lựa chọn gói
 
 Tổng băng thông Internet khuyến nghị: **2× [500 Mbps – 1 Gbps]**.
@@ -370,16 +356,14 @@ Tổng băng thông Internet khuyến nghị: **2× [500 Mbps – 1 Gbps]**.
 
 Tổng load qua WAN **mỗi trạm phụ** (thiết kế: toàn bộ Internet đi qua Main ⇒ mạng trạm phụ + khách Internet trạm đều đi qua):
 
-```
-Down qua WAN = staff (260×500 = 130 000) + guest (50×500 = 25 000)
+``Down qua WAN = staff (260×500 = 130 000) + guest (50×500 = 25 000)
              + branch server tải xuống từ Internet (2×1000 = 2 000) = 157 000 MB
 Up qua WAN   = staff (26 000) + server (2×2000 = 4 000)                =  30 000 MB
 Tổng          = 187 000 MB/ngày = 1 496 000 Mbit/ngày
 
 Phương pháp A: 1 496 000 ÷ 10 800 ≈ 139 Mbps  → ×1,2 ≈ 166 Mbps
 Phương pháp B: 0,8 × 1 496 000 ÷ 5 400 ≈ 222 Mbps → ×1,2 ≈ 266 Mbps
-```
-
+``
 → **Chọn MPLS EPL 300 Mbps/hướng mỗi trạm phụ**, đường serial backup (N×E1 hoặc IPsec broadband) chạy OSPF cost cao; khi leased-line đứt, serial đủ cho HIS/PACS/dịch vụ trọng yếu.
 
 ### 4.7 Bảng gợi ý gói ISP (đã chốt)
@@ -396,75 +380,44 @@ Phương pháp B: 0,8 × 1 496 000 ÷ 5 400 ≈ 222 Mbps → ×1,2 ≈ 266 Mbps
 
 ## 5. STEP 4 — DỰNG MÔ HÌNH PACKET TRACER
 
-> Phần này ghi lại **quy trình dựng**, kết quả đo đạc chừa placeholder, điền khi test xong.
+> Mô hình bản nộp: **`simulation/CCC-Hospital-v2.pkt`** — **49 thiết bị / 49 link**, dựng bằng MCP
+> PTBuilder trên Packet Tracer 9.0.1. Toàn bộ kết quả đo kiểm chứng live ở Step 5; cấu hình thật
+> export tại `docs/ptbuild/CCC-Hospital-v2/`.
 
 ### 5.1 Nguyên tắc thu nhỏ
 
-600 PC → **6 PC đại diện mỗi VLAN truy cập** (đại diện nhóm phòng ban); 260 PC/trạm → 2 PC đại diện; 14 server thật → đúng tên & vai trò; giữ **đúng cấu trúc IP/OSPF/NAT/ACL** của thiết kế thực.
+600 PC → **6 PC đại diện mỗi VLAN truy cập** (đại diện nhóm phòng ban); 260 PC/trạm → 2 PC đại diện;
+14 server thật → 10 server đại diện đúng tên & vai trò; giữ **đúng cấu trúc IP/VLAN/NAT/ACL/OSPF/VPN**
+của thiết kế thực.
 
-| Thực tế              | Mô phỏng (PT)             | Mô tả                                                                               |
-| -------------------- | ------------------------- | ----------------------------------------------------------------------------------- |
-| 2× C9500 core        | SW-CORE 3560-24PS         | 1 thiết bị thay cụm core HA                                                         |
-| NGFW pair            | R-EDGE-MS 2911            | Firewall + NAT + DMZ                                                                |
-| R-WAN ISR4451        | R-WAN-MS ISR4331          | WAN hub                                                                             |
-| 2× MPLS + serial     | FastEthernet + Serial DCE | Cùng dải IP 10.254.x/10.255.x                                                       |
-| 30× access switch    | 9× 2960-24TT/Switch-PT    | SW-BLD-A, SW-BLD-B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ, SW-HOME               |
-| 4 router branch/edge | R-DBP, R-BHTQ, R-CORE-MS  | Router-on-a-stick                                                                   |
-| AP ×28               | 5× AccessPoint-PT         | AP-BLD-A/B, AP-DBP, AP-BHTQ, AP-HOME                                                |
-| 1120 PC / 14 SRV     | 15 endpoint + 10 server   | PC-A1..3, PRN-A, PC-B1..3, PRN-B, CAM-01/02, PC-DBP1/2, PC-BHTQ1/2, LT-TELE, SRV-\* |
+| Thực tế | Mô phỏng (PT v2) | Mô tả |
+|---|---|---|
+| 2× C9500 core | SW-CORE 3560-24PS (L3, SVI) | 1 thiết bị thay cụm core HA; gateway mọi VLAN Main |
+| NGFW pair | **FW-MAIN 2911** | Edge + NAT/PAT + static NAT DMZ + đầu cuối VPN |
+| R-WAN ISR4451 | **GW-MAIN ISR4331** | WAN hub: 2 PVC Frame Relay + 2 serial backup |
+| Router WAN trạm phụ | GW-DBP / GW-BHTQ | Gateway mép, **không firewall riêng** |
+| 2× MPLS EPL + serial | Frame Relay PVC + Serial DCE | PVC AD 100 (172.17.x), backup AD 200 (172.18.x) |
+| 30× access switch | 8× 2960-24TT/Switch-PT | SW-BLD-A/B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ, SW-HOME |
+| Router lõi/dịch vụ | R-CORE-MS (DHCP tập trung), R-HOME | Inter-VLAN + home LAN 192.168.90.0/24 |
+| AP ×28 | AP-GUEST, AP-HOME (AccessPoint-PT) | Wi-Fi khách Main + teleworker |
+| 1120 PC / 14 SRV | 16 endpoint + 10 server | PC-A1..3, PRN-A/B, PC-B1..3, CAM-01/02, PC-DBP1/2, PC-BHTQ1/2, LT-GR-MS1, LT-MOBILE1; SRV-DNS/HIS/PACS/LOG/NVR/WEB-DMZ/MAIL-DMZ/DBP-1/BHTQ-1 + SRV-INT |
 
 ### 5.2 Các bước dựng
 
-1. **Chuẩn bị:** cài PT mới nhất; kế hoạch device/link theo thiết kế bảng mapping ở §5.1; toàn bộ cấu hình cuối đối chiếu bằng archive `docs/ptbuild/CCC-Hospital-v2/`.
-2. **Đặt thiết bị & link:** 7 router, 9 switch, 10 server, 5 AP, 15 endpoint/camera theo bảng mapping; link straight/cross/serial theo bảng topology.
-3. **Cấu hình VLAN & trunking:** SW truy cập gán VLAN 30/40/60(DBP:61/63, BHTQ:71/73); trunk 802.1Q về R-CORE-MS/SW-CORE.
-4. **Inter-VLAN (router-on-a-stick):** subinterface `G0/0.10..200` với gateway `.1` mỗi VLAN.
-5. **WAN:** gán IP Ethernet EPL `10.254.0.0/30`, `10.254.0.4/30`; Serial backup `10.255.0.0/30`, `10.255.0.4/30` + clock rate DCE.
-6. **OSPF:** tất cả router area 0 (mô phỏng) — `network` từng mạng kết nối, xác nhận neighbor & bảng định tuyến.
-7. **Internet & NAT:** ISP1/ISP2 giả Internet + web `198.51.100.10`; NAT/PAT trên R-EDGE-MS, **static NAT** `203.0.115.10 ↔ 10.10.200.10`; default route `{ISP1}` + floating `AD 50 {ISP2}`.
-8. **ACL bảo mật:** chặn VLAN 60/63/73 ra 10.10.0.0/16 & 10.11/10.12, permit DNS nội bộ + web DMZ + Internet.
-9. **DHCP:** pool cho VLAN 30/40/60/61/63/71/73; static IP cho server & MGMT.
-10. **Hardening:** enable secret, SSH-only vty, banner, user local, port-security, syslog gửi về SRV-LOG (xem Phụ lục B).
-11. **Teleworker:** LT-TELE + AP-HOME + SW-HOME + Home LAN 192.168.250.0/24 vào ISP2 đường "Internet home".
+1. **Dựng thiết bị & link:** 49 thiết bị / 49 link theo bảng mapping §5.1 qua MCP PTBuilder.
+2. **WAN:** Frame Relay (Cloud-PT, DLCI đặt tay trong GUI: 110↔101, 120↔102) + serial backup DCE
+   clock; route chính AD 100, backup AD 200 — tắt PVC thì backup tiếp quản (KC-2).
+3. **VLAN/SVI & DHCP:** SW-CORE là gateway mọi VLAN Main; DHCP tập trung trên R-CORE-MS.
+4. **NAT & DMZ:** FW-MAIN PAT ra 199.115.1.1; static NAT 1:1 cho WEB/MAIL DMZ; ACL `DMZ-IN` trên
+   SW-CORE Vlan40.
+5. **ACL:** ACL 150 trên Vlan60 (guest) + ACL branch — least privilege theo US-4.
+6. **VPN:** GRE tunnel FW-MAIN ↔ R-HOME (10.254.0.0/30) + crypto map/ISAKMP đặt trên G0/2 FW-MAIN.
+7. **Hardening & giám sát:** enable secret/SSH/banner, port-security sticky/restrict 24 access port,
+   syslog + NetFlow về SRV-LOG.
+8. **Nghiệm thu:** `pt_health_check` (0 link đứt, 0 IP trùng) → export startup-config thật bằng
+   `pt_backup_config` → đo live KC-1→KC-8.
 
-### 5.2.1 Vấn đề gặp khi dựng và cách xử lý (giá trị "debug log")
-
-Build chạy qua MCP PTBuilder (Script-Engine bridge). Các vấn đề thực tế dưới đây được ghi lại để
-người đọc có thể kiểm chứng từng quyết định cấu hình trong file `.pkt`:
-
-1. **DHCP cho VLAN guest bị ACL chính nó chặn** — ACL guest ban đầu `deny ip … 10.0.0.0/8` chặn luôn
-   DHCP DISCOVER của client (frame đi với **source `0.0.0.0`**), mọi client chỉ nhận APIPA
-   (169.254.x). _Khắc phục:_ chèn `permit udp any any eq bootps` ở **sequence 5** của ACL
-   150/151/152. Phát hiện nhờ bật _Simulation mode_ của Packet Tracer và dò từng chặng frame.
-2. **Static IP chưa được gán cho 16 PC/server** — API mặc định không có trong bản PT 9.0.1 này: đã
-   dùng chính xác `port.setIpSubnetMask(ip, mask)` + `port.setDefaultGateway(gw)` +
-   `port.setDnsServerIp(dns)` để khôi phục đúng bảng IP đã chốt ở Step 1 (SRV-DNS .20.5, SRV-HIS
-   .20.6, SRV-PACS .20.7, SRV-WEB-DMZ .200.10, PC-A1..3 .11–.13 / VLAN30, …).
-3. **Laptop không lắp được NIC wireless** — slot `0` của Laptop-PT mặc định bị module FastEthernet
-   chiếm; phải `removeModule('0')` rồi `addModule('0', PT-LAPTOP-NM-1W)` (power-off trước khi thay).
-4. **Laptop tự associate vào AP-HOME (teleworker)** vì vị trí XY ban đầu gần AP đó hơn AP-BLD-A:
-   dời `LT-GR-MS1` về (120, 400) để associate đúng AP guest của site chính. Smartphone (có sẵn
-   Wireless0) associate AP-BLD-B — cả hai sau đó nhận DHCP VLAN 60 bình thường.
-5. **Console router "kẹt dialog"/pager**: các thiết bị chưa được prime (SW-CORE, R-EDGE-MS…) phải
-   trả lời `no` cho _initial configuration dialog_ và `terminal length 0` trước khi chạy `show`.
-   Sau hardening, console yêu cầu mật khẩu `enable` — các vòng log sau dùng `enable secret`.
-6. **Stub route teleworker + gateway SRV-WEB-INT**: thêm `ip route 192.168.250.0 255.255.255.0`
-   (trên R-EDGE-MS và ISP1) để cân bằng đường về cho home LAN qua 2 chặn ISP; đặt default gateway
-   `198.51.100.1` cho SRV-WEB-INT (ban đầu server không có gateway nên không trả lời bất kỳ đích nào).
-
-### 5.3 Ảnh minh hoạ (đã chụp từ mô hình thật)
-
-![Tổng thể topology CCC-Hospital (src: Packet Tracer 9.0.1)](images/topology-final.png)
-
-Các ảnh bổ sung (OSPF neighbor, NAT table, Wi-Fi guest ACL) có thể chụp thêm từ file
-mô hình — toàn bộ cấu hình của **bản chốt v2** được export tại `docs/ptbuild/CCC-Hospital-v2/`
-(config từng thiết bị FW-MAIN, GW-MAIN, GW-DBP, GW-BHTQ, R-CORE-MS, R-HOME, SW-CORE, ISP1/ISP2 +
-metadata + `evidence-2026-11-09.md`).
-
-### 5.4 Bản chốt v2 — bám sát 3 trụ yêu cầu (2026-11-07)
-
-Từ bản khung v1 ở trên, mô hình được tái kiến trúc thành **`simulation/CCC-Hospital-v2.pkt`**
-(49 thiết bị / 49 link) để khớp đúng ba trụ đề bài; đây là **bản nộp cuối**:
+### 5.3 Ba trụ yêu cầu của đề — cách v2 đáp ứng
 
 | Trụ yêu cầu                            | Cách đáp ứng trong v2                                                                                                                              |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -472,7 +425,7 @@ Từ bản khung v1 ở trên, mô hình được tái kiến trúc thành **`si
 | **Trạm phụ không có firewall riêng**   | GW-DBP / GW-BHTQ chỉ là gateway mép (mạng tin cậy sau WAN riêng tư); toàn bộ chính sách kiểm soát tập trung ở một điểm FW-MAIN + ACL trên SW-CORE. |
 | **VPN mobile chấm ngay trên firewall** | FW-MAIN ra Internet bằng G0/2 (199.115.1.1); tunnel tới R-HOME **kết thúc tại FW-MAIN** (GRE + crypto-map IPsec kèm), không đi vào LAN nội bộ.     |
 
-**Bảng địa chỉ v2 (trích từ mô hình thật):**
+### 5.4 Bảng địa chỉ & WAN v2 (trích từ mô hình thật)
 
 | Vùng                     | Subnet                          | Gateway                 | Thiết bị tiêu biểu                                          |
 | ------------------------ | ------------------------------- | ----------------------- | ----------------------------------------------------------- |
@@ -503,7 +456,7 @@ Từ bản khung v1 ở trên, mô hình được tái kiến trúc thành **`si
 Hai PVC Frame Relay được ánh xạ **DLCI tay trong GUI Packet Tracer** (Cloud-PT → Serial0..3),
 vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 
-**Ghi chú kỹ thuật khi dựng v2 (giá trị "debug log"):**
+**Ghi chú kỹ thuật khi dựng (giá trị "debug log"):**
 
 1. **Xung đột SSID Wi-Fi** — hai AP (AP-GUEST VLAN 60, AP-HOME mobile) cùng phát SSID mặc định
    nên laptop associate nhầm AP (đổi IP chéo giữa hai LAN). _Khắc phục:_ đặt SSID khác nhau bằng
@@ -516,28 +469,14 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 3. **Enable secret trên GW-MAIN bị mất dấu** sau các vòng build trước → đặt lại đồng nhất
    `Hosp@2026!Sec` cho toàn bộ router qua `configureIosDevice` (không cần console).
 
+![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology-v2.png)
+
 ---
 
 ## 6. STEP 5 — KIỂM CHỨNG KẾT NỐI
 
-> Bảng dưới là **kết quả đợt đo trên bản v1** (topology trước — dải địa chỉ 10.10.x, EPL
-> Ethernet, R-EDGE-MS): giữ lại làm tham chiếu lịch sử. **Bảng chính thức cho bản nộp v2** là
-> ma trận §6.1 bên dưới, đo live trên `CCC-Hospital-v2.pkt` (dải 192.168.x, Frame Relay + serial
-> backup, VPN chấm trên FW-MAIN).
-
-| KC | Mục tiêu kiểm chứng | Lệnh/thao tác | Kết quả mong đợi | Kết quả thực tế |
-|---|---|---|---|---|
-| KC-1 | Truy cập LAN nội bộ: PC VLAN30/40 → DNS + HIS; camera → NVR | `ping`, Web/FTP từ PC | 100% success, DNS resolve | **ĐẠT** — PC-A1→SRV-DNS 4/4; PC-A1→PC-B1 4/4; CAM-01→SRV-NVR 4/4; `nslookup www.hospital.local` → **10.10.200.10** từ PC nội bộ |
-| KC-2 | Liên trạm: PC-DBP1, PC-BHTQ1 → SRV-HIS (10.10.20.x) | `ping` + `tracert` | Đi đường Ethernet EPL; đứt EPL → chuyển serial, ping tiếp tục thành công | **ĐẠT** — PC-DBP1→SRV-HIS 4/4 (EPL); **shutdown `Gi0/1` của R-DBP** → OSPF hội tụ, ping **vẫn 4/4 đi đường serial backup** (`10.255.0.0/30`); khôi phục EPL → 4/4 |
-| KC-3 | Internet: PC trong LAN & branch → 198.51.100.10 | `ping` + Web | Nat PAT hoạt động; shutdown ISP1 → mọi traffic chuyển ISP2 (floating AD50) | **ĐẠT (ping từ LAN)** — LT-GR-MS1→198.51.100.10 **4/4** qua PAT R-EDGE-MS; static NAT DMZ: LT-TELE→`203.0.115.10` 3/4 (TTL 125). Failover ISP1/floating đo xong ở bản v2 — xem §6.1 KC-8 |
-| KC-4 | Wi-Fi khách bị hạn chế: LT-GUEST chỉ được DNS nội bộ (10.10.20.5 = SRV-DNS), **web DMZ**, Internet; **blocked** tới các VLAN nội bộ & branch | `ping` từng đích | Ping LAN bị `Destination host unreachable / denied` theo ACL; vào web DMZ được | **ĐẠT** — Client Wi-Fi nhận DHCP guest: LT-GR-MS1 = 10.10.60.23, SM-GR-MS1 = 10.10.60.21; `nslookup` xuyên ACL **OK** (10.10.20.5); **ping 10.10.30.11 = 0/4** (ACL 150 deny); **ping 10.10.200.10 ICMP = 0/4** (chỉ permit TCP/80) — đúng policy least-privilege |
-| KC-5 | DMZ: PC-INTERNET → `203.0.115.10` (static NAT) hiển thị trang SRV-WEB-DMZ; SRV-WEB-DMZ **không** truy cập được vào VLAN nội bộ | Web browse + `ping` ngược | Web hoạt động; ping từ DMZ vào VLAN20/30 bị deny | **ĐẠT (ping static NAT)** — LT-TELE→203.0.115.10 3/4 (bị drop echo đầu do ARP, 3 reply TTL=125). Phía DMZ: chưa dựng ACL chiều ngược trong mô hình PT (đi thẳng qua router-on-a-stick) — ghi nhận là restrict của NGFW thật |
-| KC-6 | MGMT/hardening: `telnet` bị từ chối, SSH từ MGMT vào thiết bị được; syslog đi về SRV-LOG; port-security drop khi đổi thiết bị | `ssh -l admin`, `telnet`, xóa MAC | Telnet fail, SSH success, syslog thấy tại SRV-LOG, violation restrict khóa port | **ĐẠT (cấu hình + audit)** — `pt_apply_hardening` đã áp cho 6 router + SW-CORE (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local `admin`); `pt_audit_security` R-CORE-MS: **0 finding mức cao** (chỉ ghi chú type 5 — giới hạn IOS của PT); port-security sticky/restrict áp cho **24 access port** (SW-BLD-A/B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ); syslog = 10.10.20.8 + NetFlow collector còn nguyên sau hardening |
-
-> **Bằng chứng Step 5:** toàn bộ số đo KC-1→KC-8 trong hai bảng trên đã được **đo live** trên
-> `simulation/CCC-Hospital-v2.pkt` ngày 2026-11-09 (ping thật từ console thiết bị, `show`
-> thật từ router/switch) và lưu nguyên văn tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`
-> (kèm `show ip nat translations`, RIB lúc failover, RIB route table). Hai mục chỉ còn chờ
+> **Bằng chứng Step 5:** toàn bộ số đo KC-1→KC-8 trong bảng dưới đã được **đo live** trên
+> `simulation/CCC-Hospital-v2.pkt` ngày 2026-11-09 (ping thật từ console thiết bị, `show> thật từ router/switch) và lưu nguyên văn tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md> (kèm `show ip nat translations`, RIB lúc failover, RIB route table). Hai mục chỉ còn chờ
 > thao tác GUI trong đợt viva là mở trang web trong trình duyệt PT (KC-3/KC-5) — config NAT/ACL
 > tương ứng đã đối chiếu theo config thật.
 
@@ -553,8 +492,6 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 | KC-6 | MGMT/hardening: telnet chặn, SSH mở; syslog về SRV-LOG; port-security | `ssh`, `telnet`, audit | **ĐẠT** — `pt_audit_security` + hardening (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local); port-security sticky/restrict trên access port; **xác minh đăng nhập console thật 2026-11-09**: `enable` + `Hosp@2026!Sec` → prompt `GW-MAIN#` (mật khẩu thống nhất áp dụng cả GW-MAIN) |
 | KC-7 | **VPN mobile chấm trên firewall** | Từ LT-MOBILE1 ping SRV-DNS/SRV-HIS qua tunnel | **ĐẠT** — tunnel FW-MAIN ↔ R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS **0 % loss** (đi qua GRE/overlay tại FW-MAIN, không vào LAN nội bộ trực tiếp) |
 | KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | **ĐẠT (có giới hạn sim ghi rành)** — đo live 2026-11-09: thêm `ip route 0.0.0.0 0.0.0.0 199.115.1.3 50` vào FW-MAIN (config trước đó chưa có); baseline PC-A1→SRV-INT **4/4**; tắt ISP1 + thu hồi default chính → `show ip route` FW-MAIN: **`Gateway of last resort is 199.115.1.3`** (floating nhậm chức); LT-MOBILE1 → SRV-DNS **4/4 qua ISP2** (tunnel GRE tái lập sau reboot thiết bị — hạn chế của PT: GRE không tự chuyển next-hop); **PC-DBP1→HIS 4/4** (WAN FR độc lập ISP); PC-A1→198.51.100.10 **0/4** — đúng giới hạn topology sim (dải 198.51.100.0/24 chỉ neo sau ISP1, thiết kế thật là 2 AS đổi full BGP route). Khôi phục ISP1 + default chính → cả ma trận **4/4**. Transcription đầy đủ: `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md` |
-
-![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology-v2.png)
 
 > **Số đo bổ sung đã hoàn tất (2026-11-09):** KC-1 cùng-VLAN (PC-A1↔PC-A2 VLAN10 **4/4**) và
 > liên-VLAN (PC-A1→PC-B1 VLAN10→VLAN20 **4/4**) — xem bảng §6.1 và file evidence. KC-8
@@ -581,9 +518,9 @@ _KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là q
 
 ### 7.2 Hạn chế / tồn đọng (known issues)
 
-1. **R-EDGE-MS (2911) không phải NGFW thật:** chỉ stateless ACL + NAT, không DPI/IPS đầy đủ → thực tế cần FortiGate 600E (đã đưa vào bảng thiết bị).
+1. **FW-MAIN (2911) không phải NGFW thật:** chỉ stateless ACL + NAT, không DPI/IPS đầy đủ → thực tế cần FortiGate 600E (đã đưa vào bảng thiết bị).
 2. **Router-on-a-stick 1 router = SPOF** cho inter-VLAN: thực tế triển khai 2× L3 switch core (HSRP/VSS/StackWise Virtual); mô phỏng dùng 1 thiết bị thay cụm.
-3. **OSPF single area 0 (mô phỏng)** không scale khi >50 router: thiết kế thật dùng multi-area (area 0 + area 1/2 cho trạm phụ).
+3. **Định tuyến WAN mô phỏng dùng static AD 100/200 (Frame Relay + serial backup)** thay cho OSPF multi-area của thiết kế thật (area 0 + area 1/2 cho trạm phụ) — multi-area không cần thiết ở quy mô 4 router của mô hình.
 4. **Static NAT 1:1 DMZ** chưa có HA failover NAT giữa 2 ISP.
 5. **Serial backup băng thông thấp** (N×E1): chỉ bảo đảm HIS/PACS trọng yếu, không đủ cho PACS hình ảnh lớn → cần SD-WAN 4G/5G/FiBr dự phòng.
 6. **Load-share 2 ISP** trong mô phỏng chỉ là failover (floating AD): load-share thực cần PBR/BGP/BGP-PA/SD-WAN.
@@ -592,7 +529,7 @@ _KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là q
 
 ### 7.3 Định hướng phát triển (roadmap)
 
-- **Ngắn hạn (0–6 tháng):** thay R-EDGE bằng NGFW (FortiGate/Palo Alto/ASA) với IPS + SSL inspection; setup SIEM (Wazuh/Splunk) đọc syslog+NetFlow; Zabbix/SNMPv3 monitor; **chương trình chống phishing (drill + MFA) 2 lần/năm theo Phụ lục B.11**.
+- **Ngắn hạn (0–6 tháng):** thay FW-MAIN bằng NGFW (FortiGate/Palo Alto/ASA) với IPS + SSL inspection; setup SIEM (Wazuh/Splunk) đọc syslog+NetFlow; Zabbix/SNMPv3 monitor; **chương trình chống phishing (drill + MFA) 2 lần/năm theo Phụ lục B.11**.
 - **Trung hạn (6–18 tháng):** **SD-WAN overlay** giữa Main↔DBP↔BHTQ (Cisco Catalyst SD-WAN / FortiGate ADVPN): transport Internet + 4G/5G; HA core 2×; NAC 802.1X cho toàn design; captive portal Wi-Fi trả phí.
 - **Dài hạn (18–36 tháng):** nâng 40G/100G DC & spine; DR site thứ 2 (chuyển dịch VM + DB replication cho HIS/PACS); Zero Trust (micro-segmentation, ZTNA thay VPN client); IPv6 dual-stack.
 - **DR cho y tế:** RTO ≤4 h / RPO ≤15 phút cho HIS; backup 3-2-1 (xem Phụ lục B).

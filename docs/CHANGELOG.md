@@ -18,6 +18,15 @@ Log chi tiết từng bước làm — song song với commit messages của rep
 - **Sửa tham chiếu theo đó:** README,
   `report/REPORT_vi.md` (§5.2 bước chuẩn bị, §5.3 archive config, bảng đóng gói §8),
   `download/btl2_src.html` (ghi chú phiên bản + B.9 đóng gói) → PDF nộp render lại.
+- **Gỡ narrative v1 khỏi report theo yêu cầu "chỉ giữ bản final":**
+  - Viết lại toàn bộ §5 (STEP 4) thành mô hình v2: nguyên tắc thu nhỏ + mapping 49 thiết bị
+    (FW-MAIN/GW-MAIN/GW-DBP/GW-BHTQ/R-HOME...), 8 bước dựng v2, 3 trụ yêu cầu, bảng địa chỉ v2,
+    WAN Frame Relay/serial + debug log v2, ảnh `topology-v2.png`.
+  - Xóa bảng đo v1 (KC-1→KC-6 dải 10.10.x) ở đầu §6 — chỉ còn ma trận KC-1→KC-8 đo live trên v2;
+    xóa ảnh `report/images/topology-final.png` (ảnh mô hình v1).
+  - §3.2 cập nhật danh mục thiết bị mô phỏng sang v2 (49/49, FW-MAIN, GW-MAIN, R-HOME);
+    §7.2/§7.3 đổi R-EDGE-MS → FW-MAIN, ghi chú định tuyến mô hình dùng static AD 100/200.
+  - PDF nộp (`BTL2_report.pdf`) render lại từ `btl2_src.html` đã bỏ câu "bản khung v1 còn giữ".
 - Lịch sử git vẫn giữ nguyên toàn bộ file v1/web đã xóa (có thể truy vết bằng commit cũ).
 
 ## 2026-11-09 — Đợt đo kiểm chứng live trên CCC-Hospital-v2.pkt + chỉ SK xuất archive v2
