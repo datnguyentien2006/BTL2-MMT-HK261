@@ -22,6 +22,7 @@ interface GigabitEthernet0/0.62
 interface GigabitEthernet0/0.63
  encapsulation dot1Q 63
  ip address 10.11.60.1 255.255.255.0
+ ip access-group GUEST-DBP-IN in
  exit
 
 ip dhcp excluded-address 10.11.10.1 10.11.10.30
@@ -37,6 +38,15 @@ ip dhcp pool DBP-GUEST
  default-router 10.11.60.1
  dns-server 10.10.20.5
  exit
+
+ip access-list extended GUEST-DBP-IN
+ permit udp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.200.10 eq 80
+ permit tcp any host 10.10.200.10 eq 443
+ deny ip any 10.0.0.0 0.255.255.255 log
+ permit ip any any
+exit
 
 router ospf 1
  router-id 10.11.10.1

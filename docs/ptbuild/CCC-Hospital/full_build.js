@@ -111,7 +111,7 @@ ip route 203.0.115.0 255.255.255.0 203.0.113.2
 
 end
 write memory
-*/ 
+*/
 /* --- R-EDGE-MS ---
 enable
 configure terminal
@@ -143,7 +143,7 @@ router ospf 1
 
 end
 write memory
-*/ 
+*/
 /* --- ISP2 ---
 enable
 configure terminal
@@ -172,7 +172,7 @@ ip route 0.0.0.0 0.0.0.0 203.0.114.2
 
 end
 write memory
-*/ 
+*/
 /* --- R-CORE-MS ---
 enable
 configure terminal
@@ -211,10 +211,12 @@ interface GigabitEthernet0/0.40
 interface GigabitEthernet0/0.50
  encapsulation dot1Q 50
  ip address 10.10.50.1 255.255.255.0
+ ip access-group CCTV-OUT in
  exit
 interface GigabitEthernet0/0.60
  encapsulation dot1Q 60
  ip address 10.10.60.1 255.255.255.0
+ ip access-group GUEST-MS-IN in
  exit
 interface GigabitEthernet0/0.200
  encapsulation dot1Q 200
@@ -242,6 +244,22 @@ ip dhcp pool VLAN60-MS
  dns-server 10.10.20.5
  exit
 
+ip access-list extended GUEST-MS-IN
+ permit udp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.200.10 eq 80
+ permit tcp any host 10.10.200.10 eq 443
+ deny ip any 10.0.0.0 0.255.255.255 log
+ permit ip any any
+exit
+
+ip access-list extended CCTV-OUT
+ permit udp 10.10.50.0 0.0.0.255 host 10.10.20.8 eq 514
+ permit udp 10.10.50.0 0.0.0.255 host 10.10.20.5 eq 53
+ permit tcp 10.10.50.0 0.0.0.255 host 10.10.20.5 eq 53
+ deny ip 10.10.50.0 0.0.0.255 any log
+exit
+
 router ospf 1
  router-id 10.10.0.1
  network 10.10.0.0 0.0.0.3 area 0
@@ -257,7 +275,7 @@ router ospf 1
 
 end
 write memory
-*/ 
+*/
 /* --- R-WAN-MS ---
 enable
 configure terminal
@@ -288,7 +306,7 @@ router ospf 1
 
 end
 write memory
-*/ 
+*/
 /* --- R-DBP ---
 enable
 configure terminal
@@ -314,6 +332,7 @@ interface GigabitEthernet0/0.62
 interface GigabitEthernet0/0.63
  encapsulation dot1Q 63
  ip address 10.11.60.1 255.255.255.0
+ ip access-group GUEST-DBP-IN in
  exit
 
 ip dhcp excluded-address 10.11.10.1 10.11.10.30
@@ -330,6 +349,15 @@ ip dhcp pool DBP-GUEST
  dns-server 10.10.20.5
  exit
 
+ip access-list extended GUEST-DBP-IN
+ permit udp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.200.10 eq 80
+ permit tcp any host 10.10.200.10 eq 443
+ deny ip any 10.0.0.0 0.255.255.255 log
+ permit ip any any
+exit
+
 router ospf 1
  router-id 10.11.10.1
  network 10.11.10.0 0.0.0.255 area 0
@@ -340,7 +368,7 @@ router ospf 1
 
 end
 write memory
-*/ 
+*/
 /* --- R-BHTQ ---
 enable
 configure terminal
@@ -366,6 +394,7 @@ interface GigabitEthernet0/0.72
 interface GigabitEthernet0/0.73
  encapsulation dot1Q 73
  ip address 10.12.60.1 255.255.255.0
+ ip access-group GUEST-BHTQ-IN in
  exit
 
 ip dhcp excluded-address 10.12.10.1 10.12.10.30
@@ -382,6 +411,15 @@ ip dhcp pool BHTQ-GUEST
  dns-server 10.10.20.5
  exit
 
+ip access-list extended GUEST-BHTQ-IN
+ permit udp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.200.10 eq 80
+ permit tcp any host 10.10.200.10 eq 443
+ deny ip any 10.0.0.0 0.255.255.255 log
+ permit ip any any
+exit
+
 router ospf 1
  router-id 10.12.10.1
  network 10.12.10.0 0.0.0.255 area 0
@@ -392,7 +430,7 @@ router ospf 1
 
 end
 write memory
-*/ 
+*/
 /* --- SW-CORE ---
 enable
 configure terminal
@@ -468,7 +506,7 @@ interface FastEthernet0/10
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-BLD-A ---
 enable
 configure terminal
@@ -538,7 +576,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-BLD-B ---
 enable
 configure terminal
@@ -608,7 +646,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-SRV ---
 enable
 configure terminal
@@ -674,7 +712,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-CCTV ---
 enable
 configure terminal
@@ -736,7 +774,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-DMZ ---
 enable
 configure terminal
@@ -794,7 +832,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-DBP ---
 enable
 configure terminal
@@ -860,7 +898,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-BHTQ ---
 enable
 configure terminal
@@ -926,7 +964,7 @@ interface GigabitEthernet0/1
  exit
 end
 write memory
-*/ 
+*/
 /* --- SW-HOME ---
 enable
 configure terminal

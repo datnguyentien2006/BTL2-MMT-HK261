@@ -35,10 +35,12 @@ interface GigabitEthernet0/0.40
 interface GigabitEthernet0/0.50
  encapsulation dot1Q 50
  ip address 10.10.50.1 255.255.255.0
+ ip access-group CCTV-OUT in
  exit
 interface GigabitEthernet0/0.60
  encapsulation dot1Q 60
  ip address 10.10.60.1 255.255.255.0
+ ip access-group GUEST-MS-IN in
  exit
 interface GigabitEthernet0/0.200
  encapsulation dot1Q 200
@@ -65,6 +67,22 @@ ip dhcp pool VLAN60-MS
  default-router 10.10.60.1
  dns-server 10.10.20.5
  exit
+
+ip access-list extended GUEST-MS-IN
+ permit udp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.20.5 eq 53
+ permit tcp any host 10.10.200.10 eq 80
+ permit tcp any host 10.10.200.10 eq 443
+ deny ip any 10.0.0.0 0.255.255.255 log
+ permit ip any any
+exit
+
+ip access-list extended CCTV-OUT
+ permit udp 10.10.50.0 0.0.0.255 host 10.10.20.8 eq 514
+ permit udp 10.10.50.0 0.0.0.255 host 10.10.20.5 eq 53
+ permit tcp 10.10.50.0 0.0.0.255 host 10.10.20.5 eq 53
+ deny ip 10.10.50.0 0.0.0.255 any log
+exit
 
 router ospf 1
  router-id 10.10.0.1
