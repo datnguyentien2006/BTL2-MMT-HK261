@@ -5,7 +5,7 @@
 **Trường:** Đại học Bách Khoa TP.HCM (HCMUT)
 **Phiên bản báo cáo:** v1.0 — ngày 21/10/2026
 
-> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào "`Kết quả thực tế`" ở bảng Step 5 và các ảnh trong `report/images/`.
+> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào `Kết quả thực tế` ở bảng Step 5 và được chứng minh nguyên văn bằng transcription tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md` (topology: `images/topology-v2.png`).
 
 ---
 
