@@ -1,6 +1,7 @@
 ! =====================================================================
-! CCC-Hospital v2 — ISP1 (Cisco 2911) — startup-config xuất trực tiếp
-! từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config (2026-11-09)
+! CCC-Hospital v3 (dải 10.x) — ISP1 (Cisco 2911) — startup-config
+! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
+! (2026-11-11, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: ISP "Internet A" — phủ 198.51.100.0/24 (SRV-INT) + transit về ISP2
 ! =====================================================================
 !
@@ -69,9 +70,10 @@ interface Vlan1
 !
 ip classless
 ip route 203.0.113.0 255.255.255.252 199.115.1.3 
-ip route 192.168.90.0 255.255.255.0 199.115.1.3 
+ip route 10.127.128.0 255.255.255.0 199.115.1.3 
 !
 ip flow-export version 9
+!
 !
 !
 !

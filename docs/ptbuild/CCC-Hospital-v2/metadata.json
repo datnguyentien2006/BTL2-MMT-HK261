@@ -1,13 +1,18 @@
 {
   "project_name": "CCC-Hospital-v2",
+  "addressing_version": "v3 — dải 10.x (đổi subnet toàn mô hình 2026-11-11)",
   "created_at": "2026-11-09T00:00:00+07:00",
+  "readdressed_at": "2026-11-11T00:00:00+07:00",
   "source_file": "simulation/CCC-Hospital-v2.pkt",
   "devices": 49,
   "links": 49,
   "is_valid": true,
   "notes": [
     "Config (*.txt) xuất trực tiếp từ .pkt bằng pt_backup_config (startup-config thật).",
-    "Đợt đo kiểm chứng: evidence-2026-11-09.md — bảng KC-1..KC-8 đo live qua MCP.",
+    "Đợt đo kiểm chứng: evidence-2026-11-11.md — bảng KC-1..KC-8 đo live qua MCP với địa chỉ 10.x mới.",
+    "Địa chỉ LAN (2026-11-11): DEPT-A 10.0.64.0/19, DEPT-B 10.0.96.0/19, SERVER-FARM 10.0.16.0/20, DMZ 10.0.1.0/24, CCTV 10.0.32.0/19, WIFI-GUEST 10.0.8.0/21, DBP 10.128.0.0/14, BHTQ 10.132.0.0/14, Mobile-Worker 10.127.128.0/24.",
+    "Giữ nguyên: transit 172.16.0.4/30 + 172.16.0.8/30, FR 172.17.10/20, serial backup 172.18.10/20, public 199.115.1.0/29, Internet 198.51.100.0/24 + 203.0.113.0/30, GRE overlay 10.254.0.0/30.",
+    "Crypto ISAKMP/IPsec FW-MAIN ↔ R-HOME bị PT mất khi reboot (quirk KC-8) — đã khôi phục đầy đủ ngày 2026-11-11 (policy 10 3des/md5/pre-share, key Vpn2025Str0ng, TS-MOB/TS-HOSP, map VPN-MOB/VPN-HOSP + binding interface).",
     "Khác biệt so với archive v1: đổi tên/router model (GW-MAIN = ISR4331), WAN Frame Relay + serial backup thay cho EPL Ethernet, VPN chấm trên FW-MAIN, DHCP tổng về R-CORE-MS."
   ],
   "devices_exported": [

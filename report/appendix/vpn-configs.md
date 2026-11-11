@@ -3,28 +3,29 @@
 > **Lưu ý quan trọng:** Các cấu hình dưới đây là **cấu hình mẫu cho thiết bị vật lý thật**
 > (ISR 4331 / ISR 4451 / NGFW) theo thiết kế Step 1–3. Đây **KHÔNG phải cấu hình đang chạy
 > trong mô hình Packet Tracer hiện tại** — Packet Tracer không hỗ trợ đầy đủ
-> crypto isakmp/IPsec/GRE. Trong mô phỏng, đường liên trạm dùng Ethernet EPL + serial
-> backup với OSPF; VPN/IPsec chỉ được **thiết kế ở đây để triển khai thực tế**.
+> crypto isakmp/IPsec/GRE. Trong mô phỏng, đường liên trạm dùng PVC Frame Relay + serial
+> backup với static route AD 100/200; VPN/IPsec chỉ được **thiết kế ở đây để triển khai thực tế**.
 >
-> **Bảng IP áp dụng:** Phụ lục này viết theo **bảng IP của thiết kế thật (Step 1–3)**: Main
-> `10.10.0.0/16`, DBP `10.11.0.0/16`, BHTQ `10.12.0.0/16`, WAN EPL `10.254.x.x/30`, serial backup
-> `10.255.x.x/30`. Mô hình Packet Tracer **bản chốt v2** dùng bảng IP khác (trình bày tại §5.4
-> báo cáo chính: `192.168.x.0/24` + WAN Frame Relay `172.17.x.x/172.18.x.x` + GRE overlay
-> `10.254.0.0/30` kết thúc tại FW-MAIN). Khi triển khai trên thiết bị thật → dùng bảng của phần
-> này; bảng của §5.4 chỉ áp dụng cho file `.pkt` mô phỏng.
+> **Bảng IP áp dụng:** Phụ lục này viết theo **bảng IP chốt v3 (dải 10.x, 2026-11-11)** —
+> giống hệt mô hình Packet Tracer (§2.2/§5.4 báo cáo chính): Main `10.0.64.0/19` (Tòa A),
+> `10.0.96.0/19` (Tòa B), `10.0.16.0/20` (server farm), `10.0.1.0/24` (DMZ), `10.0.32.0/19`
+> (CCTV), `10.0.8.0/21` (guest); DBP `10.128.0.0/14`; BHTQ `10.132.0.0/14`; WAN EPL
+> `172.17.10.0/30` + `172.17.20.0/30`; serial backup `172.18.10.0/30` + `172.18.20.0/30`;
+> teleworker home LAN `10.127.128.0/24`. Trong file `.pkt` các dải WAN mô phỏng bằng Frame
+> Relay; GRE overlay `10.254.0.0/30` kết thúc tại FW-MAIN.
 >
 > Tham số dùng theo bảng IP đã chốt:
 > - Key chung: `HOSP2026` (ISAKMP pre-shared key — khi vận hành thật nên thay bằng key mạnh, duy nhất cho từng peer và xoay vòng định kỳ)
-> - Peers Ethernet EPL: R-WAN-MS `10.254.0.1` ↔ R-DBP `10.254.0.2`; R-WAN-MS `10.254.0.5` ↔ R-BHTQ `10.254.0.6`
-> - Peers serial backup: R-WAN-MS `10.255.0.1` ↔ R-DBP `10.255.0.2`; R-WAN-MS `10.255.0.5` ↔ R-BHTQ `10.255.0.6`
-> - Mạng hứng thú (interesting traffic): Main `10.10.0.0/16` ↔ DBP `10.11.0.0/16`, Main ↔ BHTQ `10.12.0.0/16`
-> - Home LAN teleworker: `192.168.250.0/24`
+> - Peers Ethernet EPL: R-WAN-MS `172.17.10.1` ↔ R-DBP `172.17.10.2`; R-WAN-MS `172.17.20.1` ↔ R-BHTQ `172.17.20.2`
+> - Peers serial backup: R-WAN-MS `172.18.10.1` ↔ R-DBP `172.18.10.2`; R-WAN-MS `172.18.20.1` ↔ R-BHTQ `172.18.20.2`
+> - Mạng hứng thú (interesting traffic): Main `10.0.0.0 0.63.255.255` ↔ DBP `10.128.0.0 0.3.255.255`, Main ↔ BHTQ `10.132.0.0 0.3.255.255`
+> - Home LAN teleworker: `10.127.128.0/24`
 
 ---
 
 ## A.1 Site-to-Site IPsec thuần (ACL-based, cổ điển) — R-WAN-MS ↔ R-DBP
 
-Phù hợp khi không muốn chạy GRE; IPsec chỉ bảo vệ traffic `10.10.0.0/16 ↔ 10.11.0.0/16`.
+Phù hợp khi không muốn chạy GRE; IPsec chỉ bảo vệ traffic Main (`10.0.0.0 0.63.255.255`) ↔ DBP (`10.128.0.0 0.3.255.255`).
 Vấn đề: OSPF multicast `224.0.0.5` không đi qua IPsec thuần ⇒ cần static route song song.
 (Variant GRE-over-IPsec / SVTI ở A.2 khắc phục điều này.)
 
@@ -43,10 +44,10 @@ crypto isakmp policy 10
   lifetime 86400
   hash sha256
 exit
-crypto isakmp key HOSP2026 address 10.254.0.2          ! peer R-DBP (EPL)
-crypto isakmp key HOSP2026 address 10.255.0.2          ! peer R-DBP (serial backup)
-crypto isakmp key HOSP2026 address 10.254.0.6          ! peer R-BHTQ (EPL)
-crypto isakmp key HOSP2026 address 10.255.0.6          ! peer R-BHTQ (serial backup)
+crypto isakmp key HOSP2026 address 172.17.10.2         ! peer R-DBP (EPL)
+crypto isakmp key HOSP2026 address 172.18.10.2         ! peer R-DBP (serial backup)
+crypto isakmp key HOSP2026 address 172.17.20.2         ! peer R-BHTQ (EPL)
+crypto isakmp key HOSP2026 address 172.18.20.2         ! peer R-BHTQ (serial backup)
 
 ! --- 2) IKE phase 2 (transform-set) ---
 crypto ipsec transform-set TS-AES256SHA256 esp-aes 256 esp-sha-hmac
@@ -55,23 +56,23 @@ exit
 
 ! --- 3) ACL "interesting traffic" ---
 ip access-list extended VPN-INTERESTING-DBP
-  permit ip 10.10.0.0 0.0.255.255 10.11.0.0 0.0.255.255
+  permit ip 10.0.0.0 0.63.255.255 10.128.0.0 0.3.255.255
 exit
 ip access-list extended VPN-INTERESTING-BHTQ
-  permit ip 10.10.0.0 0.0.255.255 10.12.0.0 0.0.255.255
+  permit ip 10.0.0.0 0.63.255.255 10.132.0.0 0.3.255.255
 exit
 
 ! --- 4) Crypto map ---
 crypto map CMAP-VPN 10 ipsec-isakmp
-  set peer 10.254.0.2
-  set peer 10.255.0.2
+  set peer 172.17.10.2
+  set peer 172.18.10.2
   set security-association lifetime seconds 3600
   set transform-set TS-AES256SHA256
   match address VPN-INTERESTING-DBP
 exit
 crypto map CMAP-VPN 20 ipsec-isakmp
-  set peer 10.254.0.6
-  set peer 10.255.0.6
+  set peer 172.17.20.2
+  set peer 172.18.20.2
   set security-association lifetime seconds 3600
   set transform-set TS-AES256SHA256
   match address VPN-INTERESTING-BHTQ
@@ -79,19 +80,19 @@ exit
 
 ! --- 5) Gắn crypto map lên các interface WAN ---
 interface GigabitEthernet0/0/1
-  ip address 10.254.0.1 255.255.255.252
+  ip address 172.17.10.1 255.255.255.252
   crypto map CMAP-VPN
 exit
 interface GigabitEthernet0/0/2
-  ip address 10.254.0.5 255.255.255.252
+  ip address 172.17.20.1 255.255.255.252
   crypto map CMAP-VPN
 exit
 interface Serial0/1/0        ! NIM-2T; backup path cũng dùng chung CMAP
-  ip address 10.255.0.1 255.255.255.252
+  ip address 172.18.10.1 255.255.255.252
   crypto map CMAP-VPN
 exit
 interface Serial0/2/0
-  ip address 10.255.0.5 255.255.255.252
+  ip address 172.18.20.1 255.255.255.252
   crypto map CMAP-VPN
 exit
 
@@ -117,39 +118,39 @@ crypto isakmp policy 10
   lifetime 86400
   hash sha256
 exit
-crypto isakmp key HOSP2026 address 10.254.0.1
-crypto isakmp key HOSP2026 address 10.255.0.1
+crypto isakmp key HOSP2026 address 172.17.10.1
+crypto isakmp key HOSP2026 address 172.18.10.1
 
 crypto ipsec transform-set TS-AES256SHA256 esp-aes 256 esp-sha-hmac
   mode tunnel
 exit
 
 ip access-list extended VPN-INTERESTING-MAIN
-  permit ip 10.11.0.0 0.0.255.255 10.10.0.0 0.0.255.255
+  permit ip 10.128.0.0 0.3.255.255 10.0.0.0 0.63.255.255
 exit
 
 crypto map CMAP-VPN 10 ipsec-isakmp
-  set peer 10.254.0.1
-  set peer 10.255.0.1
+  set peer 172.17.10.1
+  set peer 172.18.10.1
   set security-association lifetime seconds 3600
   set transform-set TS-AES256SHA256
   match address VPN-INTERESTING-MAIN
 exit
 
 interface GigabitEthernet0/1
-  ip address 10.254.0.2 255.255.255.252
+  ip address 172.17.10.2 255.255.255.252
   crypto map CMAP-VPN
 exit
 interface Serial0/0/0
-  ip address 10.255.0.2 255.255.255.252
+  ip address 172.18.10.2 255.255.255.252
   crypto map CMAP-VPN
 exit
 end
 write memory
 ```
 
-> Cấu hình **R-BHTQ** đồng luận với R-DBP: đổi ACL thành `10.12.0.0/16 + Main`,
-> peer `10.254.0.5` / `10.255.0.5`, IP WAN của trạm `10.254.0.6` / `10.255.0.6`.
+> Cấu hình **R-BHTQ** đồng luận với R-DBP: đổi ACL thành `10.132.0.0 0.3.255.255 + Main`,
+> peer `172.17.20.1` / `172.18.20.1`, IP WAN của trạm `172.17.20.2` / `172.18.20.2`.
 
 ---
 
@@ -171,8 +172,8 @@ crypto isakmp policy 10
   lifetime 86400
   hash sha256
 exit
-crypto isakmp key HOSP2026 address 10.254.0.2
-crypto isakmp key HOSP2026 address 10.254.0.6
+crypto isakmp key HOSP2026 address 172.17.10.2
+crypto isakmp key HOSP2026 address 172.17.20.2
 
 crypto ipsec transform-set TS-AES256SHA256 esp-aes 256 esp-sha-hmac
   mode tunnel
@@ -184,8 +185,8 @@ interface Tunnel10
   ip address 172.16.10.1 255.255.255.252
   ip mtu 1400
   ip tcp adjust-mss 1360
-  tunnel source GigabitEthernet0/0/1            ! 10.254.0.1
-  tunnel destination 10.254.0.2
+  tunnel source GigabitEthernet0/0/1            ! 172.17.10.1
+  tunnel destination 172.17.10.2
   tunnel mode ipsec ipv4
   tunnel protection ipsec profile PROF-SVTI
 exit
@@ -195,8 +196,8 @@ interface Tunnel20
   ip address 172.16.10.5 255.255.255.252
   ip mtu 1400
   ip tcp adjust-mss 1360
-  tunnel source GigabitEthernet0/0/2            ! 10.254.0.5
-  tunnel destination 10.254.0.6
+  tunnel source GigabitEthernet0/0/2            ! 172.17.20.1
+  tunnel destination 172.17.20.2
   tunnel mode ipsec ipv4
   tunnel protection ipsec profile PROF-SVTI
 exit
@@ -226,7 +227,7 @@ interface Tunnel11
   ip tcp adjust-mss 1280
   ip ospf cost 2000
   tunnel source Serial0/1/0
-  tunnel destination 10.255.0.2
+  tunnel destination 172.18.10.2
   tunnel mode ipsec ipv4
   tunnel protection ipsec profile PROF-SVTI-BACKUP
 exit
@@ -242,7 +243,7 @@ exit
 
 ---
 
-## A.4 Teleworker VPN (Home LAN 192.168.250.0/24)
+## A.4 Teleworker VPN (Home LAN 10.127.128.0/24)
 
 ### A.4.1 Phương án (a) — Remote-access IPsec theo chuẩn IOS (EzVPN legacy / NAT-T)
 
@@ -263,7 +264,7 @@ exit
 crypto isakmp key 0 HOSP2026 address 0.0.0.0 0.0.0.0          ! legacy EzVPN: key chung
 crypto isakmp client configuration group TELEWORKER
   key HOSP2026
-  dns 10.10.20.5                                              ! SRV-DNS (VLAN 20)
+  dns 10.0.16.2                                               ! SRV-DNS (VLAN 30)
   domain hospital.local
   pool VPN-POOL
   netmask 255.255.255.0
@@ -271,10 +272,10 @@ crypto isakmp client configuration group TELEWORKER
 exit
 
 ! --- 2) Pool IP cho client ---
-ip local pool VPN-POOL 10.10.99.10 10.10.99.99                ! tách VLAN/phân đoạn riêng thực tế VPN pool
+ip local pool VPN-POOL 10.127.129.10 10.127.129.99            ! tách VLAN/phân đoạn riêng thực tế VPN pool (kề dải mobile 10.127.128.0/24)
 
 ! --- 3) ACL push cho client: only internal ---
-access-list 120 permit ip 10.10.0.0 0.0.255.255 any           ! → chỉ nhét route internal về client
+access-list 120 permit ip 10.0.0.0 0.63.255.255 any           ! → chỉ nhét route internal về client
 
 ! --- 4) Transform + crypto map (mode cisco / EzVPN) ---
 crypto ipsec transform-set TS-TELE esp-aes 256 esp-sha-hmac
@@ -292,7 +293,7 @@ crypto map CMAP-CRYPTO 100 ipsec-isakmp
 exit
 
 ip access-list extended VPN-REMOTE
-  permit ip 10.10.0.0 0.0.255.255 10.10.99.0 0.0.0.255
+  permit ip 10.0.0.0 0.63.255.255 10.127.129.0 0.0.0.255
 exit
 ! --- 5) NAT-T (giữ được qua home router NAT) ---
 ! IOS tự bật IPsec/NAT-T (udp/4500) theo mặc định khi khớp.
@@ -327,7 +328,7 @@ Cấu hình mẫu ví dụ trên FortiGate (chỉ minh hoạ):
 ```
 config vpn ssl settings
   set tunnel-ip-pools "VPN-POOL-TLW"
-  set dns-servers 10.10.20.5
+  set dns-servers 10.0.16.2
   set source-interface "port-WAN-ISP1" "port-WAN-ISP2"
   set port 443
 end
@@ -340,7 +341,7 @@ config firewall policy
   edit 90
     set name "SSLVPN-to-LAN"
     set srcintf "tunnel-sslvpn" set dstintf "trunk-core"
-    set srcaddr "VPN-POOL-TLW" set dstaddr "10.10.0.0-16"
+    set srcaddr "VPN-POOL-TLW" set dstaddr "10.0.0.0-8"
     set action accept set schedule "always" set service "ANY"
     set logtraffic all
   next
@@ -348,7 +349,7 @@ end
 ```
 
 Đề xuất bổ sung: **OTP/2FA** (email/SMS) + group policy theo AD/LDAP, chỉ cấp
-route tới VLAN 20 / 30 / 40 (HIS/PACS), tách kho IPv4 pool riêng 10.10.99.0/24, chính sách
+route tới VLAN 10 / 20 / 30 (HIS/PACS đặt VLAN 30), tách kho IPv4 pool riêng 10.127.129.0/24, chính sách
 "VPN-only" (full-tunnel bắt buộc, không split-tunnel cho data nội bộ), audit session log.
 
 ---
@@ -360,7 +361,7 @@ route tới VLAN 20 / 30 / 40 (HIS/PACS), tách kho IPv4 pool riêng 10.10.99.0/
 | Main ↔ DBP | A.1 (IPsec thuần) / A.2 (SVTI GRE) | Cả 2 variant sẵn |
 | Main ↔ BHTQ | A.1 / A.2 | Như trên (tương tự cấu hình DBP) |
 | Serial backup | A.2 — Tunnel11/21 | OSPF cost cao |
-| Teleworker | A.4.1 (IOS IPsec/NAT-T) + A.4.2 (TLS AnyConnect trên NGFW, khuyến nghị) | Home LAN 192.168.250.0/24 |
+| Teleworker | A.4.1 (IOS IPsec/NAT-T) + A.4.2 (TLS AnyConnect trên NGFW, khuyến nghị) | Home LAN 10.127.128.0/24 |
 
 **Chung:** khi triển khai trên thiết bị thật, **xác nhận lại bảng IP chốt** (mục §2.2
 báo cáo chính), chạy `show crypto isakmp sa` / `show crypto ipsec sa peer <IP>`; log

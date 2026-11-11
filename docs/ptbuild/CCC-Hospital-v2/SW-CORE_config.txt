@@ -1,7 +1,7 @@
 ! =====================================================================
-! CCC-Hospital v2 — SW-CORE (Catalyst 3560-24PS, L3 switch) — startup-config
-! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-09)
+! CCC-Hospital v3 (dải 10.x) — SW-CORE (Catalyst 3560-24PS, L3 switch)
+! — startup-config xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt
+! bằng pt_backup_config (2026-11-11, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: core L3(router-on-a-stick SVI VLAN10..60) + ACL guest(150),
 ! CCTV(160), DMZ-IN (chiều ngược hạn chế DMZ vào nội bộ — KC-5)
 ! =====================================================================
@@ -22,6 +22,10 @@ enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
 ip routing
+!
+!
+!
+!
 !
 !
 !
@@ -110,31 +114,31 @@ interface Vlan1
 !
 interface Vlan10
  mac-address 0050.0f32.db01
- ip address 192.168.10.1 255.255.255.0
+ ip address 10.0.64.1 255.255.224.0
  ip helper-address 172.16.0.2
 !
 interface Vlan20
  mac-address 0050.0f32.db02
- ip address 192.168.20.1 255.255.255.0
+ ip address 10.0.96.1 255.255.224.0
  ip helper-address 172.16.0.2
 !
 interface Vlan30
  mac-address 0050.0f32.db03
- ip address 192.168.30.1 255.255.255.0
+ ip address 10.0.16.1 255.255.240.0
 !
 interface Vlan40
  mac-address 0050.0f32.db04
- ip address 192.168.40.1 255.255.255.0
+ ip address 10.0.1.1 255.255.255.0
  ip access-group DMZ-IN in
 !
 interface Vlan50
  mac-address 0050.0f32.db05
- ip address 192.168.50.1 255.255.255.0
+ ip address 10.0.32.1 255.255.224.0
  ip access-group 160 in
 !
 interface Vlan60
  mac-address 0050.0f32.db06
- ip address 192.168.60.1 255.255.255.0
+ ip address 10.0.8.1 255.255.248.0
  ip helper-address 172.16.0.2
  ip access-group 150 in
 !
@@ -144,17 +148,19 @@ ip route 0.0.0.0 0.0.0.0 172.16.0.2
 ip flow-export version 9
 !
 !
-access-list 150 permit udp 192.168.60.0 0.0.0.255 host 192.168.30.2 eq domain
-access-list 150 deny ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
-access-list 150 permit ip any any
-access-list 160 permit ip 192.168.50.0 0.0.0.255 host 192.168.30.6
-access-list 160 deny ip any any
 ip access-list extended DMZ-IN
- permit tcp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 established
- permit udp 192.168.40.0 0.0.0.255 host 192.168.30.2
- permit icmp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 echo-reply
- deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
+ permit tcp 10.0.1.0 0.0.0.255 10.0.0.0 0.255.255.255 established
+ permit udp 10.0.1.0 0.0.0.255 host 10.0.16.2
+ permit icmp 10.0.1.0 0.0.0.255 10.0.0.0 0.255.255.255 echo-reply
+ deny ip 10.0.1.0 0.0.0.255 10.0.0.0 0.255.255.255
  permit ip any any
+access-list 150 permit udp 10.0.8.0 0.0.7.255 host 10.0.16.2 eq domain
+access-list 150 permit tcp 10.0.8.0 0.0.7.255 host 10.0.1.2 eq www
+access-list 150 permit tcp 10.0.8.0 0.0.7.255 host 10.0.1.2 eq 443
+access-list 150 deny ip 10.0.8.0 0.0.7.255 10.0.0.0 0.255.255.255
+access-list 150 permit ip any any
+access-list 160 permit ip 10.0.32.0 0.0.31.255 host 10.0.16.6
+access-list 160 deny ip any any
 !
 !
 !

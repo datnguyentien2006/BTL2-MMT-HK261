@@ -1,6 +1,7 @@
 ! =====================================================================
-! CCC-Hospital v2 — ISP2 (Cisco 2911) — startup-config xuất trực tiếp
-! từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config (2026-11-09)
+! CCC-Hospital v3 (dải 10.x) — ISP2 (Cisco 2911) — startup-config
+! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
+! (2026-11-11, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: ISP "Internet B" — phủ 203.0.113.0/30 (R-HOME/mobile), là đường
 ! failover nhận floating static AD 50 của FW-MAIN khi ISP1 đứt (KC-8)
 ! =====================================================================
@@ -73,6 +74,7 @@ ip route 198.51.100.0 255.255.255.0 199.115.1.2
 ip route 199.115.1.0 255.255.255.248 199.115.1.2 
 !
 ip flow-export version 9
+!
 !
 !
 !

@@ -6,18 +6,18 @@ Thực hiện trên một PC thuộc VLAN Guest tại Main, DBP và BHTQ.
 
 | Trường hợp            | Lệnh/Ping                                      | Kết quả mong đợi                                         | Screenshot                     |
 | --------------------- | ---------------------------------------------- | -------------------------------------------------------- | ------------------------------ |
-| Main → DNS            | `ping 10.10.20.5` hoặc truy cập DNS            | Thành công nếu dịch vụ DNS hoạt động                     | `TC-B3-GUEST-MS-DNS.png`       |
-| Main → web DMZ        | `ping 10.10.200.10` / mở HTTP                  | Ping có thể bị chặn; truy cập HTTP/HTTPS phải thành công | `TC-B3-GUEST-MS-DMZ.png`       |
-| Guest → LAN nhân viên | `ping 10.10.30.x` hoặc `10.10.40.x`            | Timeout, ACL `deny log`                                  | `TC-B3-GUEST-MS-LAN-DENY.png`  |
-| Guest → CCTV          | `ping 10.10.50.x`                              | Timeout, ACL không cho truy cập CCTV                     | `TC-B3-GUEST-MS-CCTV-DENY.png` |
-| Guest → DBP/BHTQ      | `ping 10.11.x.x` hoặc `10.12.x.x`              | Timeout, không truy cập mạng nội bộ trạm phụ             | `TC-B3-GUEST-REMOTE-DENY.png`  |
+| Main → DNS            | `ping 10.0.16.2` hoặc truy cập DNS            | Thành công nếu dịch vụ DNS hoạt động                     | `TC-B3-GUEST-MS-DNS.png`       |
+| Main → web DMZ        | `ping 10.0.1.2` / mở HTTP                     | Ping có thể bị chặn; truy cập HTTP/HTTPS phải thành công | `TC-B3-GUEST-MS-DMZ.png`       |
+| Guest → LAN nhân viên | `ping 10.0.64.x` hoặc `10.0.96.x`             | Timeout, ACL `deny log`                                  | `TC-B3-GUEST-MS-LAN-DENY.png`  |
+| Guest → CCTV          | `ping 10.0.32.x`                              | Timeout, ACL không cho truy cập CCTV                     | `TC-B3-GUEST-MS-CCTV-DENY.png` |
+| Guest → DBP/BHTQ      | `ping 10.128.x.x` hoặc `10.132.x.x`           | Timeout, không truy cập mạng nội bộ trạm phụ             | `TC-B3-GUEST-REMOTE-DENY.png`  |
 | Guest → Internet      | Mở web ngoài hoặc `ping` IP công cộng được NAT | Thành công                                               | `TC-B3-GUEST-INTERNET.png`     |
 
-Lặp lại ma trận cho VLAN DBP Guest `10.11.60.0/24` và BHTQ Guest `10.12.60.0/24`:
+Lặp lại ma trận cho LAN trạm phụ DBP `10.128.0.0/14` và BHTQ `10.132.0.0/14`:
 
 | Source | Allowed                                                    | Denied                                                                  |
 | ------ | ---------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Guest  | DNS `10.10.20.5`, web DMZ `10.10.200.10`, Internet qua NAT | All `10.0.0.0/8` private networks except permitted DNS and DMZ services |
+| Guest  | DNS `10.0.16.2`, web DMZ `10.0.1.2`, Internet qua NAT      | All `10.0.0.0/8` private networks except permitted DNS and DMZ services |
 
 ## C.2 Camera/CCTV
 

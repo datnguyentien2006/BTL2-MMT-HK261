@@ -85,20 +85,20 @@ ip source binding 001A.A1B2.C3D4 vlan 30 Gi0/5
 
 ### 7) ACL least-privilege — đặc biệt Wi-Fi khách
 
-- VLAN 60/63/73 (guest) chỉ được: **DNS nội bộ (UDP/TCP 53 → 10.10.20.5 = SRV-DNS)**, **HTTP/HTTPS đến web DMZ (10.10.200.10)** và **default out Internet (NAT PAT)**.
-- **Deny all** về dải nội bộ `10.10.0.0/16`, `10.11.0.0/16`, `10.12.0.0/16`, VLAN 20, VLAN 50 (CCTV), VLAN 10 (MGMT); cuối ACL `deny ip ... log` để audit.
-- ACL đặt closest-to-source trên R-CORE-MS subinterface VLAN 60/63/73 (hoặc trên NGFW policy).
+- VLAN guest (VLAN 60 mô hình; 63/73 là biến thể guest trạm phụ trong thiết kế thật) chỉ được: **DNS nội bộ (UDP/TCP 53 → 10.0.16.2 = SRV-DNS)**, **HTTP/HTTPS đến web DMZ (10.0.1.2)** và **default out Internet (NAT PAT)**.
+- **Deny all** về dải nội bộ `10.0.0.0/8` (bao gồm LAN trạm phụ `10.128.0.0/14`, `10.132.0.0/14`, server farm VLAN 30, CCTV VLAN 50), trừ các dịch vụ được permit ở dòng trên; cuối ACL `deny ip ... log` để audit.
+- ACL đặt closest-to-source trên SVI VLAN 60 của SW-CORE (thiết kế thật: subinterface VLAN 60/63/73 hoặc NGFW policy).
 
 ### 8) Phân đoạn VLAN / micro-segmentation
 
-- Bảng VLAN chốt: MGMT 10 / SERVER-FARM 20 / DEPT-A 30 / DEPT-B 40 / CCTV 50 / GUEST 60 / DMZ 200 + DBP 61/62/63 + BHTQ 71/72/73.
-- **VLAN MGMT không có gateway đi ra Internet**; chỉ permit từ trạm quản trị & jump host.
-- VLAN 20 (server farm) chỉ permit port dịch vụ cụ thể (HIS 8080/443, DB 1521, DNS 53, syslog 514/9995) từ VLAN 30/40/61/71 + DMZ trả lời stateful; deny else.
+- Bảng VLAN chốt v3 (2026-11-11): DEPT-A 10 (10.0.64.0/19) / DEPT-B 20 (10.0.96.0/19) / SERVER-FARM 30 (10.0.16.0/20) / DMZ 40 (10.0.1.0/24) / CCTV 50 (10.0.32.0/19) / GUEST 60 (10.0.8.0/21); trạm phụ DBP `10.128.0.0/14`, BHTQ `10.132.0.0/14` (thiết kế thật tách thêm VLAN 61–63 / 71–73 trong dải này).
+- **VLAN MGMT (chỉ thiết kế thật) không có gateway đi ra Internet**; chỉ permit từ trạm quản trị & jump host.
+- VLAN 30 (server farm) chỉ permit port dịch vụ cụ thể (HIS 8080/443, DB 1521, DNS 53, syslog 514/9995) từ VLAN 10/20 + LAN trạm phụ + DMZ trả lời stateful; deny else.
 - Đóng giao VLAN↔VLAN không cần thiết (chặn vlan-1 không dùng, CDP chỉ bật lênlink).
 
 ### 9) DMZ, NAT & stateful firewall
 
-- DMZ VLAN 200: **static NAT 1:1 203.0.115.10 → 10.10.200.10**; ACL ONLY 80/443 (web), 25/587 (mail) từ Internet.
+- DMZ VLAN 40 (10.0.1.0/24): **static NAT share IP public `199.115.1.1`** (`tcp 80/443 → 10.0.1.2`, `tcp 25 → 10.0.1.3`); ACL ONLY 80/443 (web), 25/587 (mail) từ Internet.
 - **Không cho DMZ khởi tạo kết nối vào LAN** — chỉ permit reply/reset; mail server chỉ được relay qua SMTP gateway hợp lệ (kết nối TLS tới relay nội bộ).
 - Trên thiết bị thật: NGFW (FortiGate/Palo Alto/ASA) thay R-EDGE-MS với **intrusion prevention, web app firewall (WAF), SSL inspection**.
 
@@ -137,11 +137,11 @@ ip source binding 001A.A1B2.C3D4 vlan 30 Gi0/5
 
 ## B.2 Ma trận policy theo vùng (baseline)
 
-| Policy control | DMZ (VLAN 200) | Server-Farm (VLAN 20) | LAN nhân viên (30/40) | LAN trạm phụ (61/71) | Guest (60/63/73) | CCTV (50) | MGMT (10) |
+| Policy control | DMZ (VLAN 40) | Server-Farm (VLAN 30) | LAN nhân viên (VLAN 10/20) | LAN trạm phụ (DBP/BHTQ) | Guest (VLAN 60) | CCTV (VLAN 50) | MGMT |
 |---|---|---|---|---|---|---|---|
 | Internet truy xuất (inbound) | chỉ 80/443/25/587 qua static NAT | không | không | không | không | không | không |
 | Internet outbound | khống chế (web/mail ra nguồn hợp lệ) | theo whitelist | permit NAT PAT | qua Main → NAT | permit NAT PAT | trực tiếp Internet không cho phép | không |
-| Truy cập LAN nội bộ | **deny trường tạo kết nối vào LAN** | permit dịch vụ cụ thể từ 30/40/61/71 | peer-to-peer deny; tới VLAN 20 theo port | tới VLAN 20 theo port | **deny toàn LAN** (chỉ DNS + web DMZ) | deny, chỉ NVR ↔ camera | tất cả là whitelist |
+| Truy cập LAN nội bộ | **deny trường tạo kết nối vào LAN** | permit dịch vụ cụ thể từ VLAN 10/20 + trạm phụ | peer-to-peer deny; tới VLAN 30 theo port | tới VLAN 30 theo port | **deny toàn LAN** (chỉ DNS + web DMZ) | deny, chỉ NVR ↔ camera | tất cả là whitelist |
 | Truy cập CCTV | deny | NVR hợp lệ | deny | deny | deny | trong segment riêng | permit giám sát |
 | DHCP | static | static | pool + snooping | pool+snooping | pool Guest rate-limit | static | static |
 | Port-security max-MAC | 2 | 1 | 2 | 2 | 1 | 3 | 1 |

@@ -1,7 +1,8 @@
 ! =====================================================================
-! CCC-Hospital v2 — FW-MAIN (Cisco 2911, securityk9) — startup-config
-! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-09, sau đợt kiểm chứng KC-8 + khôi phục crypto)
+! CCC-Hospital v3 (dải 10.x) — FW-MAIN (Cisco 2911, securityk9)
+! — startup-config xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt
+! bằng pt_backup_config (2026-11-11, sau đợt đổi subnet + khôi phục
+! crypto sau reboot KC-8)
 ! Vai trò: firewall-edge — NAT/PAT, static NAT DMZ 1:1(share IP),
 ! GRE tunnel về R-HOME, 2 default route (ISP1 chính + floating AD 50 ISP2)
 ! =====================================================================
@@ -33,6 +34,7 @@ license boot module c2900 technology-package securityk9
 !
 !
 !
+!
 crypto isakmp policy 10
  encr 3des
  hash md5
@@ -48,6 +50,7 @@ crypto map VPN-MOB 10 ipsec-isakmp
  set peer 203.0.113.2
  set transform-set TS-MOB 
  match address 120
+!
 !
 !
 !
@@ -94,28 +97,28 @@ interface Vlan1
  shutdown
 !
 ip nat inside source list 100 interface GigabitEthernet0/2 overload
-ip nat inside source static tcp 192.168.40.2 80 199.115.1.1 80 
-ip nat inside source static tcp 192.168.40.2 443 199.115.1.1 443 
-ip nat inside source static tcp 192.168.40.3 25 199.115.1.1 25 
+ip nat inside source static tcp 10.0.1.2 80 199.115.1.1 80 
+ip nat inside source static tcp 10.0.1.2 443 199.115.1.1 443 
+ip nat inside source static tcp 10.0.1.3 25 199.115.1.1 25 
 ip classless
-ip route 192.168.10.0 255.255.255.0 172.16.0.5 
-ip route 192.168.20.0 255.255.255.0 172.16.0.5 
-ip route 192.168.30.0 255.255.255.0 172.16.0.5 
-ip route 192.168.40.0 255.255.255.0 172.16.0.5 
-ip route 192.168.50.0 255.255.255.0 172.16.0.5 
-ip route 192.168.60.0 255.255.255.0 172.16.0.5 
-ip route 192.168.110.0 255.255.255.0 172.16.0.10 
-ip route 192.168.120.0 255.255.255.0 172.16.0.10 
-ip route 192.168.90.0 255.255.255.0 10.254.0.2 
 ip route 0.0.0.0 0.0.0.0 199.115.1.3 50
+ip route 10.0.64.0 255.255.224.0 172.16.0.5 
+ip route 10.0.96.0 255.255.224.0 172.16.0.5 
+ip route 10.0.16.0 255.255.240.0 172.16.0.5 
+ip route 10.0.1.0 255.255.255.0 172.16.0.5 
+ip route 10.0.32.0 255.255.224.0 172.16.0.5 
+ip route 10.0.8.0 255.255.248.0 172.16.0.5 
+ip route 10.128.0.0 255.252.0.0 172.16.0.10 
+ip route 10.132.0.0 255.252.0.0 172.16.0.10 
+ip route 10.127.128.0 255.255.255.0 10.254.0.2 
 ip route 0.0.0.0 0.0.0.0 199.115.1.2 
 !
 ip flow-export version 9
 !
 !
-access-list 100 deny ip 192.168.0.0 0.0.255.255 192.168.90.0 0.0.0.255
-access-list 100 permit ip 192.168.0.0 0.0.255.255 any
-access-list 120 permit ip 192.168.0.0 0.0.255.255 192.168.90.0 0.0.0.255
+access-list 100 deny ip 10.0.0.0 0.255.255.255 10.127.128.0 0.0.0.255
+access-list 100 permit ip 10.0.0.0 0.255.255.255 any
+access-list 120 permit ip 10.0.0.0 0.255.255.255 10.127.128.0 0.0.0.255
 !
 !
 !

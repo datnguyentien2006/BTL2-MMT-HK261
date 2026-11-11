@@ -1,6 +1,7 @@
 ! =====================================================================
-! CCC-Hospital v2 — GW-DBP (Cisco 2911) — startup-config xuất trực tiếp
-! từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config (2026-11-09)
+! CCC-Hospital v3 (dải 10.x) — GW-DBP (Cisco 2911) — startup-config
+! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
+! (2026-11-11, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: gateway trạm DBP — PVC Frame DBP (chính, AD 100) + serial backup (AD 200)
 ! =====================================================================
 !
@@ -16,13 +17,13 @@ hostname GW-DBP
 enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
-ip dhcp excluded-address 192.168.110.1 192.168.110.9
-ip dhcp excluded-address 192.168.110.201 192.168.110.254
+ip dhcp excluded-address 10.128.0.1 10.128.0.9
+ip dhcp excluded-address 10.128.0.201 10.128.0.254
 !
 ip dhcp pool DBP-LAN
- network 192.168.110.0 255.255.255.0
- default-router 192.168.110.1
- dns-server 192.168.30.2
+ network 10.128.0.0 255.252.0.0
+ default-router 10.128.0.1
+ dns-server 10.0.16.2
 !
 !
 !
@@ -45,6 +46,7 @@ license udi pid CISCO2911/K9 sn FTX152414QS-
 !
 !
 !
+!
 spanning-tree mode pvst
 !
 !
@@ -53,7 +55,7 @@ spanning-tree mode pvst
 !
 !
 interface GigabitEthernet0/0
- ip address 192.168.110.1 255.255.255.0
+ ip address 10.128.0.1 255.252.0.0
  duplex auto
  speed auto
 !
@@ -101,7 +103,9 @@ ip flow-export version 9
 !
 !
 !
+!
 banner motd #Gateway Branch DBP - WAN Frame Relay + backup#
+!
 !
 !
 !

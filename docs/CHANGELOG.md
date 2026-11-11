@@ -2,6 +2,29 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-11 — Đổi subnet toàn mô hình sang dải 10.x (v3) theo yêu cầu mới
+
+- **Bảng IP chốt v3 (đo live lại toàn bộ):** DEPT-A `10.0.64.0/19` (GW .1 trên SVI SW-CORE),
+  DEPT-B `10.0.96.0/19`, SERVER-FARM `10.0.16.0/20`, DMZ `10.0.1.0/24`, CCTV `10.0.32.0/19`,
+  WIFI-GUEST `10.0.8.0/21`, DBP `10.128.0.0/14`, BHTQ `10.132.0.0/14`,
+  Mobile-Worker `10.127.128.0/24`. WAN/transit (`172.16/172.17/172.18`), public
+  `199.115.1.0/29`, Internet `198.51.100.0/24` + `203.0.113.0/30`, GRE overlay
+  `10.254.0.0/30` giữ nguyên.
+- **Đổi đồng bộ trên .pkt (PT live qua MCP):** 6 SVI SW-CORE (+ ACL 150/160/DMZ-IN wildcard),
+  DHCP pool R-CORE-MS/GW-DBP/GW-BHTQ/R-HOME (+ excluded-address), IP LAN GW-DBP/GW-BHTQ/R-HOME,
+  static NAT DMZ, static route FW-MAIN/GW-MAIN/ISP1/ISP2/R-CORE-MS, IP 11 host tĩnh,
+  renew DHCP 14 client, 4 DNS record SRV-DNS. `pt_health_check`: 0 link đứt, 0 IP trùng.
+- **Đo lại KC-1→KC-8 live** với dải mới — toàn bộ xanh (KC-2 cắt PVC + KC-8 failover
+  ISP1→ISP2 đo lại 2 kịch bản); PT đánh rơi khối crypto FW-MAIN/R-HOME khi reboot trong
+  kịch bản KC-8 → khôi phục đầy đủ (policy 10, key, TS, crypto map + binding interface).
+- **Save .pkt** (261.076 bytes) + copy về `simulation/`; xuất lại **9 config archive**
+  (`docs/ptbuild/CCC-Hospital-v2/*_config.txt` + `metadata.json`).
+- **Evidence:** `evidence-2026-11-09.md` xóa khỏi working tree (git history giữ), thay bằng
+  `evidence-2026-11-11.md` — bảng địa chỉ mới + ma trận KC-1→KC-8 đo lại.
+- **Đồng bộ tài liệu sang dải mới:** `report/REPORT_vi.md` (§2.2 chốt v3, §3.3–3.5 sơ đồ WAN,
+  §5.4 bảng địa chỉ, §6 ma trận KC), `download/btl2_src.html` (B.2/B.5 + ghi chú bằng chứng),
+  Phụ lục A/B/C (peers VPN, ACL guest, checklist test), README → render lại 2 PDF nộp.
+
 ## 2026-11-09 — Dọn repo: chỉ giữ bản final nộp bài
 
 - **Giao:** repo (GitHub `datnguyentien2006/BTL2-MMT-HK261`) chỉ giữ **bản final cuối cùng**;

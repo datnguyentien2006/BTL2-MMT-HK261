@@ -6,7 +6,7 @@ Repo này chứa toàn bộ sản phẩm cho Assignment 2 (Mạng máy tính –
 - **Mô phỏng Packet Tracer** (`simulation/`) — **bản nộp cuối duy nhất: `CCC-Hospital-v2.pkt`** (49 thiết bị / 49 link — Main Site một lối ra qua FW-MAIN, trạm phụ không firewall, VPN mobile chấm trên FW-MAIN, WAN Frame Relay + serial backup).
 - **Archive cấu hình IOS** (`docs/ptbuild/CCC-Hospital-v2/`) — của chính bản nộp: 9 config xuất
   startup-config thật bằng `pt_backup_config`, `metadata.json`, và
-  `evidence-2026-11-09.md` (transcription đo live KC-1→KC-8).
+  `evidence-2026-11-11.md` (transcription đo live KC-1→KC-8, dải 10.x chốt 2026-11-11).
 - **Nhật ký xây dựng + kiểm chứng** (`docs/`).
 
 ## Kiến trúc tổng quan

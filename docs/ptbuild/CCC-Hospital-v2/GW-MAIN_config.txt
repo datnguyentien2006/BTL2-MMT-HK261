@@ -1,6 +1,7 @@
 ! =====================================================================
-! CCC-Hospital v2 — GW-MAIN (Cisco ISR4331) — startup-config xuất trực tiếp
-! từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config (2026-11-09)
+! CCC-Hospital v3 (dải 10.x) — GW-MAIN (Cisco ISR4331) — startup-config
+! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
+! (2026-11-11, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: gateway WAN Main Site — 2 PVC Frame Relay + 2 serial backup
 ! =====================================================================
 !
@@ -82,17 +83,19 @@ interface Serial0/2/1
  clock rate 2000000
 !
 ip classless
-ip route 192.168.110.0 255.255.255.0 172.17.10.2 
-ip route 192.168.120.0 255.255.255.0 172.17.20.2 
-ip route 192.168.110.0 255.255.255.0 172.18.10.2 200
-ip route 192.168.120.0 255.255.255.0 172.18.20.2 200
 ip route 0.0.0.0 0.0.0.0 172.16.0.9 
+ip route 10.128.0.0 255.252.0.0 172.17.10.2 
+ip route 10.132.0.0 255.252.0.0 172.17.20.2 
+ip route 10.128.0.0 255.252.0.0 172.18.10.2 200
+ip route 10.132.0.0 255.252.0.0 172.18.20.2 200
 !
 ip flow-export version 9
 !
 !
 !
+!
 banner motd #Thiet bi WAN Main Site - GW Frame Relay#
+!
 !
 !
 !

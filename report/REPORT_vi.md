@@ -5,7 +5,7 @@
 **Trường:** Đại học Bách Khoa TP.HCM (HCMUT)
 **Phiên bản báo cáo:** v1.0 — ngày 21/10/2026
 
-> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào `Kết quả thực tế` ở bảng Step 5 và được chứng minh nguyên văn bằng transcription tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md` (topology: `images/topology-v2.png`).
+> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào `Kết quả thực tế` ở bảng Step 5 và được chứng minh nguyên văn bằng transcription tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md` (topology: `images/topology-v2.png`).
 
 ---
 
@@ -33,7 +33,7 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục _cr
 - **2 trạm phụ:** DBP Street và BHTQ Street — tòa 2 tầng, mỗi trạm **260 workstation**, **2 server**, **≥5 thiết bị mạng** mỗi trạm.
 - **WAN:** 2 đường leased line (chọn **MPLS, handoff Ethernet EPL**) Main↔DBP và Main↔BHTQ, cộng **đường serial dự phòng**; kết cấu sẵn sàng cho **SD-WAN overlay**; định tuyến **OSPF** (single area 0 trong mô phỏng).
 - **Internet:** 2× DSL (ISP1 + ISP2) về R-EDGE-MS với cơ chế **load-share/failover** (mặc định đi ISP1, ISP2 floating AD 50); toàn bộ traffic Internet đi qua Main Site.
-- **DMZ:** VLAN 200 phía sau firewall R-EDGE-MS (trong mô phỏng); thực tế đề xuất NGFW (Fortinet/Palo Alto/Cisco ASA FirePOWER).
+- **DMZ:** VLAN 40 phía sau firewall FW-MAIN (trong mô phỏng); thực tế đề xuất NGFW (Fortinet/Palo Alto/Cisco ASA FirePOWER).
 - **Bảo mật:** ACL cô lập WiFi khách, NAT/PAT + static NAT cho DMZ, hardening thiết bị, port-security, syslog + NetFlow làm nền tảng IDS/IPS.
 
 ### 1.2 Ánh xạ user story từ đề bài
@@ -44,7 +44,7 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục _cr
 | US-2 | Là bệnh viện, tôi cần 2 đường leased line dẫn về Main Site, đứt 1 vẫn chạy               | MPLS EPL ×2 + serial backup + floating static/OSPF metric | KC-2                  |
 | US-3 | Tôi cần Internet cho toàn viện, đứt ISP nào cũng phục vụ được                            | 2× DSL về R-EDGE-MS, NAT/PAT, floating route AD 50        | KC-3                  |
 | US-4 | Khách dùng Wi-Fi trả phí phải bị cô lập với mạng nội bộ                                  | ACL VLAN 60/63/73: chỉ DNS nội bộ + web DMZ + Internet    | KC-4                  |
-| US-5 | Website/email của bệnh viện phải truy cập được từ Internet                               | DMZ VLAN 200 + static NAT 1:1 203.0.115.10 → 10.10.200.10 | KC-5                  |
+| US-5 | Website/email của bệnh viện phải truy cập được từ Internet                               | DMZ VLAN 40 + static NAT share IP public `199.115.1.1:80/443 → 10.0.1.2`, `:25 → 10.0.1.3` | KC-5                  |
 | US-6 | Tôi cần quản trị thiết bị an toàn (SSH, secret, log)                                     | Hardening, ACL MGMT, syslog + NetFlow về SRV-LOG          | KC-6                  |
 | US-7 | Camera/IP camera phải nằm riêng khỏi mạng truy cập                                       | VLAN 50 CCTV riêng, NVR giám sát                          | KC-1                  |
 | US-8 | Teleworker/BSI trực cần VPN về mạng nội bộ                                               | Site-to-site IPsec + client VPN (teleworker)              | Phụ lục A             |
@@ -66,26 +66,38 @@ Thiết kế mạng hoàn chỉnh cho một bệnh viện lớn hạng mục _cr
 | Bảo mật       | ACL, NAT, hardening, port-security, syslog/NetFlow                        | Cẩm nang ở Phụ lục B                                                                   |
 | Ứng dụng y tế | HIS, RIS-PACS, LIS, CRM, DB, CCTV/NVR, DNS, syslog                        | Load balancer đặt trước HIS/RIS-PACS/DB (§2.4); LIS/CRM chạy chung server farm VLAN 20 |
 
-### 2.2 Cấu trúc VLAN / địa chỉ IP (đã chốt)
+### 2.2 Cấu trúc VLAN / địa chỉ IP (đã chốt — v3 dải 10.x, 2026-11-11)
 
-**Main Site — VLAN 10–200 (gateway .1 mỗi VLAN):**
+**Main Site — VLAN 10–60 (gateway mỗi VLAN = `.1`, đặt trên SVI SW-CORE trong mô hình):**
 
 | VLAN | Tên         | Địa chỉ        | Công dụng            |
 | ---- | ----------- | -------------- | -------------------- |
-| 10   | MGMT        | 10.10.10.0/24  | Quản trị thiết bị    |
-| 20   | SERVER-FARM | 10.10.20.0/24  | DNS/HIS/PACS/LOG/NVR |
-| 30   | DEPT-A      | 10.10.30.0/24  | Tòa A                |
-| 40   | DEPT-B      | 10.10.40.0/24  | Tòa B                |
-| 50   | CCTV        | 10.10.50.0/24  | Camera IP            |
-| 60   | WIFI-GUEST  | 10.10.60.0/24  | Khách trả phí        |
-| 200  | DMZ         | 10.10.200.0/24 | WEB/MAIL công khai   |
+| 10   | DEPT-A      | 10.0.64.0/19   | Tòa A                |
+| 20   | DEPT-B      | 10.0.96.0/19   | Tòa B                |
+| 30   | SERVER-FARM | 10.0.16.0/20   | DNS/HIS/PACS/LOG/NVR |
+| 40   | DMZ         | 10.0.1.0/24    | WEB/MAIL công khai   |
+| 50   | CCTV        | 10.0.32.0/19   | Camera IP            |
+| 60   | WIFI-GUEST  | 10.0.8.0/21    | Khách trả phí        |
 
-**Trạm phụ DBP Street:** VLAN 61 `10.11.10.0/24` (staff), 62 `10.11.20.0/24` (server), 63 `10.11.60.0/24` (guest).
-**Trạm phụ BHTQ Street:** VLAN 71 `10.12.10.0/24` (staff), 72 `10.12.20.0/24` (server), 73 `10.12.60.0/24` (guest).
+> Thiết kế thật bổ sung thêm **VLAN MGMT riêng** (dải quản trị không có gateway ra Internet);
+> mô hình Packet Tracer quản trị thiết bị qua console/SSH nên không dựng VLAN MGMT.
 
-**WAN Ethernet (MPLS leased):** `10.254.0.0/30` (R-WAN-MS `.1` ↔ R-DBP `.2`); `10.254.0.4/30` (R-WAN-MS `.5` ↔ R-BHTQ `.6`).
-**WAN Serial backup:** `10.255.0.0/30` (`.1` ↔ `.2`); `10.255.0.4/30` (`.5` ↔ `.6`).
-**Internet mô phỏng:** ISP1 `203.0.113.0/30`; ISP2 `203.0.114.0/30`; DMZ static NAT `203.0.115.10 → 10.10.200.10`; "Internet web server" `198.51.100.10/24`; Home LAN teleworker `192.168.250.0/24`.
+**Trạm phụ DBP Street:** LAN `10.128.0.0/14` — GW `10.128.0.1` (GW-DBP); staff + server
+SRV-DBP-1 `.10` (thiết kế thật tách VLAN 61 staff / 62 server / 63 guest trong dải này).
+**Trạm phụ BHTQ Street:** LAN `10.132.0.0/14` — GW `10.132.0.1` (GW-BHTQ); staff + server
+SRV-BHTQ-1 `.10` (thiết kế thật tách VLAN 71/72/73).
+**Mobile worker (LAN nhà teleworker):** `10.127.128.0/24` — GW `10.127.128.1` (R-HOME),
+về Main qua tunnel FW-MAIN ↔ R-HOME.
+
+**WAN (mô hình PT — mô phỏng L2 leased line):** PVC Frame Relay `172.17.10.0/30` (Main—DBP)
++ `172.17.20.0/30` (Main—BHTQ) — static AD 100; serial backup `172.18.10.0/30` +
+`172.18.20.0/30` — floating AD 200. Ngày thực tế các đường này là **MPLS handoff Ethernet
+(EPL) 300 Mbps/trạm**; Frame Relay chỉ là cách cấp L2 leased line trong PT.
+
+**Internet mô phỏng:** FW-MAIN nối 2 ISP tại `199.115.1.0/29` (FW `.1`, ISP1 `.2`, ISP2 `.3`);
+dải "Internet" `198.51.100.0/24` (SRV-INT `.10`) neo sau ISP1; WAN R-HOME `203.0.113.0/30`
+sau ISP2; GRE overlay FW↔R-HOME `10.254.0.0/30`. DMZ static NAT **share IP public**
+`199.115.1.1:80/443 → 10.0.1.2`, `:25 → 10.0.1.3`.
 
 ### 2.3 Checklist khảo sát mặt bằng (site survey — 15 hạng mục)
 
@@ -122,7 +134,7 @@ Chọn cấu trúc kiểu phân tầng **Access – Distribution – Core – Da
                     │   ISP1 ───────────►┌──────────┐◄─────── ISP2                        │
                     │                   │ R-EDGE-MS │  (firewall + NAT + DMZ)              │
                     │                   └────┬─────┘        │                             │
-                    │                  DMZ VLAN200 (SW-DMZ)  │                              │
+                    │                  DMZ VLAN 40 (SW-DMZ)   │                              │
                     │                  SRV-WEB / SRV-MAIL    │                              │
                     │                                       │                               │
    WAN (2×MPLS+serial) ─── R-WAN-MS ───┐        ┌────── R-CORE-MS (router-on-a-stick ◄──┘
@@ -198,10 +210,10 @@ FW-MAIN = Cisco **2911** (firewall/NAT/DMZ + đầu cuối VPN), R-CORE-MS = Cis
  │ ...               │◄50m─►│ ...               │◄──────►│ DC: 9300, SRV×10│      │ GPON OLT, WLC    │
  │ F1: AP-A1, PP-A1  │   │  │ F1: AP-B1, PP-B1  │        │ NGFW pair, R-EDGE│      │ R-WAN-MS, R-CORE │
  └─────────┬─────────┘   │  └─────────┬─────────┘        └───────┬────────┘      └────────┬─────────┘
-           │ OM4 fiber   │            │ OM4 fiber                │ SW-DMZ (VLAN200)        │
+           │ OM4 fiber   │            │ OM4 fiber                │ SW-DMZ (VLAN 40 DMZ)        │
            └─────────────┴────────────┴──────► SW-CORE (SW layer)◄──┴─────────────────────────┘
                                                   │
-                          VLAN: 10 MGMT │ 20 SRV │ 30 Toà A │ 40 Toà B │ 50 CCTV │ 60 WiFi-Guest │ 200 DMZ
+                          VLAN: 10 Toà A │ 20 Toà B │ 30 SRV │ 40 DMZ │ 50 CCTV │ 60 WiFi-Guest (+ VLAN MGMT riêng)
 ``
 Mỗi tòa 5 tầng × 10 phòng; mỗi tầng: patch panel + 1 access switch 48p (hoặc 2 nếu >24 socket/tầng), 2 AP Wi-Fi 6; backhaul fiber OM4 về SW-CORE/IT Central Cabling.
 
@@ -209,25 +221,28 @@ Mỗi tòa 5 tầng × 10 phòng; mỗi tầng: patch panel + 1 access switch 48
 
 ``┌──── Trạm phụ (DBP / BHTQ) — 2 tầng ────┐
 │  R-DBP (ISR4331)                        │
-│   ├─ G0/0  router-on-a-stick            │
-│   │    ├─ .61 ETH-MPLS: 10.254.0.2/30   │
-│   │    ├─ .62 ETH-MPLS: 10.254.0.6/30   │
-│   │    └─ .63 (chỉ trạng thái backup)   │
-│   └─ NIM-2T Serial0/x/0 backup:         │
-│        10.255.0.2/30 ↔ R-WAN-MS         │
-│  SW-DBP 2960: VLAN61 staff / 62 SRV /   │
-│               63 guest                  │
+│   ├─ WAN chính (ngày thật: EPL handoff; │
+│   │   mô hình PT: PVC Frame Relay):     │
+│   │    ├─ S0/x/0: 172.17.10.2/30 (DBP)  │
+│   │    ├─ S0/x/0: 172.17.20.2/30 (BHTQ) │
+│   └─ NIM-2T Serial backup:              │
+│        172.18.10.2/30 ↔ R-WAN-MS (DBP)  │
+│        172.18.20.2/30 ↔ R-WAN-MS (BHTQ) │
+│  SW-DBP 2960: LAN 10.128.0.0/14 (DBP)   │
+│    hoặc 10.132.0.0/14 (BHTQ) — staff /  │
+│    SRV / guest tách VLAN                │
 │  260 PC + 2 SRV + AP                    │
 └─────────────────────────────────────────┘
 ``
 ### 3.5 Sơ đồ WAN & OSPF
 
-``                 ┌─ MPLS EPL 10.254.0.0/30 ── R-DBP (.2)
-R-WAN-MS (.1/.5) ┤
-(Main)  ─ serial backup 10.255.0.0/30 ─→ R-DBP (.2)
+``                 ┌─ EPL handoff 172.17.10.0/30 ── R-DBP (.2)
+R-WAN-MS (.1/.1) ┤   (mô hình PT: PVC Frame Relay DLCI 110↔101)
+(Main)  ─ serial backup 172.18.10.0/30 ─→ R-DBP (.2)
                  │
-                 ├─ MPLS EPL 10.254.0.4/30 ── R-BHTQ (.6)
-                 └─ serial backup 10.255.0.4/30 ─→ R-BHTQ (.6)
+                 ├─ EPL handoff 172.17.20.0/30 ── R-BHTQ (.2)
+                 └─ serial backup 172.18.20.0/30 ─→ R-BHTQ (.2)
+                     (mô hình PT: DLCI 120↔102)
 
 OSPF:  area 0 backbone (Main),  area 1 (DBP),  area 2 (BHTQ)
        [mô phỏng PT: single area 0]
@@ -398,7 +413,7 @@ của thiết kế thực.
 | Router WAN trạm phụ | GW-DBP / GW-BHTQ | Gateway mép, **không firewall riêng** |
 | 2× MPLS EPL + serial | Frame Relay PVC + Serial DCE | PVC AD 100 (172.17.x), backup AD 200 (172.18.x) |
 | 30× access switch | 8× 2960-24TT/Switch-PT | SW-BLD-A/B, SW-SRV, SW-CCTV, SW-DMZ, SW-DBP, SW-BHTQ, SW-HOME |
-| Router lõi/dịch vụ | R-CORE-MS (DHCP tập trung), R-HOME | Inter-VLAN + home LAN 192.168.90.0/24 |
+| Router lõi/dịch vụ | R-CORE-MS (DHCP tập trung), R-HOME | Inter-VLAN + home LAN 10.127.128.0/24 |
 | AP ×28 | AP-GUEST, AP-HOME (AccessPoint-PT) | Wi-Fi khách Main + teleworker |
 | 1120 PC / 14 SRV | 16 endpoint + 10 server | PC-A1..3, PRN-A/B, PC-B1..3, CAM-01/02, PC-DBP1/2, PC-BHTQ1/2, LT-GR-MS1, LT-MOBILE1; SRV-DNS/HIS/PACS/LOG/NVR/WEB-DMZ/MAIL-DMZ/DBP-1/BHTQ-1 + SRV-INT |
 
@@ -425,24 +440,24 @@ của thiết kế thực.
 | **Trạm phụ không có firewall riêng**   | GW-DBP / GW-BHTQ chỉ là gateway mép (mạng tin cậy sau WAN riêng tư); toàn bộ chính sách kiểm soát tập trung ở một điểm FW-MAIN + ACL trên SW-CORE. |
 | **VPN mobile chấm ngay trên firewall** | FW-MAIN ra Internet bằng G0/2 (199.115.1.1); tunnel tới R-HOME **kết thúc tại FW-MAIN** (GRE + crypto-map IPsec kèm), không đi vào LAN nội bộ.     |
 
-### 5.4 Bảng địa chỉ & WAN v2 (trích từ mô hình thật)
+### 5.4 Bảng địa chỉ & WAN v3 (trích từ mô hình thật — chốt 2026-11-11)
 
 | Vùng                     | Subnet                          | Gateway                 | Thiết bị tiêu biểu                                          |
 | ------------------------ | ------------------------------- | ----------------------- | ----------------------------------------------------------- |
-| VLAN 10 — Tòa A          | 192.168.10.0/24                 | 192.168.10.1 (SW-CORE)  | PC-A1..3 .21–.23, PRN-A .24                                 |
-| VLAN 20 — Tòa B          | 192.168.20.0/24                 | 192.168.20.1            | PC-B1..3 .21–.24, PRN-B .22                                 |
-| VLAN 30 — Server farm    | 192.168.30.0/24                 | 192.168.30.1            | SRV-DNS .2, SRV-HIS .3, SRV-PACS .4, SRV-LOG .5, SRV-NVR .6 |
-| VLAN 40 — DMZ            | 192.168.40.0/24                 | 192.168.40.1            | SRV-WEB-DMZ .2, SRV-MAIL-DMZ .3                             |
-| VLAN 50 — CCTV           | 192.168.50.0/24                 | 192.168.50.1            | CAM-01/02 .11/.12                                           |
-| VLAN 60 — Wi-Fi khách    | 192.168.60.0/24                 | 192.168.60.1            | LT-GR-MS1 (DHCP)                                            |
+| VLAN 10 — Tòa A          | 10.0.64.0/19                    | 10.0.64.1 (SW-CORE)     | PC-A1..3 .21–.23, PRN-A .24                                 |
+| VLAN 20 — Tòa B          | 10.0.96.0/19                    | 10.0.96.1               | PC-B1..3 .21–.23, PRN-B .24                                 |
+| VLAN 30 — Server farm    | 10.0.16.0/20                    | 10.0.16.1               | SRV-DNS .2, SRV-HIS .3, SRV-PACS .4, SRV-LOG .5, SRV-NVR .6 |
+| VLAN 40 — DMZ            | 10.0.1.0/24                     | 10.0.1.1                | SRV-WEB-DMZ .2, SRV-MAIL-DMZ .3                             |
+| VLAN 50 — CCTV           | 10.0.32.0/19                    | 10.0.32.1               | CAM-01/02 .11/.12                                           |
+| VLAN 60 — Wi-Fi khách    | 10.0.8.0/21                     | 10.0.8.1                | LT-GR-MS1 (DHCP)                                            |
 | WAN transit FW↔GW-MAIN   | 172.16.0.8/30                   | .9 (FW) / .10 (GW-MAIN) | —                                                           |
 | FW ↔ Core                | 172.16.0.4/30                   | .6 (FW) / .5 (R-CORE)   | —                                                           |
-| Public/DMZ (FW G0/2)     | 199.115.1.0/29                  | 199.115.1.1             | static NAT DMZ                                              |
-| Internet giả lập         | 198.51.100.0/24; 203.0.113.0/30 | ISP1/ISP2               | SRV-INT 198.51.100.10                                       |
-| Mobile worker (home LAN) | 192.168.90.0/24                 | 192.168.90.1 (R-HOME)   | LT-MOBILE1 .10                                              |
+| Public/DMZ (FW G0/2)     | 199.115.1.0/29                  | 199.115.1.1             | static NAT DMZ share IP public                              |
+| Internet giả lập         | 198.51.100.0/24 (ISP1); 203.0.113.0/30 (ISP2) | ISP1/ISP2 | SRV-INT 198.51.100.10                                       |
+| Mobile worker (home LAN) | 10.127.128.0/24                 | 10.127.128.1 (R-HOME)   | LT-MOBILE1 .10                                              |
 | Overlay FW↔R-HOME        | 10.254.0.0/30                   | .1 (FW) / .2 (R-HOME)   | Tunnel0                                                     |
-| Trạm DBP                 | 192.168.110.0/24                | 192.168.110.1 (GW-DBP)  | PC-DBP1/2 .11/.12, SRV-DBP-1 .10                            |
-| Trạm BHTQ                | 192.168.120.0/24                | 192.168.120.1 (GW-BHTQ) | PC-BHTQ1/2 .11/.12, SRV-BHTQ-1 .10                          |
+| Trạm DBP                 | 10.128.0.0/14                   | 10.128.0.1 (GW-DBP)     | PC-DBP1/2 .11/.12, SRV-DBP-1 .10                            |
+| Trạm BHTQ                | 10.132.0.0/14                   | 10.132.0.1 (GW-BHTQ)    | PC-BHTQ1/2 .11/.12, SRV-BHTQ-1 .10                          |
 
 **WAN v2 — Frame Relay + serial backup + Internet:**
 
@@ -461,7 +476,7 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 1. **Xung đột SSID Wi-Fi** — hai AP (AP-GUEST VLAN 60, AP-HOME mobile) cùng phát SSID mặc định
    nên laptop associate nhầm AP (đổi IP chéo giữa hai LAN). _Khắc phục:_ đặt SSID khác nhau bằng
    GUI trên hai AP; sau khi **nạp lại project** bộ lọc SSID của PT mới có hiệu lực —
-   `LT-GR-MS1 → 192.168.60.21` (AP-GUEST), `LT-MOBILE1 → 192.168.90.10` (AP-HOME).
+   `LT-GR-MS1 → 10.0.8.21` (AP-GUEST), `LT-MOBILE1 → 10.127.128.10` (AP-HOME).
 2. **IKE/IPsec main-mode không hội tụ trên path đa-hop có NAT** — SA kẹt `MM_SA_SETUP` ở PT 9.0.1
    (thuộc tính simulator, không phải sai cấu hình). _Khắc phục:_ dựng **GRE tunnel** FW-MAIN↔R-HOME
    (10.254.0.0/30) làm đường dữ liệu chạy được; `crypto map`/ISAKMP policy **vẫn giữ nguyên trong
@@ -476,27 +491,29 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
 ## 6. STEP 5 — KIỂM CHỨNG KẾT NỐI
 
 > **Bằng chứng Step 5:** toàn bộ số đo KC-1→KC-8 trong bảng dưới đã được **đo live** trên
-> `simulation/CCC-Hospital-v2.pkt` ngày 2026-11-09 (ping thật từ console thiết bị, `show> thật từ router/switch) và lưu nguyên văn tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md> (kèm `show ip nat translations`, RIB lúc failover, RIB route table). Hai mục chỉ còn chờ
-> thao tác GUI trong đợt viva là mở trang web trong trình duyệt PT (KC-3/KC-5) — config NAT/ACL
-> tương ứng đã đối chiếu theo config thật.
+> `simulation/CCC-Hospital-v2.pkt` ngày 2026-11-11 sau đợt đổi subnet toàn mô hình sang dải 10.x
+> (ping thật từ console thiết bị, `show` thật từ router/switch) và lưu nguyên văn tại
+> `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md` (kèm `show ip nat translations`, RIB lúc
+> failover). Hai mục chỉ còn chờ thao tác GUI trong đợt viva là mở trang web trong trình duyệt PT
+> (KC-3/KC-5) — config NAT/ACL tương ứng đã đối chiếu theo config thật.
 
-### 6.1 Ma trận kiểm chứng v2 (bản nộp cuối — đo trên mô hình thật)
+### 6.1 Ma trận kiểm chứng v3 (bản nộp cuối — đo trên mô hình thật)
 
-| KC | Mục tiêu | Lệnh/thao tác | Kết quả thực tế (v2) |
+| KC | Mục tiêu | Lệnh/thao tác | Kết quả thực tế (v3) |
 |---|---|---|---|
-| KC-1 | LAN nội bộ Main Site: PC Tòa A/B, camera → NVR, DNS nội bộ | `ping`, `nslookup` | **ĐẠT** — đo live 2026-11-09: PC-A1→SRV-DNS **4/4**; PC-A1→SRV-HIS **4/4**; PC-A1→SRV-WEB-DMZ **4/4** (LAN→DMZ thông); PC-A1↔PC-A2 cùng VLAN10 **4/4**; PC-A1→PC-B1 (VLAN10→VLAN20) **4/4**; CAM-01→SRV-NVR **4/4** |
-| KC-2 | Liên trạm: PC-DBP1/PC-BHTQ1 → SRV-HIS (192.168.30.3) | `ping`; cắt PVC Frame Relay cả hai đầu (GW-MAIN S0/1/0 + GW-DBP S0/1/0) rồi ping lại | **ĐẠT** — đo live: PC-DBP1 → HIS **4/4**, PC-BHTQ1 → HIS **4/4** (đường PVC chính AD 100). Cắt PVC DBP: `ping 172.17.10.1` **0/5** (xác nhận đường chính chết) nhưng `traceroute` từ GW-DBP tới HIS **hop 1 = 172.18.10.1** → đã rẽ sang serial backup (AD 200), PC-DBP1 vẫn **4/4**; PC-BHTQ1 không ảnh hưởng. Khôi phục PVC → PC-DBP1 → HIS **4/4** trở lại đường chính |
-| KC-3 | Internet: LAN & trạm phụ ra `198.51.100.10`; static NAT DMZ từ Internet | `ping` + Web | **ĐẠT** — đo live: PC-A1 → 198.51.100.10 **4/4** qua PAT FW-MAIN; LT-GR-MS1 (guest) → 198.51.100.10 **4/4**. `show ip nat translations` FW-MAIN: bảng PAT `icmp 199.115.1.1:27/28 ← 192.168.60.21` (guest) + static NAT `tcp 199.115.1.1:80/443 ↔ 192.168.40.2` và `:25 ↔ 192.168.40.3` — PAT overload + static NAT share IP 199.115.1.1 hoạt động thật. Kiểm tra HTTP bằng trình duyệt trong PT dành cho demo viva (mở `http://199.115.1.1` từ PC-INTERNET) |
-| KC-4 | Wi-Fi khách bị hạn chế (chỉ DNS nội bộ + web DMZ + Internet) | `ping` từ LT-GR-MS1 | **ĐẠT** — đo live: LT-GR-MS1 DHCP **192.168.60.21** đúng VLAN guest; → PC-A1 (VLAN10) **0/4 — 100% loss** (ACL 150 deny); → SRV-DNS ICMP **0/4** (chỉ mở udp/53); → SRV-WEB-DMZ ICMP **0/4** (policy chỉ mở TCP 80/443 — đã rebuild ACL 150 thêm 2 dòng permit tcp 80/443 tới web DMZ theo US-4); → Internet 198.51.100.10 **4/4**. SSH/HTTPS test bằng trình duyệt PT để dành cho demo viva |
-| KC-5 | DMZ: truy cập web SRV-WEB-DMZ từ Internet; DMZ không vào được nội bộ | Web browse + `ping` ngược | **ĐẠT** — v2 có ACL chiều ngược thật: `ip access-list extended DMZ-IN` bind trên Vlan40 (SW-CORE) — `permit tcp established`, `permit udp → SRV-DNS`, `permit icmp echo-reply`, `deny ip 192.168.40/24 → 192.168/16`, `permit ip any any`. Đo live: SRV-WEB-DMZ → PC-A1 **0/4**, SRV-WEB-DMZ → SRV-HIS **0/4** (chủ động vào nội bộ bị chặn); SRV-WEB-DMZ → Internet **4/4** (permit any); LAN → SRV-WEB-DMZ **4/4** (echo-reply được permit). Web browse từ PC-INTERNET qua static NAT để dành demo viva |
+| KC-1 | LAN nội bộ Main Site: PC Tòa A/B, camera → NVR, DNS nội bộ | `ping`, `nslookup` | **ĐẠT** — đo live 2026-11-11: PC-A1→SRV-DNS (10.0.16.2) **4/4**; PC-A1→SRV-HIS **4/4**; PC-A1→SRV-WEB-DMZ **4/4** (LAN→DMZ thông); PC-A1↔PC-A2 cùng VLAN10 **4/4**; PC-A1→PC-B1 (VLAN10→VLAN20) **4/4**; CAM-01→SRV-NVR **4/4**; nslookup www.hospital.local → 10.0.1.2 |
+| KC-2 | Liên trạm: PC-DBP1/PC-BHTQ1 → SRV-HIS (10.0.16.3) | `ping`; cắt PVC Frame Relay cả hai đầu (GW-MAIN S0/1/0 + GW-DBP S0/1/0) rồi ping lại | **ĐẠT** — đo live: PC-DBP1 → HIS **4/4**, PC-BHTQ1 → HIS **4/4** (đường PVC chính AD 100). Cắt PVC DBP: `ping 172.17.10.1` **0/5** (xác nhận đường chính chết) nhưng `traceroute` từ GW-DBP tới HIS **hop 1 = 172.18.10.1** → đã rẽ sang serial backup (AD 200), PC-DBP1 vẫn **4/4**; PC-BHTQ1 không ảnh hưởng. Khôi phục PVC → PC-DBP1 → HIS **4/4** trở lại đường chính |
+| KC-3 | Internet: LAN & trạm phụ ra `198.51.100.10`; static NAT DMZ từ Internet | `ping` + Web | **ĐẠT** — đo live: PC-A1 → 198.51.100.10 **4/4** qua PAT FW-MAIN; LT-GR-MS1 (guest) → 198.51.100.10 **4/4**. `show ip nat translations` FW-MAIN: bảng PAT overload + static NAT `tcp 199.115.1.1:80/443 ↔ 10.0.1.2` và `:25 ↔ 10.0.1.3` — PAT + static NAT share IP 199.115.1.1 hoạt động thật. Kiểm tra HTTP bằng trình duyệt trong PT dành cho demo viva (mở `http://199.115.1.1` từ PC-INTERNET) |
+| KC-4 | Wi-Fi khách bị hạn chế (chỉ DNS nội bộ + web DMZ + Internet) | `ping` từ LT-GR-MS1 | **ĐẠT** — đo live: LT-GR-MS1 DHCP **10.0.8.21** đúng VLAN guest (10.0.8.0/21); → PC-A1 (VLAN10) **0/4 — 100% loss** (ACL 150 deny); → SRV-DNS ICMP **0/4** (chỉ mở udp/53); → SRV-WEB-DMZ ICMP **0/4** (policy chỉ mở TCP 80/443 — ACL 150 permit tcp 80/443 tới web DMZ theo US-4); → Internet 198.51.100.10 **4/4**. SSH/HTTPS test bằng trình duyệt PT để dành cho demo viva |
+| KC-5 | DMZ: truy cập web SRV-WEB-DMZ từ Internet; DMZ không vào được nội bộ | Web browse + `ping` ngược | **ĐẠT** — v2 có ACL chiều ngược thật: `ip access-list extended DMZ-IN` bind trên Vlan40 (SW-CORE) — `permit tcp established`, `permit udp → SRV-DNS`, `permit icmp echo-reply`, `deny ip 10.0.1.0/24 → 10.0.0.0/8`, `permit ip any any`. Đo live: SRV-WEB-DMZ → PC-A1 **0/4**, SRV-WEB-DMZ → SRV-HIS **0/4** (chủ động vào nội bộ bị chặn); SRV-WEB-DMZ → Internet **4/4** (permit any); LAN → SRV-WEB-DMZ **4/4** (echo-reply được permit). Web browse từ PC-INTERNET qua static NAT để dành demo viva |
 | KC-6 | MGMT/hardening: telnet chặn, SSH mở; syslog về SRV-LOG; port-security | `ssh`, `telnet`, audit | **ĐẠT** — `pt_audit_security` + hardening (enable secret, `ip ssh version 2`, `transport input ssh`, banner, user local); port-security sticky/restrict trên access port; **xác minh đăng nhập console thật 2026-11-09**: `enable` + `Hosp@2026!Sec` → prompt `GW-MAIN#` (mật khẩu thống nhất áp dụng cả GW-MAIN) |
-| KC-7 | **VPN mobile chấm trên firewall** | Từ LT-MOBILE1 ping SRV-DNS/SRV-HIS qua tunnel | **ĐẠT** — tunnel FW-MAIN ↔ R-HOME up; LT-MOBILE1 (192.168.90.10) → SRV-DNS **0 % loss** (đi qua GRE/overlay tại FW-MAIN, không vào LAN nội bộ trực tiếp) |
-| KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | **ĐẠT (có giới hạn sim ghi rành)** — đo live 2026-11-09: thêm `ip route 0.0.0.0 0.0.0.0 199.115.1.3 50` vào FW-MAIN (config trước đó chưa có); baseline PC-A1→SRV-INT **4/4**; tắt ISP1 + thu hồi default chính → `show ip route` FW-MAIN: **`Gateway of last resort is 199.115.1.3`** (floating nhậm chức); LT-MOBILE1 → SRV-DNS **4/4 qua ISP2** (tunnel GRE tái lập sau reboot thiết bị — hạn chế của PT: GRE không tự chuyển next-hop); **PC-DBP1→HIS 4/4** (WAN FR độc lập ISP); PC-A1→198.51.100.10 **0/4** — đúng giới hạn topology sim (dải 198.51.100.0/24 chỉ neo sau ISP1, thiết kế thật là 2 AS đổi full BGP route). Khôi phục ISP1 + default chính → cả ma trận **4/4**. Transcription đầy đủ: `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md` |
+| KC-7 | **VPN mobile chấm trên firewall** | Từ LT-MOBILE1 ping SRV-DNS/SRV-HIS qua tunnel | **ĐẠT** — tunnel FW-MAIN ↔ R-HOME up; LT-MOBILE1 (10.127.128.10) → SRV-DNS **0 % loss** (đi qua GRE/overlay tại FW-MAIN, không vào LAN nội bộ trực tiếp) |
+| KC-8 | Failover Internet (ISP1 → ISP2, floating AD) | Shutdown ISP1 rồi kiểm tra | **ĐẠT (có giới hạn sim ghi rành)** — đo live 2026-11-11: floating `ip route 0.0.0.0 0.0.0.0 199.115.1.3 50` trên FW-MAIN; baseline PC-A1→SRV-INT **4/4**; tắt ISP1 + thu hồi default chính → `show ip route` FW-MAIN: **`Gateway of last resort is 199.115.1.3`** (floating nhậm chức); LT-MOBILE1 → SRV-DNS **4/4 qua ISP2** (tunnel GRE tái lập sau reboot thiết bị — hạn chế của PT: GRE không tự chuyển next-hop); **PC-DBP1→HIS 4/4** (WAN FR độc lập ISP); PC-A1→198.51.100.10 **0/4** — đúng giới hạn topology sim (dải 198.51.100.0/24 chỉ neo sau ISP1, thiết kế thật là 2 AS đổi full BGP route). Khôi phục ISP1 + default chính → cả ma trận **4/4**. Transcription đầy đủ: `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md` |
 
-> **Số đo bổ sung đã hoàn tất (2026-11-09):** KC-1 cùng-VLAN (PC-A1↔PC-A2 VLAN10 **4/4**) và
+> **Số đo bổ sung đã hoàn tất (2026-11-11, đo lại sau đổi subnet):** KC-1 cùng-VLAN (PC-A1↔PC-A2 VLAN10 **4/4**) và
 > liên-VLAN (PC-A1→PC-B1 VLAN10→VLAN20 **4/4**) — xem bảng §6.1 và file evidence. KC-8
 > (failover ISP1→ISP2, floating AD 50) đã đo live với 2 kịch bản đứt/khôi phục, kết quả +
-> transcription lưu trong `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`.
+> transcription lưu trong `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md`.
 
 _KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là quy ước vẽ của PT cho link FR
 (không phải link lỗi) — trạng thái thật đã xác nhận up/up bằng `pt_inspect_ports` (Serial 4/4 up)._
@@ -565,4 +582,4 @@ _KB cuối: các link Frame Relay hiển thị **màu đỏ** trên canvas là q
 - **Tài liệu tham khảo:** Cisco Validated Design (Campus LAN, WAN), Fortinet Security Fabric, TIA-568-D / TIA-606-D, ITIL/HL7 (chuẩn y tế), khuyến nghị bảo mật y tế (HIPAA toolkit, SNS guidelines hospital).
 
 ---
-*Báo cáo được biên soạn cho môn Mạng máy tính – Assignment 2, HCMUT. Số liệu băng thông/chi phí là tính toán thiết kế và giá tham chiếu; kết quả mô phỏng đã đo live trên `simulation/CCC-Hospital-v2.pkt` và được ghi đầy đủ ở Step 5 + `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-09.md`.*
+*Báo cáo được biên soạn cho môn Mạng máy tính – Assignment 2, HCMUT. Số liệu băng thông/chi phí là tính toán thiết kế và giá tham chiếu; kết quả mô phỏng đã đo live trên `simulation/CCC-Hospital-v2.pkt` và được ghi đầy đủ ở Step 5 + `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md`.*
