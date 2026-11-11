@@ -2,6 +2,21 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-11 — Thống nhất enable secret `cisco123` trên toàn bộ thiết bị IOS
+
+- **Đổi mật khẩu enable** từ `Hosp@2026!Sec` (trước đó chỉ đúng trên GW-MAIN, 8 thiết bị còn lại
+  mang hash khác) sang **`cisco123`** cho **15 thiết bị IOS** — 8 router (GW-MAIN, FW-MAIN,
+  R-CORE-MS, ISP1, ISP2, R-HOME, GW-DBP, GW-BHTQ) + 7 switch (SW-CORE, SW-BLD-A, SW-BLD-B,
+  SW-SRV, SW-CCTV, SW-DBP, SW-EDGE-TRANS), qua `pt_apply_hardening` (`enable secret` +
+  `service password-encryption`).
+- **Xác minh bằng tính toán:** đọc lại 15 startup-config qua `pt_backup_config` — tất cả cùng
+  hash `$1$mERr$5.a6P4JqbNiMX01usIfka/` = MD5-crypt("cisco123", salt "mERr") (passlib xác nhận
+  khớp; hash cũ `Hosp@2026!Sec` không còn trên GW-MAIN).
+- `copy running-config startup-config` 15/15 → **save .pkt** (263.345 bytes) về `simulation/`;
+  đồng bộ dòng enable secret trong archive `docs/ptbuild/CCC-Hospital-v2/GW-MAIN_config.txt`.
+- Thêm ảnh **`report/images/topology-renamed-labels.png`** — topology 49 thiết bị / 49 link chụp
+  sau khi rename label (MAIN SITE, Branch DBP/BHTQ, SW-CORE VLAN 10/20/30/40/50/60, DMZ, …).
+
 ## 2026-11-11 — Đổi subnet toàn mô hình sang dải 10.x (v3) theo yêu cầu mới
 
 - **Bảng IP chốt v3 (đo live lại toàn bộ):** DEPT-A `10.0.64.0/19` (GW .1 trên SVI SW-CORE),

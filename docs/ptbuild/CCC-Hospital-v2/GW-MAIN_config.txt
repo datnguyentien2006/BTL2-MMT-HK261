@@ -14,7 +14,7 @@ hostname GW-MAIN
 !
 !
 !
-enable secret 5 $1$mERr$CtnZNbvoH/DQowrZdxVHU1
+enable secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
 !
