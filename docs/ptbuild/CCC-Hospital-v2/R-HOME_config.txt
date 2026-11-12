@@ -33,6 +33,8 @@ no ipv6 cef
 !
 !
 !
+username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
+!
 !
 license udi pid CISCO2911/K9 sn FTX1524L9ZX-
 license boot module c2900 technology-package securityk9
@@ -40,15 +42,15 @@ license boot module c2900 technology-package securityk9
 !
 !
 crypto isakmp policy 10
- encr 3des
- hash md5
+ encr aes
  authentication pre-share
+ group 2
 !
 crypto isakmp key Vpn2025Str0ng address 199.115.1.1
 !
 !
 !
-crypto ipsec transform-set TS-HOSP esp-3des esp-md5-hmac
+crypto ipsec transform-set TS-HOSP esp-aes esp-sha-hmac
 !
 crypto map VPN-HOSP 10 ipsec-isakmp 
  set peer 199.115.1.1
@@ -60,7 +62,8 @@ crypto map VPN-HOSP 10 ipsec-isakmp
 !
 !
 !
-!
+ip ssh version 2
+ip domain-name hospital.local
 !
 !
 spanning-tree mode pvst
@@ -117,6 +120,7 @@ access-list 101 deny ip 10.127.128.0 0.0.0.255 10.0.0.0 0.255.255.255
 access-list 101 permit ip 10.127.128.0 0.0.0.255 any
 access-list 130 permit ip 10.127.128.0 0.0.0.255 10.0.0.0 0.255.255.255
 !
+banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
@@ -126,7 +130,8 @@ line con 0
 line aux 0
 !
 line vty 0 4
- login
+ login local
+ transport input ssh
 !
 !
 !

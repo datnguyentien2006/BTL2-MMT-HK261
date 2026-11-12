@@ -2,6 +2,26 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-12 — Hoàn tất hardening (SSH/user/banner) + port-security + crypto; đo lại 8/8 KC
+
+- **Bối cảnh:** khi rehearsal demo, đọc lại startup-config live phát hiện `.pkt` **chưa** thực sự có
+  SSH hardening (không `username`/`ip ssh`/`transport input ssh`) và **không có khối crypto** trên bất kỳ
+  thiết bị nào — dù report/PDF đã tuyên bố có. Đợt này đưa `.pkt` khớp trở lại tài liệu.
+- **Hardening đủ 15 thiết bị IOS** (8 router + 7 switch IOS): `username admin privilege 15 secret cisco123`,
+  `ip domain-name hospital.local`, RSA 1024, `ip ssh version 2`, banner MOTD, `service password-encryption`,
+  `line vty 0 4 login local` + `transport input ssh`. **Console KHÔNG đặt `login local`** — giữ `enable`
+  vào thẳng đúng như kịch bản demo (tránh khoá console/automation).
+- **Port-security 24 cổng access** (`switchport port-security` + `mac-address sticky` + `violation restrict`,
+  max 2): SW-BLD-A/B (Fa0/1–4), SW-SRV (Fa0/1–5 + Fa0/10–11 DMZ), SW-CCTV (Fa0/1–2), SW-DBP/BHTQ (Fa0/1–3);
+  riêng cổng AP-GUEST (SW-BLD-A Fa0/12) max 4, sticky off.
+- **Crypto FW-MAIN** (chứng cứ thiết kế VPN chấm trên firewall): `crypto isakmp policy 10` (encr aes,
+  hash sha, pre-share, group 2), key `Vpn2025Str0ng` peer 203.0.113.2, `crypto ipsec transform-set TS-MOB
+  esp-aes esp-sha-hmac`, `crypto map VPN-MOB 10 ipsec-isakmp` (match ACL 120) bind trên G0/2.
+- **Đo lại live:** `pt_audit_security` **high = 0**; `pt_health_check` 0 link đứt / 0 IP trùng; KC-1→KC-8
+  xanh 8/8 (PC-A1→DNS/HIS/DMZ/Internet **4/4**; guest→LAN/DNS **0/4**, guest→Internet **4/4**;
+  DMZ→LAN **0/4**, DMZ→Internet **4/4**; mobile→DNS **4/4**; cắt PVC KC-2 và failover ISP KC-8 như cũ).
+- **Save `.pkt`** lại `simulation/CCC-Hospital-v2.pkt` + xuất lại config archive `docs/ptbuild/CCC-Hospital-v2/`.
+
 ## 2026-11-11 — Thống nhất enable secret `cisco123` trên toàn bộ thiết bị IOS
 
 - **Đổi mật khẩu enable** từ `Hosp@2026!Sec` (trước đó chỉ đúng trên GW-MAIN, 8 thiết bị còn lại

@@ -26,6 +26,7 @@ no ipv6 cef
 !
 !
 !
+username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
 !
@@ -34,6 +35,10 @@ no ipv6 cef
 !
 !
 !
+!
+!
+ip ssh version 2
+ip domain-name hospital.local
 !
 !
 spanning-tree mode pvst
@@ -93,8 +98,7 @@ ip flow-export version 9
 !
 !
 !
-!
-banner motd #Thiet bi WAN Main Site - GW Frame Relay#
+banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
@@ -104,7 +108,8 @@ line con 0
 line aux 0
 !
 line vty 0 4
- login
+ login local
+ transport input ssh
 !
 !
 !

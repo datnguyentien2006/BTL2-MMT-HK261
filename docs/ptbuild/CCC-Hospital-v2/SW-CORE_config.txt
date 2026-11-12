@@ -26,6 +26,7 @@ ip routing
 !
 !
 !
+username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
 !
 !
@@ -35,6 +36,9 @@ ip routing
 !
 !
 !
+!
+ip ssh version 2
+ip domain-name hospital.local
 !
 !
 spanning-tree mode pvst
@@ -162,6 +166,7 @@ access-list 150 permit ip any any
 access-list 160 permit ip 10.0.32.0 0.0.31.255 host 10.0.16.6
 access-list 160 deny ip any any
 !
+banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
@@ -172,7 +177,8 @@ line con 0
 line aux 0
 !
 line vty 0 4
- login
+ login local
+ transport input ssh
 !
 !
 !

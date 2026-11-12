@@ -12,7 +12,8 @@
     "Đợt đo kiểm chứng: evidence-2026-11-11.md — bảng KC-1..KC-8 đo live qua MCP với địa chỉ 10.x mới.",
     "Địa chỉ LAN (2026-11-11): DEPT-A 10.0.64.0/19, DEPT-B 10.0.96.0/19, SERVER-FARM 10.0.16.0/20, DMZ 10.0.1.0/24, CCTV 10.0.32.0/19, WIFI-GUEST 10.0.8.0/21, DBP 10.128.0.0/14, BHTQ 10.132.0.0/14, Mobile-Worker 10.127.128.0/24.",
     "Giữ nguyên: transit 172.16.0.4/30 + 172.16.0.8/30, FR 172.17.10/20, serial backup 172.18.10/20, public 199.115.1.0/29, Internet 198.51.100.0/24 + 203.0.113.0/30, GRE overlay 10.254.0.0/30.",
-    "Crypto ISAKMP/IPsec FW-MAIN ↔ R-HOME bị PT mất khi reboot (quirk KC-8) — đã khôi phục đầy đủ ngày 2026-11-11 (policy 10 3des/md5/pre-share, key Vpn2025Str0ng, TS-MOB/TS-HOSP, map VPN-MOB/VPN-HOSP + binding interface).",
+    "Crypto ISAKMP/IPsec FW-MAIN ↔ R-HOME bị PT mất khi reboot (quirk KC-8) — đã khôi phục đầy đủ ngày 2026-11-11 (policy 10 aes/sha/pre-share, key Vpn2025Str0ng, TS-MOB/TS-HOSP, map VPN-MOB/VPN-HOSP + binding interface).",
+    "Cập nhật 2026-11-12: hoàn tất hardening (username/ip ssh/transport input ssh/banner MOTD trên 15 thiết bị IOS) + port-security 24 cổng access; config archive xuất lại từ .pkt cùng ngày (djb2 khớp live toàn bộ 9 thiết bị).",
     "Khác biệt so với archive v1: đổi tên/router model (GW-MAIN = ISR4331), WAN Frame Relay + serial backup thay cho EPL Ethernet, VPN chấm trên FW-MAIN, DHCP tổng về R-CORE-MS."
   ],
   "devices_exported": [

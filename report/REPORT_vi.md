@@ -5,7 +5,7 @@
 **Trường:** Đại học Bách Khoa TP.HCM (HCMUT)
 **Phiên bản báo cáo:** v1.0 — ngày 21/10/2026
 
-> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào `Kết quả thực tế` ở bảng Step 5 và được chứng minh nguyên văn bằng transcription tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md` (topology: `images/topology-v2.png`).
+> **Quy ước trình bày:** Kiến trúc *thiết kế thực tế* được trình bày đầy đủ ở Step 1–3. Mô hình Packet Tracer (Step 4–7) là **bản thu nhỏ đại diện** của kiến trúc đó để kiểm chứng logic mạng. Toàn bộ kết quả đo trên mô hình đã được điền vào `Kết quả thực tế` ở bảng Step 5 và được chứng minh nguyên văn bằng transcription tại `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md` (topology: `images/topology.png`).
 
 ---
 
@@ -486,7 +486,7 @@ vì API Script-Engine của PT 9.0.1 không phơi thao tác cấu hình DLCI.
    **`cisco123`** trên 15 thiết bị IOS (8 router + 7 switch — đồng bộ lại 2026-11-11, hash MD5
    `$1$mERr$5.a6P4JqbNiMX01usIfka/` xác minh khớp trên cả 15 config).
 
-![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology-v2.png)
+![Tổng thể topology bản chốt v2 — 49 thiết bị / 49 link](images/topology.png)
 
 ---
 

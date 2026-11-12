@@ -45,6 +45,8 @@ no ipv6 cef
 !
 !
 !
+username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
+!
 !
 license udi pid CISCO2911/K9 sn FTX1524ZB1X-
 !
@@ -58,6 +60,8 @@ license udi pid CISCO2911/K9 sn FTX1524ZB1X-
 !
 !
 !
+ip ssh version 2
+ip domain-name hospital.local
 !
 !
 spanning-tree mode pvst
@@ -100,8 +104,7 @@ ip flow-export version 9
 !
 !
 !
-!
-banner motd #Router DHCP & routing Main Site#
+banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
@@ -111,7 +114,8 @@ line con 0
 line aux 0
 !
 line vty 0 4
- login
+ login local
+ transport input ssh
 !
 !
 !
