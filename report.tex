@@ -1,13 +1,13 @@
 \section{Phân tích yêu cầu và kiến trúc mạng}
 
-Hệ thống mạng được thiết kế theo mô hình bệnh viện hạng mục quan trọng, bao gồm: Main Site tại TP.HCM; hai trạm phụ DBP và BHQT; mạng WAN kết nối đến trung tâm; 2 đường Internet từ hai ISP; và một vùng DMZ phục vụ các dịch vụ công khai. Mục tiêu của kiến trúc là đảm bảo tính sẵn sàng, bảo mật, phân tách lưu lượng theo chức năng, và khả năng mở rộng trong tương lai.
+Hệ thống mạng được thiết kế theo mô hình bệnh viện hạng mục quan trọng, bao gồm: Main Site tại TP.HCM; hai trạm phụ DBP và BHTQ; mạng WAN kết nối đến trung tâm; 2 đường Internet từ hai ISP; và một vùng DMZ phục vụ các dịch vụ công khai. Mục tiêu của kiến trúc là đảm bảo tính sẵn sàng, bảo mật, phân tách lưu lượng theo chức năng, và khả năng mở rộng trong tương lai.
 
 \subsection{Cấu trúc tổng thể}
 
 \begin{itemize}
     \item Main Site: gồm 2 tòa nhà A và B, trung tâm dữ liệu, khu quản trị, Wi-Fi phủ rộng, và các VLAN theo phòng ban.
     \item Trạm phụ: mỗi trạm có các máy trạm, máy chủ, điểm truy cập và mạng nội bộ riêng, kết nối về Main Site qua WAN.
-    \item WAN: 2 leased line MPLS/Ethernet + 1 đường serial dự phòng, định tuyến theo OSPF.
+    \item WAN: thiết kế đề xuất dùng 2 leased line MPLS/Ethernet + 1 đường serial dự phòng và OSPF; mô hình \texttt{.pkt} dùng Frame Relay cùng static route dự phòng.
     \item Internet: 2 đường ISP, hoạt động theo mô hình load-share / failover.
     \item DMZ: đặt các dịch vụ web, mail và dịch vụ công khai, tách biệt khỏi mạng nội bộ.
 \end{itemize}
@@ -16,7 +16,7 @@ Hệ thống mạng được thiết kế theo mô hình bệnh viện hạng m�
 
 Main Site gồm hai tòa nhà A và B; mỗi tòa nhà có 5 tầng, mỗi tầng 10 phòng. Phòng Data Center, IT và Cabling Central Local (tập trung patch panel) được bố trí riêng, cách hai tòa nhà khoảng 50 m. Main Site có quy mô trung bình với 600 máy trạm, 10 máy chủ và ít nhất 12 thiết bị mạng; số thiết bị có thể tăng khi bổ sung firewall, IDS/IPS và các thiết bị an ninh chuyên dụng. Wi-Fi cần phủ toàn bộ khuôn viên Main Site.
 
-Mỗi trạm phụ DBP và BHQT có tòa nhà 2 tầng; tầng 1 bố trí một phòng IT và một Cabling Central Local. Mỗi trạm có quy mô nhỏ với 260 máy trạm, 2 máy chủ và tối thiểu 5 thiết bị mạng.
+Mỗi trạm phụ DBP và BHTQ có tòa nhà 2 tầng; tầng 1 bố trí một phòng IT và một Cabling Central Local. Mỗi trạm có quy mô nhỏ với 260 máy trạm, 2 máy chủ và tối thiểu 5 thiết bị mạng.
 
 Như vậy, toàn hệ thống phục vụ 1.120 máy trạm và 14 máy chủ, với ít nhất 22 thiết bị mạng cơ bản, chưa tính thiết bị bảo mật chuyên dụng. Quy mô này cần hạ tầng cáp quang giữa các khu vực, kết nối Ethernet tốc độ cao cho uplink và lõi mạng, cùng thiết kế VLAN có khả năng mở rộng.
 
@@ -37,7 +37,7 @@ Như vậy, toàn hệ thống phục vụ 1.120 máy trạm và 14 máy chủ, 
 \hline
 Main Site & Hai tòa nhà A/B, mỗi tòa 5 tầng và 10 phòng mỗi tầng; 600 máy trạm, 10 máy chủ, tối thiểu 12 thiết bị mạng. Phòng Data Center, IT và tập trung patch panel cách hai tòa nhà khoảng 50 m. & Backbone tốc độ cao giữa các tòa nhà và trung tâm; Wi-Fi phủ toàn khuôn viên; phân VLAN theo chức năng; bảo vệ tập trung tại firewall và vùng DMZ; dự phòng các thành phần trọng yếu. \\
 \hline
-DBP và BHQT & Mỗi site có một tòa nhà 2 tầng, 260 máy trạm, 2 máy chủ và ít nhất 5 thiết bị mạng; phòng IT và điểm tập trung cáp ở tầng 1. & Mỗi site có switch truy cập theo tầng, uplink về điểm tập trung, router WAN và subnet riêng; truy cập ứng dụng trung tâm qua WAN/VPN; có thể mở rộng thêm AP, máy trạm và thiết bị y tế. \\
+DBP và BHTQ & Mỗi site có một tòa nhà 2 tầng, 260 máy trạm, 2 máy chủ và ít nhất 5 thiết bị mạng; phòng IT và điểm tập trung cáp ở tầng 1. & Mỗi site có switch truy cập theo tầng, uplink về điểm tập trung, router WAN và subnet riêng; truy cập ứng dụng trung tâm qua WAN/VPN; có thể mở rộng thêm AP, máy trạm và thiết bị y tế. \\
 \hline
 Toàn hệ thống & 1.120 máy trạm, 14 máy chủ, ít nhất 22 thiết bị mạng cơ bản, chưa gồm thiết bị an ninh chuyên dụng. HIS, RIS/PACS, LIS, CRM, văn phòng, cơ sở dữ liệu và ứng dụng client-server cùng hoạt động. & Ưu tiên độ trễ và tính sẵn sàng cho ứng dụng y tế; theo dõi năng lực đường truyền; áp dụng HA, sao lưu cấu hình/dữ liệu, kiểm soát truy cập và giám sát tập trung. \\
 \hline
@@ -81,7 +81,7 @@ Wi-Fi khu vực đông người & Mật độ client cao tại sảnh, phòng ch
 \hline
 Biên Internet tại Main Site & Tất cả lưu lượng Internet của các site đi qua Main Site; có hai tuyến DSL. & Router/firewall biên hỗ trợ hai WAN để cân bằng tải theo phiên/chính sách và failover. Cân bằng tải này không làm tăng tốc độ của một phiên đơn lẻ vượt quá một tuyến. \\
 \hline
-Kết nối WAN đến DBP/BHQT & Lưu lượng ứng dụng trung tâm và dữ liệu nghiệp vụ đi qua hai tuyến leased line. & Router/SD-WAN tại Main Site và các chi nhánh theo dõi chất lượng tuyến, chọn đường theo chính sách và chuyển sang tuyến còn lại khi lỗi. \\
+Kết nối WAN đến DBP/BHTQ & Lưu lượng ứng dụng trung tâm và dữ liệu nghiệp vụ đi qua hai tuyến leased line. & Router/SD-WAN tại Main Site và các chi nhánh theo dõi chất lượng tuyến, chọn đường theo chính sách và chuyển sang tuyến còn lại khi lỗi. \\
 \hline
 \end{tabularx}
 
@@ -101,7 +101,7 @@ Thiết kế Wi-Fi phải dựa trên khảo sát RF tại chỗ, không chỉ d
     \item Nhân viên: xác thực WPA2/WPA3-Enterprise với 802.1X/RADIUS nếu thiết bị đầu cuối hỗ trợ; cấp quyền đến ứng dụng theo vai trò.
     \item Thiết bị y tế/IoT: VLAN riêng, chỉ cho phép các luồng cần thiết đến máy chủ quản lý; dùng cấu hình tương thích an toàn cho thiết bị cũ và không mở quyền truy cập ngang mặc định.
     \item Khách: VLAN WIFI-GUEST riêng, client isolation, giới hạn băng thông và chỉ cho phép truy cập Internet; chặn truy cập vào LAN, SERVER-FARM và mạng quản trị.
-    \item Quản trị AP và thiết bị mạng: VLAN quản trị riêng, chỉ cho phép truy cập từ máy trạm quản trị được xác thực; bật mã hóa quản trị và lưu log tập trung.
+    \item Quản trị AP và thiết bị mạng: thiết kế đề xuất VLAN quản trị riêng, chỉ cho phép truy cập từ máy trạm quản trị được xác thực; bật mã hóa quản trị và lưu log tập trung. Mô hình \texttt{.pkt} không triển khai VLAN quản trị riêng; VLAN 1 đã shutdown.
 \end{itemize}
 
 Ở lớp mạng có dây, đặt SERVER-FARM trong VLAN/mạng máy chủ riêng; DMZ đặt sau firewall với chính sách chỉ mở các dịch vụ công khai cần thiết. Firewall/NGFW là điểm kiểm soát giữa Internet, DMZ, WAN và LAN; dùng ACL/IPS, NAT, VPN, ghi log và chính sách quyền tối thiểu. Không cho phép truy cập trực tiếp từ guest hoặc thiết bị IoT đến máy chủ nội bộ; các luồng giữa VLAN phải đi qua gateway/firewall theo chính sách đã duyệt.
@@ -122,12 +122,12 @@ Thiết kế Wi-Fi phải dựa trên khảo sát RF tại chỗ, không chỉ d
 \hline
 \endhead
 Router WAN chính & 1 & \shortstack[l]{Kết nối Main Site với trạm phụ\\và Internet} \\
-Router WAN trạm phụ & 2 & Gateway cho DBP và BHQT \\
+Router WAN trạm phụ & 2 & Gateway cho DBP và BHTQ \\
 Firewall/NGFW & 1 bộ chính + dự phòng & NAT, ACL, DMZ, VPN \\
 Core switch L3 & 1--2 & Gateway VLAN, định tuyến nội bộ \\
 Access switch & 8--12 & Kết nối máy trạm, AP, camera \\
 AP Wi-Fi & 20--30 & Phủ sóng toàn site \\
-Server & 10--14 & DNS, HIS, PACS, DB, log, web/mail \\
+Server & 14 & DNS, HIS, PACS, DB, log, web/mail \\
 Camera/NVR & Theo yêu cầu & Giám sát an ninh \\
 UPS/ATS & Theo khu vực & Bảo đảm nguồn điện liên tục \\
 Patch panel + cáp & Theo kiến trúc & \shortstack[l]{Hạ tầng cáp và\\quản trị mạng} \\
@@ -155,7 +155,7 @@ Các VLAN được phân theo chức năng để đảm bảo tách biệt lưu 
 60 & WIFI-GUEST & \texttt{10.0.8.0/21} & 2,046 & Khách truy cập \\
 40 & DMZ & \texttt{10.0.1.0/24} & 254 & Web/mail công khai \\
 -- & DBP-Branch & \texttt{10.128.0.0/14} & 262,142 & Mạng nội bộ trạm DBP \\
--- & BHQT-Branch & \texttt{10.132.0.0/14} & 262,142 & Mạng nội bộ trạm BHQT \\
+-- & BHTQ-Branch & \texttt{10.132.0.0/14} & 262,142 & Mạng nội bộ trạm BHTQ \\
 -- & Mobile-Worker & \texttt{10.127.128.0/24} & 254 & \shortstack[l]{Pool địa chỉ cho nhân viên\\truy cập từ xa} \\
 \hline
 \end{longtable}
@@ -181,7 +181,7 @@ Các tiêu chí kỹ thuật của sơ đồ đi dây:
 
 \section{Băng thông}
 
-Băng thông được ước tính từ lưu lượng sử dụng hằng ngày của Main Site và hai trạm phụ. Main Site có 600 máy trạm; mỗi site DBP và BHQT có 260 máy trạm, tổng cộng 1.120 máy. Giả định khoảng 80\% lưu lượng ngày phát sinh trong các khung giờ cao điểm 9:00--11:00 và 15:00--16:00, tổng cộng 3 giờ mỗi ngày.
+Băng thông được ước tính từ lưu lượng sử dụng hằng ngày của Main Site và hai trạm phụ. Main Site có 600 máy trạm; mỗi site DBP và BHTQ có 260 máy trạm, tổng cộng 1.120 máy. Giả định khoảng 80\% lưu lượng ngày phát sinh trong các khung giờ cao điểm 9:00--11:00 và 15:00--16:00, tổng cộng 3 giờ mỗi ngày.
 
 \subsection{Cách tính toán}
 
@@ -200,12 +200,15 @@ Băng thông được ước tính từ lưu lượng sử dụng hằng ngày c
 
 \begin{tabularx}{\textwidth}{|c|c|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
 \hline
-\textbf{Site} & \shortstack{\textbf{Số máy}\\\textbf{trạm}} & \shortstack{\textbf{Download}\\\textbf{(/day)}} & \shortstack{\textbf{Upload}\\\textbf{(/day)}} & \shortstack{\textbf{Download}\\\textbf{(peak avg.)}} & \shortstack{\textbf{Upload}\\\textbf{(peak avg.)}} \\
+\textbf{Site} & \shortstack{\textbf{Số máy}\\\textbf{trạm}} & \shortstack{\textbf{Download}\\\textbf{(MB/ngày)}} & \shortstack{\textbf{Upload}\\\textbf{(MB/ngày)}} & \shortstack{\textbf{Download}\\\textbf{(TB 3h, Mbps)}} & \shortstack{\textbf{Upload}\\\textbf{(TB 3h, Mbps)}} \\
 \hline
-Main Site & 600 & 300,000 MB & 60,000 MB & 177.78 Mbps & 35.56 Mbps \\
-DBP & 260 & 130,000 MB & 26,000 MB & 77.04 Mbps & 15.41 Mbps \\
-BHQT & 260 & 130,000 MB & 26,000 MB & 77.04 Mbps & 15.41 Mbps \\
-\textbf{Tổng máy trạm} & \textbf{1,120} & \textbf{560,000 MB} & \textbf{112,000 MB} & \textbf{331.85 Mbps} & \textbf{66.37 Mbps} \\
+Main Site & 600 & 300,000 & 60,000 & 222.22 & 44.44 \\
+\hline
+DBP & 260 & 130,000 & 26,000 & 96.30 & 19.26 \\
+\hline
+BHTQ & 260 & 130,000 & 26,000 & 96.30 & 19.26 \\
+\hline
+\textbf{Tổng máy trạm} & \textbf{1,120} & \textbf{560,000} & \textbf{112,000} & \textbf{414.81} & \textbf{82.96} \\
 \hline
 \end{tabularx}
 
@@ -213,20 +216,21 @@ BHQT & 260 & 130,000 MB & 26,000 MB & 77.04 Mbps & 15.41 Mbps \\
 
 \subsection{Lưu lượng dùng chung và tổng ước tính}
 
-\begin{longtable}{@{}|l|c|c|c|c|@{}}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}X|c|c|c|c|}
 \hline
-\shortstack[l]{\textbf{Loại}\\\textbf{lưu lượng}} & \shortstack{\textbf{Download}\\\textbf{(/day)}} & \shortstack{\textbf{Upload}\\\textbf{(/day)}} & \shortstack{\textbf{Download}\\\textbf{(peak avg.)}} & \shortstack{\textbf{Upload}\\\textbf{(peak avg.)}} \\
+\textbf{Loại lưu lượng} & \shortstack{\textbf{Download}\\\textbf{(MB/ngày)}} & \shortstack{\textbf{Upload}\\\textbf{(MB/ngày)}} & \shortstack{\textbf{Download}\\\textbf{(TB 3h, Mbps)}} & \shortstack{\textbf{Upload}\\\textbf{(TB 3h, Mbps)}} \\
 \hline
-\endfirsthead
+Máy trạm (1,120 máy) & 560,000 & 112,000 & 414.81 & 82.96 \\
 \hline
-\shortstack[l]{\textbf{Loại}\\\textbf{lưu lượng}} & \shortstack{\textbf{Download}\\\textbf{(/day)}} & \shortstack{\textbf{Upload}\\\textbf{(/day)}} & \shortstack{\textbf{Download}\\\textbf{(peak avg.)}} & \shortstack{\textbf{Upload}\\\textbf{(peak avg.)}} \\
+Máy chủ (14 máy $\times$ 1,000 / 2,000 MB) & 14,000 & 28,000 & 10.37 & 20.74 \\
 \hline
-\endhead
-\shortstack[l]{Máy chủ: cập nhật phần mềm, web,\\cơ sở dữ liệu (toàn hệ thống)} & \shortstack{1,000\\MB} & \shortstack{2,000\\MB} & \shortstack{0.59\\Mbps} & \shortstack{1.19\\Mbps} \\
-\shortstack[l]{Thiết bị khách qua Wi-Fi\\(toàn hệ thống)} & \shortstack{500\\MB} & \shortstack{Chưa có\\số liệu} & \shortstack{0.30\\Mbps} & Chưa tính \\
-\shortstack[l]{\textbf{Tổng gồm máy trạm và}\\\textbf{lưu lượng dùng chung}} & \shortstack{\textbf{561,500}\\\textbf{MB}} & \shortstack{\textbf{114,000}\\\textbf{MB}} & \shortstack{\textbf{332.74}\\\textbf{Mbps}} & \shortstack{\textbf{67.56}\\\textbf{Mbps}} \\
+Wi-Fi khách (200 thiết bị $\times$ 500 MB) & 100,000 & Chưa có số liệu & 74.07 & -- \\
 \hline
-\end{longtable}
+\textbf{Tổng} & \textbf{674,000} & \textbf{140,000$^{*}$} & \textbf{499.26} & \textbf{103.70$^{*}$} \\
+\hline
+\end{tabularx}
+
+{\small $^{*}$ Chưa gồm upload của thiết bị khách Wi-Fi. Tổng download + upload = 814,000 MB/ngày.}
 
 Số liệu server và Wi-Fi được cộng như lưu lượng toàn hệ thống do chưa có phân bổ theo site. HIS/PACS, camera IP và tải lên Wi-Fi chưa có dung lượng hoặc bitrate nên chưa được tính; vì vậy tổng trên chưa phản ánh đầy đủ tải thực tế, tải đỉnh tức thời hay phần dự phòng tăng trưởng.
 
@@ -242,7 +246,7 @@ Số liệu server và Wi-Fi được cộng như lưu lượng toàn hệ thố
 \hline
 \endhead
 Internet Main Site & \shortstack[l]{2 tuyến DSL,\\cân bằng tải} & \shortstack[l]{Internet tập trung qua Main Site;\\băng thông mỗi tuyến theo gói ISP} \\
-WAN trạm phụ & 300 Mbps mỗi tuyến & Main \(\leftrightarrow\) DBP / Main \(\leftrightarrow\) BHQT \\
+WAN trạm phụ & 300 Mbps mỗi tuyến & Main \(\leftrightarrow\) DBP / Main \(\leftrightarrow\) BHTQ \\
 Serial backup & 2--8 Mbps & Dự phòng khi MPLS bị mất \\
 \hline
 \end{longtable}
@@ -253,12 +257,12 @@ Theo ước tính trung bình, mỗi site phụ cần khoảng 77 Mbps tải xu�
 
 \subsection{Sơ đồ tổng thể}
 
-Hình~\ref{fig:network-topology} thể hiện thiết kế logic của Main Site và hai site phụ DBP, BHQT. Main Site là điểm tập trung định tuyến WAN, truy cập Internet và chính sách bảo mật; hai site phụ kết nối về trung tâm qua WAN và sử dụng các mạng riêng.
+Hình~\ref{fig:network-topology} thể hiện thiết kế logic của Main Site và hai site phụ DBP, BHTQ. Main Site là điểm tập trung định tuyến WAN, truy cập Internet và chính sách bảo mật; hai site phụ kết nối về trung tâm qua WAN và sử dụng các mạng riêng.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.82\textwidth,keepaspectratio]{graphics/topology.png}
-    \caption{Sơ đồ logic kết nối Main Site, DBP và BHQT}
+    \caption{Sơ đồ logic kết nối Main Site, DBP và BHTQ}
     \label{fig:network-topology}
 \end{figure}
 
@@ -270,13 +274,13 @@ SERVER-FARM đặt các máy chủ nghiệp vụ và hạ tầng như DNS, HIS/R
 
 \subsection{Kết nối WAN và truy cập Internet}
 
-Hai site DBP và BHQT sử dụng router WAN kết nối về Main Site qua các tuyến thuê riêng; định tuyến động (OSPF) trao đổi các mạng site và hỗ trợ chuyển tuyến khi tuyến chính lỗi. Sơ đồ mô phỏng WAN bằng Frame Relay/cloud; khi triển khai thực tế có thể dùng MPLS/Ethernet hoặc SD-WAN theo dịch vụ nhà mạng. Đường serial được dành làm tuyến dự phòng nếu đáp ứng yêu cầu dịch vụ và đã được kiểm thử.
+Hai site DBP và BHTQ sử dụng router WAN kết nối về Main Site qua các tuyến thuê riêng. OSPF là phương án định tuyến động trong thiết kế đề xuất; tuy nhiên, file mô phỏng \texttt{.pkt} không cấu hình OSPF mà dùng Frame Relay cho tuyến chính với static route AD 100 và floating static AD 200 trên đường serial dự phòng giữa GW-MAIN, GW-DBP và GW-BHTQ. Vì vậy, OSPF không phải cấu hình đã được kiểm thử trong mô hình. Khi triển khai thực tế có thể dùng MPLS/Ethernet hoặc SD-WAN theo dịch vụ nhà mạng; phương án định tuyến cần được xác nhận và kiểm thử theo hạ tầng được chọn.
 
 Hai kết nối DSL/ISP kết thúc tại biên Main Site. Router biên và firewall thực hiện cân bằng tải theo phiên/chính sách, NAT/PAT, lọc lưu lượng và failover. Mọi truy cập Internet từ các site phụ được định tuyến qua Main Site theo yêu cầu thiết kế. Cần lưu ý cân bằng tải nhiều WAN phân phối các phiên kết nối; nó không cộng băng thông cho một phiên đơn lẻ.
 
 \subsection{VPN và mạng nhân viên từ xa}
 
-VPN site-to-site bảo vệ lưu lượng giữa Main Site và các site phụ khi đi qua mạng công cộng hoặc khi cần mã hóa bổ sung trên tuyến thuê riêng. VPN remote-access kết thúc tại firewall Main Site; người dùng từ xa được cấp địa chỉ từ một pool riêng, xác thực mạnh và chỉ truy cập các ứng dụng cần thiết theo vai trò.
+VPN site-to-site có thể được đề xuất để bảo vệ lưu lượng giữa Main Site và các site phụ khi đi qua mạng công cộng hoặc khi cần mã hóa bổ sung trên tuyến thuê riêng; kết nối này không có trong mô hình hiện tại. Mô hình chỉ triển khai VPN remote-access giữa FW-MAIN và R-HOME qua Tunnel0 với crypto map VPN-MOB. Người dùng từ xa được cấp địa chỉ từ một pool riêng, xác thực mạnh và chỉ truy cập các ứng dụng cần thiết theo vai trò.
 
 \subsection{Dự phòng và giới hạn của sơ đồ}
 
@@ -299,23 +303,34 @@ Kiểm thử được thực hiện theo các tiêu chí: kết nối nội bộ
     \item Kiểm tra hoạt động của syslog, NetFlow và VPN.
 \end{itemize}
 
-\subsection{Kết quả mong đợi}
+\subsection{Kết quả kiểm thử thực tế}
 
-\begin{longtable}{@{}|l|l|@{}}
+Các kịch bản KC-1--KC-8 được đo trực tiếp trên mô hình Packet Tracer ngày 2026-11-12. Kết quả chi tiết và bản ghi kiểm chứng được lưu tại \texttt{docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md}.
+
+\begin{longtable}{@{}|l|p{0.82\textwidth}|@{}}
 \hline
-\textbf{Tiêu chí} & \textbf{Kết quả kỳ vọng} \\
+\textbf{Kịch bản} & \textbf{Kết quả đo} \\
 \hline
 \endfirsthead
 \hline
-\textbf{Tiêu chí} & \textbf{Kết quả kỳ vọng} \\
+\textbf{Kịch bản} & \textbf{Kết quả đo} \\
 \hline
 \endhead
-Kết nối nội bộ & Đạt, các thiết bị cùng VLAN giao tiếp bình thường \\
-VLAN riêng & Tách biệt camera, server, guest, DMZ và quản trị \\
-Failover WAN & Khi đường chính mất, tuyến backup tiếp quản \\
-Internet & Tất cả lưu lượng nội bộ đi qua firewall chính \\
-Bảo mật & Wi-Fi khách không truy cập trực tiếp mạng nội bộ \\
-Quản trị & SSH và log hoạt động ổn định \\
+KC-1 & \textbf{ĐẠT} — PC-A1 đến DNS, HIS, web DMZ, PC-A2 cùng VLAN và PC-B1 khác VLAN đều 4/4; CAM-01 đến NVR 4/4; phân giải \texttt{his.hospital.local} trả về 10.0.16.3. \\
+\hline
+KC-2 & \textbf{ĐẠT} — PC-DBP1 và PC-BHTQ1 đến HIS 4/4. Khi ngắt PVC DBP, next-hop chuyển từ 172.17.10.1 sang 172.18.10.1 (AD 200), kết nối vẫn 4/4; khôi phục PVC cũng 4/4. \\
+\hline
+KC-3 & \textbf{ĐẠT} — PC-A1 đến Internet 198.51.100.10 đạt 4/4; bảng NAT xác nhận PAT và static NAT đến web/mail DMZ. \\
+\hline
+KC-4 & \textbf{ĐẠT} — máy khách Wi-Fi đến PC-A1 và DNS qua ICMP đều 0/4; truy cập Internet đạt 4/4. \\
+\hline
+KC-5 & \textbf{ĐẠT} — LAN đến web DMZ đạt 4/4; web DMZ chủ động đến PC-A1 bị chặn (0/4), còn đến Internet đạt 4/4. \\
+\hline
+KC-6 & \textbf{ĐẠT} — SSH đăng nhập FW-MAIN thành công; Telnet bị đóng, port-security hoạt động và kiểm tra bảo mật không còn lỗi mức cao. \\
+\hline
+KC-7 & \textbf{ĐẠT} — LT-MOBILE1 đến DNS và HIS đạt 4/4 qua Tunnel0. \\
+\hline
+KC-8 & \textbf{ĐẠT, có giới hạn mô phỏng} — khi tắt ISP1, default route chuyển sang next-hop ISP2 (AD 50); LT-MOBILE1 đến DNS/HIS và PC-DBP1 đến HIS đạt 4/4. PC-A1 đến Internet là 0/4 do giới hạn topology mô phỏng; sau khôi phục ISP1, kết nối đạt 4/4. \\
 \hline
 \end{longtable}
 
@@ -323,15 +338,15 @@ Quản trị & SSH và log hoạt động ổn định \\
 
 \subsection{Độ tin cậy và tính sẵn sàng}
 
-Hai ISP, các tuyến WAN dự phòng và OSPF hỗ trợ duy trì kết nối khi có sự cố. Tuy nhiên, khả năng chuyển tuyến cần được kiểm thử thực tế; core switch, firewall và máy chủ vẫn có thể là điểm lỗi đơn nếu không được cấu hình dự phòng.
+Hai ISP và các tuyến WAN dự phòng hỗ trợ duy trì kết nối khi có sự cố; trong mô hình \texttt{.pkt}, floating static AD 200 tiếp quản khi tuyến Frame Relay chính AD 100 lỗi. Khả năng chuyển tuyến cần được kiểm thử thực tế; core switch, firewall và máy chủ vẫn có thể là điểm lỗi đơn nếu không được cấu hình dự phòng.
 
 \subsection{Khả năng nâng cấp}
 
-Phân vùng theo VLAN và chức năng giúp bổ sung thiết bị, người dùng hoặc site thuận lợi. Các subnet DEPT-A, DEPT-B và CCTV dùng \texttt{/19}, WIFI-GUEST dùng \texttt{/21}, DMZ và Mobile-Worker dùng \texttt{/24}; mỗi nhóm có không gian địa chỉ riêng để quản lý và áp dụng chính sách truy cập phù hợp. Hai mạng DBP-Branch và BHQT-Branch được cấp \texttt{/14}, tạo dư địa lớn cho mở rộng chi nhánh nhưng có thể dư thừa nếu số lượng thiết bị thực tế nhỏ. Vì vậy, cần dự báo số thiết bị, chia subnet phù hợp theo từng khu vực/VLAN, dành địa chỉ cho tăng trưởng và kiểm soát không chồng lấn với các mạng hiện hữu hoặc mạng kết nối VPN. Cách phân bổ nhất quán cũng giúp quản lý định tuyến và tổng hợp tuyến giữa các site dễ hơn.
+Phân vùng theo VLAN và chức năng giúp bổ sung thiết bị, người dùng hoặc site thuận lợi. Các subnet DEPT-A, DEPT-B và CCTV dùng \texttt{/19}, WIFI-GUEST dùng \texttt{/21}, DMZ và Mobile-Worker dùng \texttt{/24}; mỗi nhóm có không gian địa chỉ riêng để quản lý và áp dụng chính sách truy cập phù hợp. Hai mạng DBP-Branch và BHTQ-Branch được cấp \texttt{/14}, tạo dư địa lớn cho mở rộng chi nhánh nhưng có thể dư thừa nếu số lượng thiết bị thực tế nhỏ. Vì vậy, cần dự báo số thiết bị, chia subnet phù hợp theo từng khu vực/VLAN, dành địa chỉ cho tăng trưởng và kiểm soát không chồng lấn với các mạng hiện hữu hoặc mạng kết nối VPN. Cách phân bổ nhất quán cũng giúp quản lý định tuyến và tổng hợp tuyến giữa các site dễ hơn.
 
 \subsection{Khả năng tương thích phần mềm}
 
-OSPF, SSH, VPN, syslog và NetFlow là các giao thức, dịch vụ phổ biến có thể tích hợp với nhiều nền tảng quản trị, giám sát và phân tích mạng. Khả năng tương thích thực tế phụ thuộc vào thiết bị được chọn và cần được xác nhận trước khi triển khai.
+OSPF (phương án định tuyến của thiết kế đề xuất), SSH, VPN, syslog và NetFlow là các giao thức, dịch vụ phổ biến có thể tích hợp với nhiều nền tảng quản trị, giám sát và phân tích mạng. OSPF không được cấu hình trong file mô phỏng \texttt{.pkt}; khả năng tương thích thực tế phụ thuộc vào thiết bị được chọn và cần được xác nhận trước khi triển khai.
 
 \subsection{An toàn vận hành}
 
@@ -351,7 +366,7 @@ Dự phòng thiết bị/đường truyền và giám sát liên tục làm tăn
 
 \section{Kết luận}
 
-Qua quá trình phân tích kiến trúc, yêu cầu vận hành và các tiêu chí về độ tin cậy, bảo mật và khả năng mở rộng, có thể kết luận rằng mạng bệnh viện được đề xuất phù hợp với mô hình hoạt động hiện đại, đồng thời đảm bảo tách riêng lưu lượng theo chức năng, giảm nguy cơ xung đột giữa các hệ thống nghiệp vụ và nâng cao hiệu quả quản trị. Việc triển khai Main Site làm trung tâm, kết nối DBP và BHQT qua WAN, phân vùng VLAN theo vai trò, đặt DMZ cho các dịch vụ công khai và triển khai Internet/WAN dự phòng tạo nền tảng quan trọng để hệ thống duy trì hoạt động liên tục trong điều kiện có sự cố.
+Qua quá trình phân tích kiến trúc, yêu cầu vận hành và các tiêu chí về độ tin cậy, bảo mật và khả năng mở rộng, có thể kết luận rằng mạng bệnh viện được đề xuất phù hợp với mô hình hoạt động hiện đại, đồng thời đảm bảo tách riêng lưu lượng theo chức năng, giảm nguy cơ xung đột giữa các hệ thống nghiệp vụ và nâng cao hiệu quả quản trị. Việc triển khai Main Site làm trung tâm, kết nối DBP và BHTQ qua WAN, phân vùng VLAN theo vai trò, đặt DMZ cho các dịch vụ công khai và triển khai Internet/WAN dự phòng tạo nền tảng quan trọng để hệ thống duy trì hoạt động liên tục trong điều kiện có sự cố.
 
 Bên cạnh đó, thiết kế còn chú trọng đến yếu tố an toàn thông tin bằng cách tách Wi-Fi khách, thiết bị camera, máy chủ và mạng quản trị; áp dụng ACL, NAT/PAT, VPN, giám sát log và phân quyền truy cập theo vai trò. Đây là các biện pháp cần thiết để bảo vệ dữ liệu bệnh nhân, tránh truy cập trái phép và đảm bảo hệ thống y tế luôn vận hành ổn định. Tuy nhiên, giải pháp này mới chỉ là mô hình thiết kế tổng thể; để hoàn thiện và đưa vào vận hành thực tế, cần thực hiện khảo sát địa điểm chi tiết, xác nhận băng thông thực tế, kiểm thử failover, sao lưu cấu hình, và triển khai hệ thống giám sát liên tục.
 
