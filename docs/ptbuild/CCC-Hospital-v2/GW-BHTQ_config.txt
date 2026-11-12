@@ -1,8 +1,8 @@
 ! =====================================================================
-! CCC-Hospital v3 (dải 10.x) — GW-BHTQ (Cisco 2911) — startup-config
-! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-11, sau đợt đổi subnet toàn mô hình)
-! Vai trò: gateway trạm BHTQ — PVC Frame BHTQ (chính, AD 100) + serial backup (AD 200)
+! CCC-Hospital v3 (dáº£i 10.x) â€” GW-BHTQ (Cisco 2911) â€” startup-config
+! xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt báº±ng pt_backup_config
+! (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
+! Vai trÃ²: gateway tráº¡m BHTQ â€” PVC Frame BHTQ (chÃ­nh, AD 100) + serial backup (AD 200)
 ! =====================================================================
 !
 version 15.1
@@ -112,6 +112,7 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
+logging 10.0.16.5
 line con 0
 !
 line aux 0

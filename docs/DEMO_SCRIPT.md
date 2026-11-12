@@ -8,7 +8,7 @@
 | Thời lượng mục tiêu | **18 phút** (+ ~2 phút buffer) |
 | Mật khẩu enable | `cisco123` (thống nhất 15 thiết bị IOS: 8 router + 7 switch) |
 | Mô hình | Main Site TP.HCM + trạm phụ DBP/BHTQ + home/teleworker |
-| Trạng thái chốt | Xanh 8/8 KC — đo live 2026-11-11 (dải 10.x) |
+| Trạng thái chốt | Xanh 8/8 KC — đo live 2026-11-11, chạy lại đúng kịch bản 2026-11-12 (dải 10.x) |
 
 > **Nguyên tắc an toàn khi demo:** mọi thao tác phá tiết (cắt PVC, tắt ISP) đều có mục **khôi phục** ngay sau đó. Kết thúc demo, `.pkt` phải trở lại trạng thái "cả 2 đường sống" (xem Checklist mục 7).
 
@@ -37,6 +37,7 @@
 - Sao lưu `.pkt` ra nơi khác: copy `simulation/CCC-Hospital-v2.pkt` thành `CCC-Hospital-v2_BACKUP.pkt`.
 - Mở `.pkt` bằng PT, bấm **File > Save** để chốt trạng thái sạch; đóng lại. Nếu PT hỏi lưu khi thoát, chọn **Không** sau khi đã save.
 - Kiểm tra `pt_health_check` (nếu dùng MCP): phải 0 link đứt, 0 IP trùng.
+- **SSH đã sẵn sàng:** `.pkt` đã sinh RSA key trên cả 15 thiết bị IOS bằng cú pháp đúng `crypto key generate rsa general-keys modulus 1024` + `write memory`, nên `ssh` chạy được ngay. Nếu thiết bị báo `SSH Disabled`, sinh lại key theo Plan-B ở KC-6.
 - Mở sẵn 2 tài liệu để fallback: `report/REPORT_vi.md` (bảng §6.1) và `docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md`.
 
 ### 1.2. Trước 30 phút (T-30')
@@ -374,7 +375,7 @@ show port-security interface fastEthernet0/1
 
 **Lời thoại:** « Mật khẩu enable được thống nhất thành `cisco123` trên **15 thiết bị IOS** (8 router + 7 switch); hash MD5 `$1$mERr$5.a6P4JqbNiMX01usIfka/` khớp trên cả 15 startup-config — đã kiểm bằng đọc lại config thật. Telnet bị chặn, chỉ SSH; có user local, banner, và port-security sticky/restrict ở 24 cổng access. »
 
-**Plan B:** nếu `ssh` từ R-CORE-MS không kết nối (RSA key chưa sinh sau reboot), chạy `crypto key generate rsa modulus 1024` trên thiết bị đích rồi thử lại — hoặc dẫn `pt_audit_security`.
+**Plan B:** nếu `ssh` từ R-CORE-MS không kết nối (thiết bị báo `SSH Disabled`), vào thiết bị đích: `conf t` → `ip domain-name hospital.local` → `crypto key generate rsa general-keys modulus 1024` → `end` → `write memory`, rồi thử lại. **Lưu ý cú pháp:** phải có `general-keys`; dạng rút gọn `crypto key generate rsa modulus 1024` bị PT 9.0.1 từ chối (`% Invalid input`). RSA key đã sinh sẵn trong `.pkt` nên bình thường không cần bước này.
 
 ### 4.11. Bảo mật mở rộng & giám sát (14:30–16:00)
 
@@ -389,10 +390,12 @@ show access-lists 160
 **Giám sát:** trên **FW-MAIN** hoặc **R-CORE-MS**:
 
 ```
-show running-config | include logging|netflow
+show running-config | include logging|flow
 ```
 
-**Lời thoại:** « Ngoài ACL khách, còn ACL cô lập camera: chỉ NVR giao tiếp với camera, không có đường ra Internet. NetFlow và syslog đẩy về SRV-LOG (10.0.16.5) làm nền cho IDS/IPS — đúng yêu cầu 'monitoring' của đề. »
+**Kết quả mong đợi (giám sát):** `flow exporter NF-TO-LOG` (destination `10.0.16.5`, udp 2055) + `ip flow-export destination 10.0.16.5 2055` (NetFlow v9, lấy mẫu ở interface LAN/WAN) và `logging 10.0.16.5` (syslog về SRV-LOG).
+
+**Lời thoại:** « Ngoài ACL khách, còn ACL cô lập camera: chỉ NVR giao tiếp với camera, không có đường ra Internet. NetFlow (`flow exporter NF-TO-LOG` + `ip flow-export destination 10.0.16.5 2055`) và syslog (`logging 10.0.16.5`) đẩy về SRV-LOG làm nền cho IDS/IPS — đúng yêu cầu 'monitoring' của đề. »
 
 **Plan B:** nếu lệnh `show` trả về ít dòng, dẫn Phụ lục B (best practice) trong report.
 
@@ -414,7 +417,7 @@ show running-config | include logging|netflow
 | `nslookup` timeout | DNS service chưa bind sau khi reboot server | Chờ 5–10 giây, gõ lại; hoặc ping trực tiếp IP server | "DNS cần vài giây khởi động lại dịch vụ sau reboot." |
 | LLaptop không nhận IP Wi-Fi | Chưa associate AP | Desktop > PC Wireless > Connect đúng SSID | "Laptop cần associate lại SSID; đây là bước client, không phải lỗi cấu hình." |
 | Tunnel GRE down sau failover | PT: GRE không tự chuyển next-hop khi route đổi | Reboot FW-MAIN + R-HOME (pt_device_power) | "Hạn chế của PT: GRE cần re-establish next-hop; đường dữ liệu vẫn đúng thiết kế." |
-| SSH từ router fail | RSA key chưa sinh sau reboot | `crypto key generate rsa modulus 1024` | "RSA key phải sinh lại sau reboot — một bước bảo trì bình thường." |
+| SSH từ router fail | RSA key chưa sinh sau reboot | `conf t` → `ip domain-name hospital.local` → `crypto key generate rsa general-keys modulus 1024` → `write memory` | "RSA key phải sinh lại sau reboot — một bước bảo trì bình thường. Cú pháp phải có `general-keys` mới đúng." |
 | Backup không nhậm sau cắt PVC | Route chưa hội tụ | Chờ 5–10 giây; `show ip route` xác nhận AD 200 | "Static route hội tụ tức thời; cho nó một nhịp." |
 | Bảng NAT không hiện dòng động | Ping chưa sinh traffic | Ping lại từ PC-A1 | "Bảng NAT chỉ hiện entry khi đã có phiên — ping vừa rồi tạo ra nó." |
 | Bất kỳ thao tác live lỗi nặng | - | Dẫn ảnh + file evidence | "Số đo này đã được ghi lại đầy đủ trong evidence; em xin trình bày bảng để đối chiếu." |

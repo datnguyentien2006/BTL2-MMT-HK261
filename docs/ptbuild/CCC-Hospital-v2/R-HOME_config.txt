@@ -1,10 +1,10 @@
 ! =====================================================================
-! CCC-Hospital v3 (dải 10.x) — R-HOME (Cisco 2911) — startup-config
-! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-11, sau đợt đổi subnet + khôi phục crypto sau reboot KC-8)
-! Vai trò: gateway nhân viên làm việc từ xa tại nhà — GRE tunnel về FW-MAIN
-! (crypto ISAKMP/IPsec giữ làm chứng cứ thiết kế; GRE là đường dữ liệu chạy được
-! trên simulator PT 9.0.1 — xem ghi chú kỹ thuật §5 report)
+! CCC-Hospital v3 (dáº£i 10.x) â€” R-HOME (Cisco 2911) â€” startup-config
+! xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt báº±ng pt_backup_config
+! (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet + khÃ´i phá»¥c crypto sau reboot KC-8)
+! Vai trÃ²: gateway nhÃ¢n viÃªn lÃ m viá»‡c tá»« xa táº¡i nhÃ  â€” GRE tunnel vá» FW-MAIN
+! (crypto ISAKMP/IPsec giá»¯ lÃ m chá»©ng cá»© thiáº¿t káº¿; GRE lÃ  Ä‘Æ°á»ng dá»¯ liá»‡u cháº¡y Ä‘Æ°á»£c
+! trÃªn simulator PT 9.0.1 â€” xem ghi chÃº ká»¹ thuáº­t Â§5 report)
 ! =====================================================================
 !
 version 15.1
@@ -125,6 +125,7 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
+logging 10.0.16.5
 line con 0
 !
 line aux 0

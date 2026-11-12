@@ -2,6 +2,29 @@
 
 Log chi tiết từng bước làm — song song với commit messages của repo.
 
+## 2026-11-12 (đợt 2) — Kiểm chứng lại kịch bản demo: sửa cú pháp RSA (SSH chạy thật) + cấu hình syslog/NetFlow
+
+- **Bối cảnh:** chạy lại **đúng kịch bản `docs/DEMO_SCRIPT.md`** trên `.pkt` đang mở để xem demo có thật
+  hoạt động không. Phát hiện 2 điểm tài liệu chưa khớp thực tế.
+- **KC-6 — SSH chạy thật:** lệnh sinh key ghi trong tài liệu (`crypto key generate rsa modulus 1024`)
+  **thiếu `general-keys`** nên bị PT 9.0.1 từ chối → `show ip ssh` = `SSH Disabled`. Cú pháp đúng:
+  **`crypto key generate rsa general-keys modulus 1024`**. Sinh key + `write memory` trên **15/15 thiết bị
+  IOS** → `SSH Enabled - version 2.0`; kiểm chứng live: R-CORE-MS `ssh -l admin 172.16.0.6` vào `FW-MAIN#`,
+  `telnet 172.16.0.6` bị từ chối. (RSA key bền qua power-cycle — đã thử.)
+- **Giám sát — cấu hình thật:** tài liệu tuyên bố syslog + NetFlow về SRV-LOG nhưng thiết bị không có.
+  Đã thêm `logging 10.0.16.5` trên 7 thiết bị IOS (FW-MAIN, R-CORE-MS, SW-CORE, GW-MAIN, GW-DBP, GW-BHTQ,
+  R-HOME) + NetFlow về SRV-LOG (`flow exporter NF-TO-LOG` udp 2055, `ip flow-export destination 10.0.16.5 2055`
+  trên FW-MAIN/R-CORE-MS; SW-CORE chỉ hỗ trợ `ip flow-export version 9`).
+- **Kiểm chứng lại 8/8 KC** đúng kịch bản: KC-1 (PC-A1→DNS/HIS/DMZ/PC-A2/PC-B1 4/4; CAM-01→NVR 4/4; nslookup
+  his=10.0.16.3), KC-2 (cắt PVC → 172.18.10.1 AD 200, liên trạm 4/4), KC-3 (NAT PAT + 3 static),
+  KC-4 (guest→LAN/DNS 0/4, →Internet 4/4), KC-5 (DMZ→LAN 0/4, →Internet 4/4), KC-6 (SSH OK/telnet chặn/
+  port-security/audit high=0), KC-7 (mobile 4/4), KC-8 (ISP1 off → GOLR 199.115.1.3, mobile+liên trạm sống,
+  PC-A1→Internet 0/4 theo giới hạn sim).
+- **Đồng bộ:** xuất lại 7 archive config (thêm syslog/NetFlow) từ `.pkt`; hash djb2 khớp live 9/9.
+  Sửa `docs/DEMO_SCRIPT.md` (Plan-B KC-6 + lệnh giám sát §4.11). Save `.pkt` (273.509 bytes).
+- **Render lại PDF kịch bản:** `download/BTL2_demo_script.pdf` in lại từ bản `DEMO_SCRIPT.md` đã sửa
+  (Markdown → HTML UTF-8 → Chrome headless print-to-pdf), **17 trang**, phông Việt hoá đúng.
+
 ## 2026-11-12 — Hoàn tất hardening (SSH/user/banner) + port-security + crypto; đo lại 8/8 KC
 
 - **Bối cảnh:** khi rehearsal demo, đọc lại startup-config live phát hiện `.pkt` **chưa** thực sự có

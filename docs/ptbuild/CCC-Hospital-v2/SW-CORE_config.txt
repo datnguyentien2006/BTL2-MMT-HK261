@@ -1,9 +1,9 @@
 ! =====================================================================
-! CCC-Hospital v3 (dải 10.x) — SW-CORE (Catalyst 3560-24PS, L3 switch)
-! — startup-config xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt
-! bằng pt_backup_config (2026-11-11, sau đợt đổi subnet toàn mô hình)
-! Vai trò: core L3(router-on-a-stick SVI VLAN10..60) + ACL guest(150),
-! CCTV(160), DMZ-IN (chiều ngược hạn chế DMZ vào nội bộ — KC-5)
+! CCC-Hospital v3 (dáº£i 10.x) â€” SW-CORE (Catalyst 3560-24PS, L3 switch)
+! â€” startup-config xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt
+! báº±ng pt_backup_config (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
+! Vai trÃ²: core L3(router-on-a-stick SVI VLAN10..60) + ACL guest(150),
+! CCTV(160), DMZ-IN (chiá»u ngÆ°á»£c háº¡n cháº¿ DMZ vÃ o ná»™i bá»™ â€” KC-5)
 ! =====================================================================
 !
 version 12.2(37)SE1
@@ -28,6 +28,12 @@ ip routing
 !
 username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
+!
+!
+flow exporter NF-TO-LOG
+ destination 10.0.16.5
+ source Vlan30
+ transport udp 2055
 !
 !
 !
@@ -172,6 +178,7 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
+logging 10.0.16.5
 line con 0
 !
 line aux 0

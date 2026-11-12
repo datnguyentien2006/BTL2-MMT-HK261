@@ -1,9 +1,9 @@
 ! =====================================================================
-! CCC-Hospital v3 (dải 10.x) — R-CORE-MS (Cisco 2911) — startup-config
-! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-11, sau đợt đổi subnet toàn mô hình)
-! Vai trò: router DHCP trung tâm Main Site (pool VLAN10/20/60 qua
-! ip helper-address từ SW-CORE) + routing giữa SW-CORE ↔ FW-MAIN/GW-MAIN
+! CCC-Hospital v3 (dáº£i 10.x) â€” R-CORE-MS (Cisco 2911) â€” startup-config
+! xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt báº±ng pt_backup_config
+! (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
+! Vai trÃ²: router DHCP trung tÃ¢m Main Site (pool VLAN10/20/60 qua
+! ip helper-address tá»« SW-CORE) + routing giá»¯a SW-CORE â†” FW-MAIN/GW-MAIN
 ! =====================================================================
 !
 version 15.1
@@ -47,6 +47,12 @@ no ipv6 cef
 !
 username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
+!
+!
+flow exporter NF-TO-LOG
+ destination 10.0.16.5
+ source GigabitEthernet0/1
+ transport udp 2055
 !
 license udi pid CISCO2911/K9 sn FTX1524ZB1X-
 !
@@ -100,7 +106,9 @@ ip route 10.0.1.0 255.255.255.0 172.16.0.1
 ip route 10.0.32.0 255.255.224.0 172.16.0.1 
 ip route 10.0.8.0 255.255.248.0 172.16.0.1 
 !
+ip flow-export destination 10.0.16.5 2055
 ip flow-export version 9
+ip flow-export source GigabitEthernet0/1
 !
 !
 !
@@ -109,6 +117,7 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
+logging 10.0.16.5
 line con 0
 !
 line aux 0

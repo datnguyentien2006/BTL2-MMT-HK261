@@ -1,10 +1,10 @@
 ! =====================================================================
-! CCC-Hospital v3 (dải 10.x) — FW-MAIN (Cisco 2911, securityk9)
-! — startup-config xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt
-! bằng pt_backup_config (2026-11-11, sau đợt đổi subnet + khôi phục
+! CCC-Hospital v3 (dáº£i 10.x) â€” FW-MAIN (Cisco 2911, securityk9)
+! â€” startup-config xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt
+! báº±ng pt_backup_config (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet + khÃ´i phá»¥c
 ! crypto sau reboot KC-8)
-! Vai trò: firewall-edge — NAT/PAT, static NAT DMZ 1:1(share IP),
-! GRE tunnel về R-HOME, 2 default route (ISP1 chính + floating AD 50 ISP2)
+! Vai trÃ²: firewall-edge â€” NAT/PAT, static NAT DMZ 1:1(share IP),
+! GRE tunnel vá» R-HOME, 2 default route (ISP1 chÃ­nh + floating AD 50 ISP2)
 ! =====================================================================
 !
 version 15.1
@@ -30,6 +30,12 @@ no ipv6 cef
 !
 username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
+!
+!
+flow exporter NF-TO-LOG
+ destination 10.0.16.5
+ source GigabitEthernet0/0
+ transport udp 2055
 !
 license udi pid CISCO2911/K9 sn FTX1524PCV3-
 license boot module c2900 technology-package securityk9
@@ -115,7 +121,9 @@ ip route 10.132.0.0 255.252.0.0 172.16.0.10
 ip route 10.127.128.0 255.255.255.0 10.254.0.2 
 ip route 0.0.0.0 0.0.0.0 199.115.1.2 
 !
+ip flow-export destination 10.0.16.5 2055
 ip flow-export version 9
+ip flow-export source GigabitEthernet0/1
 !
 !
 access-list 100 deny ip 10.0.0.0 0.255.255.255 10.127.128.0 0.0.0.255
@@ -127,6 +135,7 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 !
 !
+logging 10.0.16.5
 line con 0
 !
 line aux 0
