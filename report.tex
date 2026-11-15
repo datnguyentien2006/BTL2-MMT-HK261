@@ -257,13 +257,34 @@ Theo ước tính trung bình, mỗi site phụ cần khoảng 77 Mbps tải xu�
 
 \subsection{Sơ đồ tổng thể}
 
-Hình~\ref{fig:network-topology} thể hiện thiết kế logic của Main Site và hai site phụ DBP, BHTQ. Main Site là điểm tập trung định tuyến WAN, truy cập Internet và chính sách bảo mật; hai site phụ kết nối về trung tâm qua WAN và sử dụng các mạng riêng.
+Các sơ đồ dưới đây được xuất từ Draw.io; bản nguồn có thể chỉnh sửa nằm trong \texttt{report/CCC-Hospital-Diagrams/individual\_tabs}. Kiến trúc logic mô tả Main Site, hai trạm phụ và đường hầm teleworker; các sơ đồ vật lý phân rã Main Site, trạm phụ và WAN.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.82\textwidth,keepaspectratio]{graphics/topology.png}
-    \caption{Sơ đồ logic kết nối Main Site, DBP và BHTQ}
-    \label{fig:network-topology}
+    \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{report/CCC-Hospital-Diagrams/individual_tabs/2.5_Logical_Architecture.png}
+    \caption{Kiến trúc logic mạng bệnh viện}
+    \label{fig:logical-architecture}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{report/CCC-Hospital-Diagrams/individual_tabs/3.3_Main_Site_Physical.png}
+    \caption{Sơ đồ hạ tầng vật lý Main Site}
+    \label{fig:main-site-physical}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{report/CCC-Hospital-Diagrams/individual_tabs/3.4_Branch_Site_Design.png}
+    \caption{Kiến trúc các trạm phụ DBP và BHTQ}
+    \label{fig:branch-site-design}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{report/CCC-Hospital-Diagrams/individual_tabs/3.5_WAN_OSPF_Topology.png}
+    \caption{Kết nối WAN, OSPF và định tuyến dự phòng}
+    \label{fig:wan-ospf-topology}
 \end{figure}
 
 \subsection{Mạng LAN tại Main Site}
@@ -276,11 +297,11 @@ SERVER-FARM đặt các máy chủ nghiệp vụ và hạ tầng như DNS, HIS/R
 
 Hai site DBP và BHTQ sử dụng router WAN kết nối về Main Site qua các tuyến thuê riêng. OSPF là phương án định tuyến động trong thiết kế đề xuất; tuy nhiên, file mô phỏng \texttt{.pkt} không cấu hình OSPF mà dùng Frame Relay cho tuyến chính với static route AD 100 và floating static AD 200 trên đường serial dự phòng giữa GW-MAIN, GW-DBP và GW-BHTQ. Vì vậy, OSPF không phải cấu hình đã được kiểm thử trong mô hình. Khi triển khai thực tế có thể dùng MPLS/Ethernet hoặc SD-WAN theo dịch vụ nhà mạng; phương án định tuyến cần được xác nhận và kiểm thử theo hạ tầng được chọn.
 
-Hai kết nối DSL/ISP kết thúc tại biên Main Site. Router biên và firewall thực hiện cân bằng tải theo phiên/chính sách, NAT/PAT, lọc lưu lượng và failover. Mọi truy cập Internet từ các site phụ được định tuyến qua Main Site theo yêu cầu thiết kế. Cần lưu ý cân bằng tải nhiều WAN phân phối các phiên kết nối; nó không cộng băng thông cho một phiên đơn lẻ.
+Hai kết nối ISP kết thúc tại biên Main Site. Thiết kế đề xuất cân bằng tải theo phiên/chính sách, NAT/PAT, lọc lưu lượng và failover; mô hình Packet Tracer dùng ISP1 làm tuyến mặc định và floating static AD 50 qua ISP2, tức active/standby chứ chưa kiểm chứng cân bằng tải chủ động. Mọi truy cập Internet từ các site phụ được định tuyến qua Main Site theo yêu cầu thiết kế. Cân bằng tải nhiều WAN không cộng băng thông cho một phiên đơn lẻ.
 
 \subsection{VPN và mạng nhân viên từ xa}
 
-VPN site-to-site có thể được đề xuất để bảo vệ lưu lượng giữa Main Site và các site phụ khi đi qua mạng công cộng hoặc khi cần mã hóa bổ sung trên tuyến thuê riêng; kết nối này không có trong mô hình hiện tại. Mô hình chỉ triển khai VPN remote-access giữa FW-MAIN và R-HOME qua Tunnel0 với crypto map VPN-MOB. Người dùng từ xa được cấp địa chỉ từ một pool riêng, xác thực mạnh và chỉ truy cập các ứng dụng cần thiết theo vai trò.
+Mô hình triển khai đường hầm GRE-over-IPsec site-to-site giữa FW-MAIN và R-HOME, kết thúc trực tiếp tại FW-MAIN trên Tunnel0 (10.254.0.0/30). GRE được bảo vệ bằng IPsec (ESP-AES/ESP-SHA-HMAC) qua ISP2; LT-MOBILE1 dùng mạng nhà 10.127.128.0/24 và được định tuyến đến các dịch vụ nội bộ theo chính sách. VPN giữa các trạm phụ không được triển khai trong mô hình.
 
 \subsection{Dự phòng và giới hạn của sơ đồ}
 
@@ -305,7 +326,7 @@ Kiểm thử được thực hiện theo các tiêu chí: kết nối nội bộ
 
 \subsection{Kết quả kiểm thử thực tế}
 
-Các kịch bản KC-1--KC-8 được đo trực tiếp trên mô hình Packet Tracer ngày 2026-11-12. Kết quả chi tiết và bản ghi kiểm chứng được lưu tại \texttt{docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md}.
+Các kịch bản KC-1--KC-8 được đo trực tiếp trên mô hình Packet Tracer sau khi hoàn thiện các bản vá định tuyến, IPsec, Frame Relay LMI và hardening switch. Bản ghi kiểm chứng được lưu tại \texttt{docs/ptbuild/CCC-Hospital-v2/evidence-2026-11-11.md}.
 
 \begin{longtable}{@{}|l|p{0.82\textwidth}|@{}}
 \hline
@@ -316,21 +337,21 @@ Các kịch bản KC-1--KC-8 được đo trực tiếp trên mô hình Packet T
 \textbf{Kịch bản} & \textbf{Kết quả đo} \\
 \hline
 \endhead
-KC-1 & \textbf{ĐẠT} — PC-A1 đến DNS, HIS, web DMZ, PC-A2 cùng VLAN và PC-B1 khác VLAN đều 4/4; CAM-01 đến NVR 4/4; phân giải \texttt{his.hospital.local} trả về 10.0.16.3. \\
+KC-1 & \textbf{ĐẠT} — PC-A1 đến DNS, HIS, web DMZ, PC-A2 cùng VLAN và PC-B1 khác VLAN đều 4/4; CAM-01 đến NVR 4/4; DNS phân giải \texttt{www.hospital.local} thành 10.0.1.2. \\
 \hline
-KC-2 & \textbf{ĐẠT} — PC-DBP1 và PC-BHTQ1 đến HIS 4/4. Khi ngắt PVC DBP, next-hop chuyển từ 172.17.10.1 sang 172.18.10.1 (AD 200), kết nối vẫn 4/4; khôi phục PVC cũng 4/4. \\
+KC-2 & \textbf{ĐẠT} — \texttt{show frame-relay pvc} xác nhận DLCI 110/120 ACTIVE sau khi bật \texttt{keepalive 10}; PC-DBP1 và PC-BHTQ1 đến HIS đều 4/4. Khi ngắt PVC DBP, tuyến chuyển sang serial (AD 200; next-hop 172.18.10.1), PC-DBP1 vẫn 4/4; khôi phục PVC cũng 4/4. \\
 \hline
-KC-3 & \textbf{ĐẠT} — PC-A1 đến Internet 198.51.100.10 đạt 4/4; bảng NAT xác nhận PAT và static NAT đến web/mail DMZ. \\
+KC-3 & \textbf{ĐẠT} — PC-A1 và LT-GR-MS1 đến Internet 198.51.100.10 đều 4/4; bảng NAT xác nhận PAT và static NAT dùng IP 199.115.1.1 cho WEB (80/443) và MAIL (25). \\
 \hline
-KC-4 & \textbf{ĐẠT} — máy khách Wi-Fi đến PC-A1 và DNS qua ICMP đều 0/4; truy cập Internet đạt 4/4. \\
+KC-4 & \textbf{ĐẠT} — LT-GR-MS1 nhận địa chỉ VLAN 60; ACL chặn ICMP đến PC-A1, DNS và web DMZ (chỉ cho phép DNS UDP/53 và web TCP 80/443 theo chính sách); truy cập Internet đạt 4/4. \\
 \hline
-KC-5 & \textbf{ĐẠT} — LAN đến web DMZ đạt 4/4; web DMZ chủ động đến PC-A1 bị chặn (0/4), còn đến Internet đạt 4/4. \\
+KC-5 & \textbf{ĐẠT} — LAN đến web DMZ đạt 4/4; ACL \texttt{DMZ-IN} chặn web DMZ chủ động đến PC-A1 và HIS (0/4), còn lưu lượng DMZ đến Internet đạt 4/4. \\
 \hline
-KC-6 & \textbf{ĐẠT} — SSH đăng nhập FW-MAIN thành công; Telnet bị đóng, port-security hoạt động và kiểm tra bảo mật không còn lỗi mức cao. \\
+KC-6 & \textbf{ĐẠT} — 15 thiết bị IOS được harden với SSHv2 trên toàn bộ VTY 0--15, Telnet bị từ chối, port-security hoạt động và các cổng vật lý không sử dụng trên switch truy cập ở trạng thái \texttt{administratively down}; SSH vào SW-CORE thành công. \\
 \hline
-KC-7 & \textbf{ĐẠT} — LT-MOBILE1 đến DNS và HIS đạt 4/4 qua Tunnel0. \\
+KC-7 & \textbf{ĐẠT} — GRE-over-IPsec trên Tunnel0 giữa FW-MAIN và R-HOME hoạt động hai chiều; IPsec xác nhận ESP-AES/ESP-SHA-HMAC ACTIVE. LT-MOBILE1 đến DNS qua tunnel đạt 4/4. \\
 \hline
-KC-8 & \textbf{ĐẠT, có giới hạn mô phỏng} — khi tắt ISP1, default route chuyển sang next-hop ISP2 (AD 50); LT-MOBILE1 đến DNS/HIS và PC-DBP1 đến HIS đạt 4/4. PC-A1 đến Internet là 0/4 do giới hạn topology mô phỏng; sau khôi phục ISP1, kết nối đạt 4/4. \\
+KC-8 & \textbf{ĐẠT, có giới hạn mô phỏng} — khi tắt ISP1, default route chuyển sang ISP2 (AD 50); VPN của LT-MOBILE1 đến DNS/HIS và PC-DBP1 đến HIS vẫn đạt 4/4. Mạng Internet giả lập chỉ neo sau ISP1 nên không thể xác nhận đầy đủ truy cập Internet qua ISP2; đây là giới hạn topology, không phải kiểm chứng hai ISP hoạt động đồng thời. \\
 \hline
 \end{longtable}
 
