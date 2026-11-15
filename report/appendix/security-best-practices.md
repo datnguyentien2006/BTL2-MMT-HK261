@@ -129,7 +129,7 @@ ip source binding 001A.A1B2.C3D4 vlan 30 Gi0/5
 ### 14) Monitoring: syslog / NetFlow / SNMP
 
 - Syslog gửi về SRV-LOG (UDP 514 + TLS nếu có), định mức log: login/privilege escalation/port-security/VPN/denied ACL; đồng bộ giờ NTP từ server nội bộ (không đi ra Internet).
-- NetFlow (Flexible NetFlow v9/IPFIX) từ R-EDGE-MS + core switch → phân tích baseline lưu lượng, phát hiện exfiltration (tăng traffic bất thường lúc 2h sáng).
+- NetFlow (Flexible NetFlow v9/IPFIX) từ R-EDGE-MS + core switch (trong mô hình PT: **FW-MAIN, R-CORE-MS, SW-CORE → SRV-LOG `10.0.16.5`**) → phân tích baseline lưu lượng, phát hiện exfiltration (tăng traffic bất thường lúc 2h sáng).
 - SNMPv3 (authPriv, AES-128/SHA) + Zabbix/PRTG; hạn chế SNMPv2c; trap alert (link-down, CPU 80%, đĩa >85%, camera offline NVR).
 - Monitor: uptime core/edge, VPN tunnel state, OSPF neighbor, ISP latency, UPS, NVR FPS, server HIS response time.
 
@@ -174,6 +174,7 @@ crypto key generate rsa modulus 2048
 banner login @...@                     ! banner như mục B.1-3
 ```
 
+- Riêng trong Packet Tracer: RSA sinh bằng `crypto key generate rsa general-keys modulus 1024` (bắt buộc có `general-keys` — PT 9.0.1 từ chối cú pháp rút gọn); VTY khóa toàn bộ `line vty 0 15` (`transport input ssh`, `exec-timeout 5 0`); hash tài khoản/enable chỉ dùng **Type 5** (MD5) — Type 8/9 để dành cho thiết bị thật.
 - Switch access: hạn chế trunk, chỉ trunk các VLAN được phép; VLAN 1 không dùng → dùng Native VLAN khác (VLAN 999, shut).
 - Checklist kiểm bằng `pt_audit_security` (mô phỏng PT) hoặc audit script thật sau khi config.
 
@@ -186,10 +187,9 @@ IP camera x N ─┐
 NVR ────────── VLAN 50 ──┐
 Access switch ─TRUNK─┐   │
 R-CORE-MS ─┐         │   │
-R-WAN-MS  ─┤         │   │
-R-EDGE-MS ─┤  syslog (UDP 514) + NetFlow (v9) ──► SRV-LOG  ──► SIEM/Alert (email/SMS)
-L3 switch  ─┘                                 └─► Zabbix (SNMPv3) ──► Dashboard NOC 24/7
-NGFW (thực tế) ─ bổ sung log ──► SRV-LOG
+FW-MAIN   ─┤  syslog (UDP 514) + NetFlow (v9) ──► SRV-LOG  ──► SIEM/Alert (email/SMS)
+SW-CORE   ─┘                                 └─► Zabbix (SNMPv3) ──► Dashboard NOC 24/7
+(thiết kế thật: R-WAN-MS/R-EDGE-MS + NGFW cũng gửi log ──► SRV-LOG)
 ```
 
 > Tài liệu này dùng chung cho thiết kế thật & mô phỏng; mục B.3 là phần hardening

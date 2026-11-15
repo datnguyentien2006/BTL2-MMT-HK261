@@ -1,10 +1,12 @@
 # PHỤ LỤC A — CẤU HÌNH VPN ĐỀ XUẤT (thiết bị THẬT)
 
 > **Lưu ý quan trọng:** Các cấu hình dưới đây là **cấu hình mẫu cho thiết bị vật lý thật**
-> (ISR 4331 / ISR 4451 / NGFW) theo thiết kế Step 1–3. Đây **KHÔNG phải cấu hình đang chạy
-> trong mô hình Packet Tracer hiện tại** — Packet Tracer không hỗ trợ đầy đủ
-> crypto isakmp/IPsec/GRE. Trong mô phỏng, đường liên trạm dùng PVC Frame Relay + serial
-> backup với static route AD 100/200; VPN/IPsec chỉ được **thiết kế ở đây để triển khai thực tế**.
+> (ISR 4331 / ISR 4451 / NGFW) theo thiết kế Step 1–3 — **không phải toàn bộ** cấu hình đang
+> chạy trong mô hình Packet Tracer. Hiện trạng mô phỏng: **teleworker GRE-over-IPsec đã chạy
+> thật** (`Tunnel0` FW-MAIN ↔ R-HOME, overlay `10.254.0.0/30` — KC-7 ĐẠT, xem Phụ lục C.3);
+> đường liên trạm Main↔DBP/BHTQ trong `.pkt` dùng PVC Frame Relay + serial backup với static
+> route AD 100/200. Các mục A.1–A.4 dưới đây vẫn là **cấu hình đề xuất để triển khai trên
+> thiết bị thật**.
 >
 > **Bảng IP áp dụng:** Phụ lục này viết theo **bảng IP chốt v3 (dải 10.x, 2026-11-11)** —
 > giống hệt mô hình Packet Tracer (§2.2/§5.4 báo cáo chính): Main `10.0.64.0/19` (Tòa A),
@@ -248,10 +250,10 @@ exit
 ### A.4.1 Phương án (a) — Remote-access IPsec theo chuẩn IOS (EzVPN legacy / NAT-T)
 
 Client VPN tool cũ (Cisco VPN Client, iOS VPN config, hoặc OS X IKEv2):
-Gateway: R-EDGE-MS (thiết bị thật là NGFW) hoặc R-WAN-MS, mở cổng udp/500 + udp/4500 (IPsec NAT-T).
+Gateway: **FW-MAIN** (thiết bị thật là NGFW; trong mô hình `.pkt`, VPN teleworker chấm dứt tại FW-MAIN — `Tunnel0`, KC-7 ĐẠT), mở cổng udp/500 + udp/4500 (IPsec NAT-T).
 
 ```ios
-! ============ R-EDGE-MS (thiết bị thật: NGFW đảm nhiệm vai này; dưới đây là thể hiện IOS) ============
+! ============ FW-MAIN (thiết bị thật: NGFW đảm nhiệm vai này; dưới đây là thể hiện IOS) ============
 ! --- 1) ISAKMP client ---
 crypto isakmp enable
 crypto isakmp policy 20

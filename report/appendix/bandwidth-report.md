@@ -100,10 +100,16 @@ Con số 250 Mbps trong báo cáo làm tròn từ công suất 62 × 4 Mbps. VLA
 ### A. Đo link WAN theo CLI
 
 ```ios
-show interfaces GigabitEthernet0/0/1
+show interfaces GigabitEthernet0/0/0
 show interfaces Serial0/1/0
-show ip ospf neighbor
+show frame-relay pvc
+show ip route
 ```
+
+> Trong mô hình PT (`.pkt` hiện tại): đo trên **GW-MAIN** — `Serial0/1/0` (PVC Frame Relay
+> DLCI 110 mô phỏng EPL DBP) và `Serial0/1/1` (DLCI 120, BHTQ); routing liên trạm là
+> **static AD 100/200**, không chạy OSPF trong `.pkt` — `show frame-relay pvc` +
+> `show ip route` thay cho `show ip ospf neighbor` của thiết kế thật.
 
 Thu thập các chỉ số:
 
@@ -145,7 +151,7 @@ Trong Packet Tracer, nếu Traffic Generator/iperf không hỗ trợ cho model t
 Lưu hai loại bằng chứng:
 
 1. Screenshot CLI `show interfaces` trước và sau traffic burst.
-2. Screenshot Simulation mode/counters thể hiện packet loss, latency hoặc ECMP/OSPF failover.
+2. Screenshot Simulation mode/counters thể hiện packet loss, latency hoặc failover đường backup serial (floating static AD 200).
 
 Tên file gợi ý:
 
@@ -154,8 +160,8 @@ Tên file gợi ý:
 - `BW-03-BHTQ-WAN.png`
 - `BW-04-GUEST-NAT.png`
 - `BW-05-CCTV-NVR.png`
-- `BW-CLI-R-WAN-MS.png`
+- `BW-CLI-GW-MAIN.png`
 
 ## D.8 Khẳng định cần tránh
 
-Không ghi rằng hệ thống đã đạt một mức Mbps cụ thể nếu chưa chạy traffic trong PT và lưu counters. Không gọi ước tính là kết quả đo. Không ghi IPsec đã vận hành nếu file `.pkt` không hỗ trợ hoặc không có tunnel/output SA.
+Không ghi rằng hệ thống đã đạt một mức Mbps cụ thể nếu chưa chạy traffic trong PT và lưu counters. Không gọi ước tính là kết quả đo. Không ghi IPsec đã vận hành nếu không có bằng chứng tunnel/output SA — bằng chứng hiện có: GRE-over-IPsec `Tunnel0` FW-MAIN ↔ R-HOME (KC-7, xem Phụ lục C.3); liên trạm Main↔DBP/BHTQ trong `.pkt` vẫn là Frame Relay + static.

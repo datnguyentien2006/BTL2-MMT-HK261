@@ -25,7 +25,7 @@ Lặp lại ma trận cho LAN trạm phụ DBP `10.128.0.0/14` và BHTQ `10.132.
 - Kiểm tra camera/NVR tại VLAN 50 có truy cập DNS và syslog theo policy.
 - Kiểm tra VLAN Guest, Staff và Internet không truy cập trực tiếp VLAN 50.
 - Nếu camera không hỗ trợ ping, dùng DHCP/DNS HTTP hoặc trạng thái giao tiếp trong Packet Tracer.
-- Trên R-CORE-MS chạy `show access-lists CCTV-OUT`; chụp kết quả counters sau khi test deny.
+- Trên SW-CORE chạy `show access-lists 160` (ACL CCTV bind trên Vlan50); chụp kết quả counters sau khi test deny.
 - Chụp topology, bảng trạng thái camera/NVR và trang giám sát.
 
 Gợi ý tên ảnh:
@@ -36,11 +36,14 @@ Gợi ý tên ảnh:
 
 ## C.3 VPN/IPsec
 
-Packet Tracer hiện tại không chạy VPN/IPsec như phần thiết bị vật lý thật. Kết quả bắt buộc trong mô hình chính là:
+Trong mô hình `.pkt` hiện tại, **teleworker GRE-over-IPsec đã triển khai thật** (`Tunnel0` FW-MAIN ↔ R-HOME, overlay `10.254.0.0/30`) và được kiểm chứng qua KC-7 — không còn là "chỉ thiết kế".
 
-- OSPF liên site hoạt động qua EPL.
-- Serial/backup path được chỉ ra trong thiết kế nhưng không chấp nhận thay cho cấu hình crypto thực tế nếu bản .pkt không hỗ trợ.
-- Tài liệu VPN thực tế nằm trong `vpn-configs.md` và phải ghi rõ đây là cấu hình đề xuất, chưa triển khai trong Packet Tracer.
+Kết quả bắt buộc trong mô hình chính:
+
+- `show crypto ipsec sa` trên FW-MAIN: SA GRE (`prot 47`, `esp-aes esp-sha-hmac`) **ACTIVE** cả `inbound`/`outbound` esp sas, `#pkts encaps`/`#pkts encrypt` tăng đồng bộ.
+- Ping từ `LT-MOBILE1` (10.127.128.10) → SRV-DNS (10.0.16.2) / SRV-HIS (10.0.16.3) đạt, `TTL=124`, 0% loss (traffic đi trong tunnel GRE, chấm dứt tại FW-MAIN).
+- Liên trạm DBP/BHTQ: PVC Frame Relay static AD 100 + serial backup floating AD 200, LMI `keepalive 10` — `show frame-relay pvc` cho DLCI 110/120 `STATUS = ACTIVE` (**không chạy OSPF trong mô phỏng**; static thay cho OSPF multi-area của thiết kế thật).
+- Site-to-site IPsec Main ↔ DBP/BHTQ (A.1/A.2 `vpn-configs.md`) là cấu hình **đề xuất cho thiết bị thật**, chưa dựng trong Packet Tracer — phải ghi rõ như vậy khi trình bày.
 
 Máy phải kiểm tra trong thiết bị thật hoặc môi trường bổ sung:
 
@@ -50,13 +53,13 @@ Máy phải kiểm tra trong thiết bị thật hoặc môi trường bổ sung
 | Phase 2 IPsec            | Security association có encrypted/decrypted packets    |
 | Ping Main ↔ DBP qua VPN  | Đạt qua đường EPL hoặc backup                          |
 | Ping Main ↔ BHTQ qua VPN | Đạt qua đường EPL hoặc backup                          |
-| Teleworker ↔ LAN nội bộ  | Chỉ mạng được phép truy cập                            |
+| Teleworker ↔ LAN nội bộ  | Chỉ mạng được phép truy cập (đạt trong `.pkt` — KC-7)  |
 | Đứt EPL                  | Traffic chuyển sang backup/alternate path theo routing |
 
 ## C.4 B3 cleanup trước nộp
 
-- [ ] Xuất `show access-lists` từ R-CORE-MS, R-DBP và R-BHTQ.
-- [ ] Lưu `show ip ospf neighbor` cho liên site.
+- [ ] Xuất `show access-lists` từ FW-MAIN (DMZ-IN/guest), SW-CORE (ACL 150/160) và GW-DBP/GW-BHTQ.
+- [ ] Lưu bằng chứng routing liên site: `show ip route` (static PVC AD 100 + backup AD 200) và `show frame-relay pvc` (DLCI 110/120 `ACTIVE`, LMI `keepalive 10`).
 - [ ] Kiểm tra `show ip interface brief` trên ba router guest/VLAN.
 - [ ] Đặt tên ảnh theo bảng trên, không dùng tên chung như `test1.png`.
 - [ ] Lưu cấu hình bằng `write memory` trên mỗi router/switch.
