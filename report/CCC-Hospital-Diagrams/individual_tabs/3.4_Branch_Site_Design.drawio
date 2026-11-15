@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-11-15T01:19:00.000Z" agent="Gemini Diagram Generator" version="24.7.17" type="device">
+  <diagram id="page_branch" name="3. So do tram phu DBP-BHTQ (3.4)">
+    <mxGraphModel dx="1422" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1280" pageHeight="780" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="node_2" value="&lt;b&gt;KIẾN TRÚC CHUẨN TRẠM PHỤ — DBP STREET &amp;amp; BHTQ STREET (NHÂN BẢN 2 SITE)&lt;/b&gt;&lt;br/&gt;&lt;span style='font-weight:normal;font-size:10px;'&gt;Quy mô mỗi trạm: Tòa 2 tầng | 260 Workstations | 2 Servers | 7 Camera IP | ≥ 5 Thiết bị mạng&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#0F172A;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=13;fontStyle=1;fontColor=#FFFFFF;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1200" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_3" value="MAIN SITE — TP.HCM&#10;GW-MAIN / R-WAN-MS&#10;&#10;PVC DBP: 172.17.10.1/30&#10;PVC BHTQ: 172.17.20.1/30&#10;Backup: 172.18.10.1 / .20.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#1E3A8A;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_4" value="TRẠM PHỤ: DBP STREET (10.128.0.0/14)  |  BHTQ STREET (10.132.0.0/14)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=12;fontStyle=1;fontColor=#065F46;" vertex="1" parent="1">
+          <mxGeometry x="430" y="95" width="810" height="610" as="geometry" />
+        </mxCell>
+        <mxCell id="node_5" value="Router Biên Trạm Phụ&#10;GW-DBP / GW-BHTQ (ISR 4331)&#10;&#10;S0/1/0 (Chính): 172.17.x.2/30&#10;S0/1/1 (Backup): 172.18.x.2/30&#10;Gateway LAN: 10.128.0.1 / 10.132.0.1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#064E3B;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="465" y="250" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="node_6" value="Switch Tập Trung &amp;amp; Access&#10;SW-DBP / SW-BHTQ&#10;(Catalyst 9200L-48P PoE+)&#10;&#10;Port-Security Sticky/Restrict&#10;Khóa cổng trống (Shutdown)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A7F3D0;strokeColor=#047857;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#064E3B;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="775" y="250" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="node_7" value="Mạng Nhân Viên (VLAN 61/71)&#10;260 Workstations (PC-DBP/BHTQ)&#10;Truy cập HIS/PACS về Main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#059669;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#0F172A;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="135" width="190" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="node_8" value="Máy Chủ Cục Bộ (VLAN 62/72)&#10;2 Servers (SRV-DBP-1 / BHTQ-1 .10)&#10;Local Cache &amp;amp; Print/File" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#0C4A6E;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="235" width="190" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="node_9" value="Wi-Fi Nội Bộ &amp;amp; Khách (VLAN 63/73)&#10;Access Point Wi-Fi 6 (PoE+)&#10;Guest tách biệt ACL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9C3;strokeColor=#CA8A04;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#713F12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="335" width="190" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="node_10" value="Giám Sát An Ninh (CCTV)&#10;7 Camera IP 4MP + 1× NVR 8-ch&#10;Lưu trữ cục bộ 14 ngày (RAID-5)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#475569;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#1E293B;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="435" width="190" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="node_11" value="Hạ tầng nguồn &amp;amp; bảo vệ: UPS 10kVA + Chống sét SPD + Tiếp đất ≤ 4Ω (Không đặt Firewall riêng — Tập trung tại FW-MAIN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#78350F;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="465" y="450" width="510" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_12" value="MPLS EPL 300Mbps / FR PVC&#10;Static AD 100 (Keepalive 10s)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=2.2;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_3" target="node_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_13" value="Serial Backup (NIM-2T)&#10;Floating Static AD 200" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#EA580C;strokeWidth=1.8;dashed=1;dashPattern=6 4;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_3" target="node_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_14" value="1GbE / 10GbE&#10;Trunk" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_5" target="node_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.6;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=1.5;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

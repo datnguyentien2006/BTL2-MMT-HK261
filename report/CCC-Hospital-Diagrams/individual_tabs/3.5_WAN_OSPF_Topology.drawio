@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-11-15T01:19:00.000Z" agent="Gemini Diagram Generator" version="24.7.17" type="device">
+  <diagram id="page_wan" name="4. So do WAN &amp; OSPF (3.5)">
+    <mxGraphModel dx="1422" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1360" pageHeight="820" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="node_2" value="&lt;b&gt;SƠ ĐỒ KẾT NỐI WAN, FRAME RELAY LMI &amp;amp; ĐỊNH TUYẾN DỰ PHÒNG&lt;/b&gt;&lt;br/&gt;&lt;span style='font-weight:normal;font-size:10px;'&gt;Thiết kế thực tế: OSPF Multi-Area (Area 0, 1, 2) | Mô phỏng PT: Frame Relay PVC (AD 100) + Serial Backup (AD 200)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#0F172A;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=13;fontStyle=1;fontColor=#FFFFFF;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1280" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_3" value="OSPF AREA 0 — BACKBONE (MAIN SITE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=12;fontStyle=1;fontColor=#1E3A8A;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="400" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="node_4" value="R-CORE-MS / SW-CORE&#10;Mạng nội bộ Main: 10.0.0.0/16&#10;(VLAN 10, 20, 30, 40, 50, 60)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#1E3A8A;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="165" width="260" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="node_5" value="FW-MAIN (172.16.0.9)&#10;Default Route → ISP1 (AD 1) / ISP2 (AD 50)&#10;VPN Mobile: 10.127.128.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#7F1D1D;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="265" width="260" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="node_6" value="GW-MAIN / R-WAN-MS (ABR)&#10;&#10;• S0/1/0 (FR Main): 172.17.10.1/30 [DLCI 110]&#10;• S0/1/1 (FR Main): 172.17.20.1/30 [DLCI 120]&#10;• S0/2/0 (Backup): 172.18.10.1/30&#10;• S0/2/1 (Backup): 172.18.20.1/30&#10;• LMI Keepalive: 10s (ACTIVE)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E7FF;strokeColor=#4F46E5;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#312E81;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="85" y="390" width="310" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_7" value="172.16.0.4/30" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_4" target="node_5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_8" value="172.16.0.8/30" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F46E5;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_5" target="node_6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cloud_9" value="MPLS EPL (Thực tế)&#10;/ FR-CLOUD (PT)&#10;&#10;PVC 1: DLCI 110 ↔ 101&#10;PVC 2: DLCI 120 ↔ 102&#10;LMI Status: ACTIVE" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=1.5;fontSize=12;fontStyle=1;fontColor=#92400E;" vertex="1" parent="1">
+          <mxGeometry x="530" y="200" width="260" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="node_10" value="&lt;b&gt;ĐƯỜNG DỰ PHÒNG SERIAL (NIM-2T)&lt;/b&gt;&lt;br/&gt;&lt;span style='font-weight:normal;font-size:10px;'&gt;• OSPF Cost cao / Floating Static &lt;b&gt;AD 200&lt;/b&gt;&lt;br/&gt;• Tự động tiếp quản ngay khi LMI phát hiện đứt PVC chính&lt;br/&gt;• Sẵn sàng nâng cấp SD-WAN Overlay (GRE/IPsec + BFD)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#7C2D12;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="525" y="535" width="270" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_11" value="OSPF AREA 1 — TRẠM PHỤ DBP STREET" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=12;fontStyle=1;fontColor=#065F46;" vertex="1" parent="1">
+          <mxGeometry x="880" y="110" width="440" height="255" as="geometry" />
+        </mxCell>
+        <mxCell id="node_12" value="GW-DBP (10.128.0.0/14)&#10;&#10;• S0/1/0 (FR Chính): 172.17.10.2/30 [DLCI 101 | Keepalive 10s]&#10;• S0/1/1 (Serial Backup): 172.18.10.2/30&#10;• Default Route chính: via 172.17.10.1 (AD 100)&#10;• Default Route dự phòng: via 172.18.10.1 (AD 200)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#064E3B;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="915" y="160" width="370" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="grp_13" value="OSPF AREA 2 — TRẠM PHỤ BHTQ STREET" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=12;fontStyle=1;fontColor=#065F46;" vertex="1" parent="1">
+          <mxGeometry x="880" y="415" width="440" height="255" as="geometry" />
+        </mxCell>
+        <mxCell id="node_14" value="GW-BHTQ (10.132.0.0/14)&#10;&#10;• S0/1/0 (FR Chính): 172.17.20.2/30 [DLCI 102 | Keepalive 10s]&#10;• S0/1/1 (Serial Backup): 172.18.20.2/30&#10;• Default Route chính: via 172.17.20.1 (AD 100)&#10;• Default Route dự phòng: via 172.18.20.1 (AD 200)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1FAE5;strokeColor=#059669;strokeWidth=1.5;verticalAlign=middle;align=center;fontSize=10;fontStyle=1;fontColor=#064E3B;spacing=6;" vertex="1" parent="1">
+          <mxGeometry x="915" y="465" width="370" height="175" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_15" value="S0/1/0 &amp;amp; S0/1/1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D97706;strokeWidth=2;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.1;entryY=0.6;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="cloud_9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_16" value="172.17.10.0/30&#10;(AD 100)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;exitX=0.9;exitY=0.35;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="cloud_9" target="node_12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_17" value="172.17.20.0/30&#10;(AD 100)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;exitX=0.85;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="cloud_9" target="node_14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="825" y="312" />
+              <mxPoint x="825" y="526" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_18" value="Backup 172.18.10.0/30 (AD 200)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#EA580C;strokeWidth=1.8;dashed=1;dashPattern=6 4;exitX=1;exitY=0.65;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="481" />
+              <mxPoint x="465" y="390" />
+              <mxPoint x="855" y="390" />
+              <mxPoint x="855" y="291" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_19" value="Backup 172.18.20.0/30 (AD 200)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#EA580C;strokeWidth=1.8;dashed=1;dashPattern=6 4;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;fontColor=#1E293B;labelBackgroundColor=#FFFFFF;endArrow=block;endFill=1;" edge="1" parent="1" source="node_6" target="node_14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465" y="509" />
+              <mxPoint x="465" y="650" />
+              <mxPoint x="855" y="650" />
+              <mxPoint x="855" y="596" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
