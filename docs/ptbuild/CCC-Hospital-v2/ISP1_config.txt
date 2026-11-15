@@ -1,9 +1,10 @@
 ! =====================================================================
 ! CCC-Hospital v3 (dải 10.x) — ISP1 (Cisco 2911) — startup-config
 ! xuất trực tiếp từ simulation/CCC-Hospital-v2.pkt bằng pt_backup_config
-! (2026-11-11, sau đợt đổi subnet toàn mô hình)
+! (2026-11-15, sau đợt đổi subnet toàn mô hình)
 ! Vai trò: ISP "Internet A" — phủ 198.51.100.0/24 (SRV-INT) + transit về ISP2
 ! =====================================================================
+!
 !
 version 15.1
 no service timestamps log datetime msec

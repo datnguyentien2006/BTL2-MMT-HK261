@@ -1,11 +1,12 @@
 ! =====================================================================
 ! CCC-Hospital v3 (dáº£i 10.x) â€” R-HOME (Cisco 2911) â€” startup-config
 ! xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt báº±ng pt_backup_config
-! (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet + khÃ´i phá»¥c crypto sau reboot KC-8)
+! (2026-11-15, sau Ä‘á»£t Ä‘á»•i subnet + khÃ´i phá»¥c crypto sau reboot KC-8)
 ! Vai trÃ²: gateway nhÃ¢n viÃªn lÃ m viá»‡c tá»« xa táº¡i nhÃ  â€” GRE tunnel vá» FW-MAIN
 ! (crypto ISAKMP/IPsec giá»¯ lÃ m chá»©ng cá»© thiáº¿t káº¿; GRE lÃ  Ä‘Æ°á»ng dá»¯ liá»‡u cháº¡y Ä‘Æ°á»£c
 ! trÃªn simulator PT 9.0.1 â€” xem ghi chÃº ká»¹ thuáº­t Â§5 report)
 ! =====================================================================
+!
 !
 version 15.1
 no service timestamps log datetime msec
@@ -118,7 +119,7 @@ ip flow-export version 9
 !
 access-list 101 deny ip 10.127.128.0 0.0.0.255 10.0.0.0 0.255.255.255
 access-list 101 permit ip 10.127.128.0 0.0.0.255 any
-access-list 130 permit ip 10.127.128.0 0.0.0.255 10.0.0.0 0.255.255.255
+access-list 130 permit gre host 203.0.113.2 host 199.115.1.1
 !
 banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !

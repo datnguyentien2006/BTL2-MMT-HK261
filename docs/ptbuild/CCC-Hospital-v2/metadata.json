@@ -14,6 +14,7 @@
     "Giữ nguyên: transit 172.16.0.4/30 + 172.16.0.8/30, FR 172.17.10/20, serial backup 172.18.10/20, public 199.115.1.0/29, Internet 198.51.100.0/24 + 203.0.113.0/30, GRE overlay 10.254.0.0/30.",
     "Crypto ISAKMP/IPsec FW-MAIN ↔ R-HOME bị PT mất khi reboot (quirk KC-8) — đã khôi phục đầy đủ ngày 2026-11-11 (policy 10 aes/sha/pre-share, key Vpn2025Str0ng, TS-MOB/TS-HOSP, map VPN-MOB/VPN-HOSP + binding interface).",
     "Cập nhật 2026-11-12: hoàn tất hardening (username/ip ssh/transport input ssh/banner MOTD trên 15 thiết bị IOS) + port-security 24 cổng access; config archive xuất lại từ .pkt cùng ngày (djb2 khớp live toàn bộ 9 thiết bị).",
+    "Cập nhật 2026-11-15: xuất lại toàn bộ 9 config từ .pkt hiện hành (bản 277.302 bytes, commit 2b01a3c) bằng pt_backup_config; đối chiếu FNV-1a khớp byte-exact 9/9 thiết bị với startup-config live. Khác biệt so với bản 2026-11-12: ACL 120 (FW-MAIN) và 130 (R-HOME) đúng là permit GRE giữa 2 peer, thêm route 203.0.113.0/30 trên FW-MAIN, bỏ no keepalive trên serial FR của 3 gateway.",
     "Khác biệt so với archive v1: đổi tên/router model (GW-MAIN = ISR4331), WAN Frame Relay + serial backup thay cho EPL Ethernet, VPN chấm trên FW-MAIN, DHCP tổng về R-CORE-MS."
   ],
   "devices_exported": [

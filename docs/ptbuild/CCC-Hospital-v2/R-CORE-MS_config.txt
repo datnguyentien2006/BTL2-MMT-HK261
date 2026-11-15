@@ -1,10 +1,11 @@
 ! =====================================================================
 ! CCC-Hospital v3 (dáº£i 10.x) â€” R-CORE-MS (Cisco 2911) â€” startup-config
 ! xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt báº±ng pt_backup_config
-! (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
+! (2026-11-15, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
 ! Vai trÃ²: router DHCP trung tÃ¢m Main Site (pool VLAN10/20/60 qua
 ! ip helper-address tá»« SW-CORE) + routing giá»¯a SW-CORE â†” FW-MAIN/GW-MAIN
 ! =====================================================================
+!
 !
 version 15.1
 no service timestamps log datetime msec

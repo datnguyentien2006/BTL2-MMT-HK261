@@ -1,10 +1,11 @@
 ! =====================================================================
 ! CCC-Hospital v3 (dáº£i 10.x) â€” SW-CORE (Catalyst 3560-24PS, L3 switch)
 ! â€” startup-config xuáº¥t trá»±c tiáº¿p tá»« simulation/CCC-Hospital-v2.pkt
-! báº±ng pt_backup_config (2026-11-11, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
+! báº±ng pt_backup_config (2026-11-15, sau Ä‘á»£t Ä‘á»•i subnet toÃ n mÃ´ hÃ¬nh)
 ! Vai trÃ²: core L3(router-on-a-stick SVI VLAN10..60) + ACL guest(150),
 ! CCTV(160), DMZ-IN (chiá»u ngÆ°á»£c háº¡n cháº¿ DMZ vÃ o ná»™i bá»™ â€” KC-5)
 ! =====================================================================
+!
 !
 version 12.2(37)SE1
 no service timestamps log datetime msec
@@ -28,12 +29,6 @@ ip routing
 !
 username admin privilege 15 secret 5 $1$mERr$5.a6P4JqbNiMX01usIfka/
 !
-!
-!
-flow exporter NF-TO-LOG
- destination 10.0.16.5
- source Vlan30
- transport udp 2055
 !
 !
 !
@@ -180,10 +175,16 @@ banner motd #CCC HOSPITAL NETWORK - AUTHORIZED ACCESS ONLY#
 !
 logging 10.0.16.5
 line con 0
+ exec-timeout 5 0
 !
 line aux 0
 !
 line vty 0 4
+ exec-timeout 5 0
+ login local
+ transport input ssh
+line vty 5 15
+ exec-timeout 5 0
  login local
  transport input ssh
 !
